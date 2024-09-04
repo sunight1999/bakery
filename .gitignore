@@ -1,4 +1,4 @@
-# Visual Studio 2015 user specific files
+﻿# Visual Studio 2015 user specific files
 .vs/
 
 # Compiled Object files
@@ -47,7 +47,7 @@ SourceArt/**/*.tga
 
 # Binary Files
 Binaries/*
-Plugins/**/Binaries/*
+Plugins/*/Binaries/*
 
 # Builds
 Build/*
@@ -68,7 +68,15 @@ Saved/*
 
 # Compiled source files for the engine to use
 Intermediate/*
-Plugins/**/Intermediate/*
+Plugins/*/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+
+
+
+# Megascan Assets
+Content/Megascans/*
+
+# External Assets
+Content/External
