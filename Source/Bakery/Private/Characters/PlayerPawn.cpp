@@ -9,6 +9,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "Interactions/InteractorComponent.h"
+
 APlayerPawn::APlayerPawn()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -20,7 +22,8 @@ APlayerPawn::APlayerPawn()
 	CharacterMovementComponent->bOrientRotationToMovement = true;
 	CharacterMovementComponent->RotationRate = FRotator(0.f, 1080.f, 0.f);
 
-	World = GetWorld();
+	Interactor = CreateDefaultSubobject<UInteractorComponent>(TEXT("Interactor"));
+	Interactor->SetupAttachment(RootComponent);
 }
 
 void APlayerPawn::BeginPlay()
@@ -46,9 +49,14 @@ void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	verify(MoveAction);
+	verify(InteractAction);
+
 	if (UEnhancedInputComponent* EnhancedInput = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		EnhancedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerPawn::Move);
+		EnhancedInput->BindAction(InteractAction, ETriggerEvent::Started, Interactor, &UInteractorComponent::BeginInteraction);
+		EnhancedInput->BindAction(InteractAction, ETriggerEvent::Completed, Interactor, &UInteractorComponent::EndInteraction);
 	}
 }
 
@@ -59,16 +67,3 @@ void APlayerPawn::Move(const FInputActionValue& Value)
 	AddMovementInput(FVector::ForwardVector, MovementValue.Y);
 	AddMovementInput(FVector::RightVector, MovementValue.X);
 }
-
-/*bool APlayerPawn::DetectObstacles(FVector Direction, FHitResult& HitResult)
-{
-	//FVector Start = GetActorLocation() + FVector::UpVector * ObstacleDetectHeight;
-	//FVector End = Start + Direction * ObstacleDetectDistance;
-	//ECollisionChannel TraceChannel = ECollisionChannel::ECC_GameTraceChannel1;
-
-	//DrawDebugLine(World, Start, End, FColor::Red, true);
-
-	//return World->LineTraceSingleByChannel(HitResult, Start, End, TraceChannel);
-	return true;
-}*/
-

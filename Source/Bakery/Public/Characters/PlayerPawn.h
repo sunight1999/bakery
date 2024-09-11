@@ -6,10 +6,10 @@
 #include "GameFramework/Character.h"
 #include "PlayerPawn.generated.h"
 
-class UCapsuleComponent;
+struct FInputActionValue;
 class UInputMappingContext;
 class UInputAction;
-struct FInputActionValue;
+class UInteractorComponent;
 
 UCLASS()
 class BAKERY_API APlayerPawn : public ACharacter
@@ -27,18 +27,22 @@ protected:
 
 	void Move(const FInputActionValue& Value);
 
-	UPROPERTY(EditAnywhere, Category="Movement")
+	UPROPERTY(EditAnywhere, Category="Player Movement")
 	UInputMappingContext* InputMappingContext;
 
-	UPROPERTY(EditAnywhere, Category = "Movement")
+	UPROPERTY(EditAnywhere, Category = "Player Movement")
 	UInputAction* MoveAction;
 
+	UPROPERTY(EditAnywhere, Category = "Interactor")
+	UInputAction* InteractAction;
+
+	UPROPERTY(EditAnywhere, Category = "Interactor")
+	UInteractorComponent* Interactor;
+
 private:
-	UPROPERTY(EditAnywhere, Category = "Movement")
+	UPROPERTY(EditAnywhere, Category = "Player Movement")
 	float TurnSpeed = 3.f;
 
-	UPROPERTY(EditAnywhere, Category = "Movement")
+	UPROPERTY(EditAnywhere, Category = "Player Movement")
 	float MeshTurnOffset = -90.f;
-
-	const UWorld* World;
 };
