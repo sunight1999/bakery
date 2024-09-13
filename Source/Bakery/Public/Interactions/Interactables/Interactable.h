@@ -14,8 +14,8 @@ class UInteractable : public UInterface
 };
 
 /**
- * ��ȣ�ۿ� �̺�Ʈ�� ��ϵǴ� ��� �������̽�
- * - ���� �� UFUNCTION(BlueprintCallable) ��ũ�θ� �߰��ؾ� ��
+ * 상호작용 이벤트에 등록되는 기능 인터페이스
+ * - 구현 시 UFUNCTION(BlueprintCallable) 매크로를 추가해야 함
  */
 class BAKERY_API IInteractable
 {

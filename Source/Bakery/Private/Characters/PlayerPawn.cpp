@@ -15,7 +15,7 @@ APlayerPawn::APlayerPawn()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	// Ä³¸¯ÅÍ ÀÌµ¿½Ã ¹Ð¸®´Â Á¶ÀÛ°¨À» ¾ø¾Ö±â À§ÇØ °¡¼Óµµ Á¦°Å
+	// ìºë¦­í„° ì´ë™ì‹œ ë°€ë¦¬ëŠ” ì¡°ìž‘ê°ì„ ì—†ì• ê¸° ìœ„í•´ ê°€ì†ë„ ì œê±°
 	UCharacterMovementComponent* CharacterMovementComponent = GetCharacterMovement();
 	CharacterMovementComponent->MaxAcceleration = 2048000.f;
 	CharacterMovementComponent->BrakingDecelerationWalking = 2048000.f;

@@ -1,8 +1,10 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "TestActor.h"
 #include "Interactions/Interactables/InteractableComponent.h"
+
+// 제거 예정
 
 ATestActor::ATestActor()
 {

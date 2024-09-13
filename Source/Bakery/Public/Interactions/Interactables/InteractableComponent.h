@@ -19,11 +19,11 @@ public:
 	UInteractableComponent();
 
 	UPROPERTY(BlueprintAssignable, Category = "Interactions")
-	FOnEnterInteractDelegate OnEnterInteractDelegate;
+	FOnEnterInteractDelegate OnEnterInteractDelegate;	// 상호작용 키를 눌렀을 때 콜백
 
 	UPROPERTY(BlueprintAssignable, Category="Interactions")
-	FOnInteractDelegate OnInteractDelegate;
+	FOnInteractDelegate OnInteractDelegate;	// 상호작용 키를 누르고 있을 때 콜백
 
 	UPROPERTY(BlueprintAssignable, Category = "Interactions")
-	FOnExitInteractDelegate OnExitInteractDelegate;
+	FOnExitInteractDelegate OnExitInteractDelegate;	// 상호작용 키를 뗐을 때 콜백
 };
