@@ -3,14 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
-#include "Interactions/Interactables/Interactable.h"
+#include "Interactions/Interactables/InteractableActor.h"
 #include "TestActor.generated.h"
 
-class UInteractableComponent;
-
 UCLASS()
-class BAKERY_API ATestActor : public AActor, public IInteractable
+class BAKERY_API ATestActor : public AInteractableActor
 {
 	GENERATED_BODY()
 	
@@ -18,19 +15,13 @@ public:
 	ATestActor();
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION(BlueprintCallable)
-	void OnEnterInteract() override;
-
-	UFUNCTION(BlueprintCallable)
+	void OnEnterInteract(const FInteractionInfo& InteractionInfo) override;
 	void OnInteract() override;
-
-	UFUNCTION(BlueprintCallable)
 	void OnExitInteract() override;
 
 protected:
 	virtual void BeginPlay() override;
 
 private:
-	UPROPERTY(VisibleAnywhere)
-	UInteractableComponent* Interactable;
+
 };

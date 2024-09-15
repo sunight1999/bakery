@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -27,7 +27,11 @@ protected:
 
 	void Move(const FInputActionValue& Value);
 
-	UPROPERTY(EditAnywhere, Category="Player Movement")
+private:
+	/*
+	 * Input Actions
+	 */
+	UPROPERTY(EditAnywhere, Category = "Player Movement")
 	UInputMappingContext* InputMappingContext;
 
 	UPROPERTY(EditAnywhere, Category = "Player Movement")
@@ -37,9 +41,11 @@ protected:
 	UInputAction* InteractAction;
 
 	UPROPERTY(EditAnywhere, Category = "Interactor")
+	UInputAction* ThrowAction;
+
+	UPROPERTY(VisibleAnywhere, Category = "Interactor")
 	UInteractorComponent* Interactor;
 
-private:
 	UPROPERTY(EditAnywhere, Category = "Player Movement")
 	float TurnSpeed = 3.f;
 

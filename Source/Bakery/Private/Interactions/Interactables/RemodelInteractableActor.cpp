@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
+#include "Interactions/Interactables/RemodelInteractableActor.h"
 #include "Interactions/Interactables/InteractableComponent.h"
 #include "Interactions/InteractionDefines.h"
 
-UInteractableComponent::UInteractableComponent()
+ARemodelInteractableActor::ARemodelInteractableActor()
 {
-	PrimaryComponentTick.bCanEverTick = false;
-	ComponentTags.Add(INTERACTABLE_COMPONENT_SIMPLE);
+	Interactable->ComponentTags.Add(INTERACTABLE_COMPONENT_REMODEL);
 }

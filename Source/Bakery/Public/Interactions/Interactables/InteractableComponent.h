@@ -6,7 +6,9 @@
 #include "Components/ActorComponent.h"
 #include "InteractableComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEnterInteractDelegate);
+struct FInteractionInfo;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEnterInteractDelegate, const FInteractionInfo&, InteractionInfo);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInteractDelegate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnExitInteractDelegate);
 

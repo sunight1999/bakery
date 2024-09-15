@@ -6,6 +6,8 @@
 #include "UObject/Interface.h"
 #include "Interactable.generated.h"
 
+struct FInteractionInfo;
+
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
 class UInteractable : public UInterface
@@ -22,7 +24,7 @@ class BAKERY_API IInteractable
 	GENERATED_BODY()
 
 public:
-	virtual void OnEnterInteract() = 0;
+	virtual void OnEnterInteract(const FInteractionInfo& InteractionInfo) = 0;
 	virtual void OnInteract() = 0;
 	virtual void OnExitInteract() = 0;
 };
