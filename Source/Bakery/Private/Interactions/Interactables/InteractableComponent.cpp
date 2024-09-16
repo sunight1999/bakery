@@ -7,5 +7,4 @@
 UInteractableComponent::UInteractableComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
-	ComponentTags.Add(INTERACTABLE_COMPONENT_SIMPLE);
 }

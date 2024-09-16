@@ -8,9 +8,9 @@
 /*
  * Interactable Component 태그
  */
-#define INTERACTABLE_COMPONENT_SIMPLE TEXT("simple")
-#define INTERACTABLE_COMPONENT_GRAB TEXT("grab")
-#define INTERACTABLE_COMPONENT_REMODEL TEXT("remodel")
+#define INTERACTABLE_COMPONENT_REMODELABLE TEXT("remodel")
+#define INTERACTABLE_COMPONENT_GRABBALE TEXT("grab")
+#define INTERACTABLE_COMPONENT_KEEPABLE TEXT("keep")
 
  /*
   * Interaction 정보

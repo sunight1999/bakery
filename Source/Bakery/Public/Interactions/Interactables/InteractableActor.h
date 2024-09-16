@@ -30,7 +30,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(VisibleAnywhere, Category = "Interactions")
+	UPROPERTY(VisibleAnywhere, Category = "Interaction")
 	UInteractableComponent* Interactable;
 
 private:

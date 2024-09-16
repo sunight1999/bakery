@@ -23,6 +23,8 @@ public:
 	virtual void OnExitInteract() override;
 
 protected:
+	UPROPERTY(VisibleAnywhere, Category="Interaction|Grab")
+	UStaticMeshComponent* StaticMesh;
 
 private:
 

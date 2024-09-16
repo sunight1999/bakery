@@ -31,24 +31,24 @@ private:
 	/*
 	 * Input Actions
 	 */
-	UPROPERTY(EditAnywhere, Category = "Player Movement")
+	UPROPERTY(EditAnywhere, Category = "Player|Movement")
 	UInputMappingContext* InputMappingContext;
 
-	UPROPERTY(EditAnywhere, Category = "Player Movement")
+	UPROPERTY(EditAnywhere, Category = "Player|Movement")
 	UInputAction* MoveAction;
 
-	UPROPERTY(EditAnywhere, Category = "Interactor")
+	UPROPERTY(EditAnywhere, Category = "Player|Interaction")
 	UInputAction* InteractAction;
 
-	UPROPERTY(EditAnywhere, Category = "Interactor")
+	UPROPERTY(EditAnywhere, Category = "Player|Interaction")
 	UInputAction* ThrowAction;
 
-	UPROPERTY(VisibleAnywhere, Category = "Interactor")
+	UPROPERTY(VisibleAnywhere, Category = "Player|Interaction")
 	UInteractorComponent* Interactor;
 
-	UPROPERTY(EditAnywhere, Category = "Player Movement")
+	UPROPERTY(EditAnywhere, Category = "Player|Movement")
 	float TurnSpeed = 3.f;
 
-	UPROPERTY(EditAnywhere, Category = "Player Movement")
+	UPROPERTY(EditAnywhere, Category = "Player|Movement")
 	float MeshTurnOffset = -90.f;
 };

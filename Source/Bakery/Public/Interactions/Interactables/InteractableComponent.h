@@ -20,12 +20,12 @@ class BAKERY_API UInteractableComponent : public UActorComponent
 public:	
 	UInteractableComponent();
 
-	UPROPERTY(BlueprintAssignable, Category = "Interactions")
+	UPROPERTY(BlueprintAssignable, Category = "Interaction")
 	FOnEnterInteractDelegate OnEnterInteractDelegate;	// 상호작용 키를 눌렀을 때 콜백
 
-	UPROPERTY(BlueprintAssignable, Category="Interactions")
+	UPROPERTY(BlueprintAssignable, Category="Interaction")
 	FOnInteractDelegate OnInteractDelegate;	// 상호작용 키를 누르고 있을 때 콜백
 
-	UPROPERTY(BlueprintAssignable, Category = "Interactions")
+	UPROPERTY(BlueprintAssignable, Category="Interaction")
 	FOnExitInteractDelegate OnExitInteractDelegate;	// 상호작용 키를 뗐을 때 콜백
 };

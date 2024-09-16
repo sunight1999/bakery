@@ -44,12 +44,6 @@ void UInteractorComponent::BeginInteraction()
 			return;
 		}
 
-		// Grab Interactable인 경우 PhysicsHandle을 이용해 잡기
-		if (Interactable->ComponentHasTag(INTERACTABLE_COMPONENT_GRAB))
-		{
-			Grabber->Grab(HitResult);
-		}
-
 		CurrentInteractable = Interactable;
 		CurrentInteractable->OnEnterInteractDelegate.Broadcast(FInteractionInfo(this, HitResult));
 		IsInteracting = true;

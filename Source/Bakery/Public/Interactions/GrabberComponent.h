@@ -18,18 +18,20 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void Grab(FHitResult HitResult);
+	void Grab(UPrimitiveComponent* Primitive, const FVector& ImpactPoint);
 	void ReleaseBegin();
 	void Release();
 
 	bool IsGrabbing();
+	UPrimitiveComponent* GetGrabbed();
 
 protected:
 	virtual void BeginPlay() override;
 
 private:
-	UPROPERTY(VisibleAnywhere, Category = "Interactor")
+	UPROPERTY(VisibleAnywhere, Category = "Interaction|Grabber")
 	UPhysicsHandleComponent* PhysicsHandle;
 
-	UPROPERTY(VisibleAnywhere, Category = "Interactor")
+	UPROPERTY(VisibleAnywhere, Category = "Interaction|Grabber")
 	USceneComponent* GrabPoint;
 };

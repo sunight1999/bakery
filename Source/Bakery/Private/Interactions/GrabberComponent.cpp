@@ -39,16 +39,23 @@ void UGrabberComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 
 void UGrabberComponent::Grab(FHitResult HitResult)
 {
-	UPrimitiveComponent* PrimitiveComponent = HitResult.GetComponent();
-	PrimitiveComponent->WakeAllRigidBodies();
+	UPrimitiveComponent* Primitive = HitResult.GetComponent();
+	const FVector& ImpactPoint = HitResult.ImpactPoint;
+
+	Grab(Primitive, ImpactPoint);
+}
+
+void UGrabberComponent::Grab(UPrimitiveComponent* Primitive, const FVector& ImpactPoint)
+{
+	Primitive->WakeAllRigidBodies();
 
 	// 잡고 있는 오브젝트가 Interactor의 트레이스에 걸리지 않도록 Collision 설정 변경
-	PrimitiveComponent->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	Primitive->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 
 	PhysicsHandle->GrabComponentAtLocationWithRotation(
-		PrimitiveComponent,
+		Primitive,
 		NAME_None,
-		HitResult.ImpactPoint,
+		ImpactPoint,
 		GrabPoint->GetComponentRotation()
 	);
 }
@@ -73,7 +80,9 @@ void UGrabberComponent::Release()
 
 	if (Interactable)
 	{
-		if (Interactable->ComponentHasTag(INTERACTABLE_COMPONENT_GRAB))
+		// 놓기 버튼 기능 구현을 IReleasable 인터페이스 만들어서 Interactable이 구현하게 변경하기
+
+		if (Interactable->ComponentHasTag(INTERACTABLE_COMPONENT_GRABBALE))
 		{
 			// 놓기 버튼 누른 시간에 따라 강도 조절
 
@@ -81,7 +90,7 @@ void UGrabberComponent::Release()
 			return;
 		}
 
-		if (Interactable->ComponentHasTag(INTERACTABLE_COMPONENT_REMODEL))
+		if (Interactable->ComponentHasTag(INTERACTABLE_COMPONENT_REMODELABLE))
 		{
 			// 해당 위치에 오브젝트 설치
 
@@ -101,5 +110,10 @@ void UGrabberComponent::Release()
 bool UGrabberComponent::IsGrabbing()
 {
 	return PhysicsHandle->GetGrabbedComponent() != nullptr;
+}
+
+UPrimitiveComponent* UGrabberComponent::GetGrabbed()
+{
+	return PhysicsHandle->GetGrabbedComponent();
 }
 
