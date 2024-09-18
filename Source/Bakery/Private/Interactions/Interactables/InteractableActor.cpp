@@ -2,6 +2,8 @@
 
 
 #include "Interactions/Interactables/InteractableActor.h"
+#include "Components/BoxComponent.h"
+
 #include "Interactions/Interactables/InteractableComponent.h"
 #include "Interactions/InteractionDefines.h"
 
@@ -13,6 +15,10 @@ AInteractableActor::AInteractableActor()
 	Interactable->OnEnterInteractDelegate.AddDynamic(this, &AInteractableActor::OnEnterInteract);
 	Interactable->OnInteractDelegate.AddDynamic(this, &AInteractableActor::OnInteract);
 	Interactable->OnExitInteractDelegate.AddDynamic(this, &AInteractableActor::OnExitInteract);
+
+	InteractionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("InteractionBox"));
+	InteractionBox->SetupAttachment(RootComponent);
+	InteractionBox->SetCollisionProfileName(TEXT("Interactable"));
 }
 
 void AInteractableActor::BeginPlay()

@@ -24,17 +24,25 @@ void UInteractorComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (IsInteracting)
+	if (bIsInteracting)
 	{
 		CurrentInteractable->OnInteractDelegate.Broadcast();
+	}
+	else if (bIsGrabbing)
+	{
+		CurrentInteractable->OnGrabDelegate.Broadcast();
 	}
 }
 
 void UInteractorComponent::BeginInteraction()
 {
+	if (bIsGrabbing)
+	{
+		return;
+	}
+
 	FHitResult HitResult;
-	
-	if (DetectInteractable(HitResult))
+	if (DetectInteractable(InteractTraceChannel, HitResult))
 	{
 		UE_LOG(LogTemp, Display, TEXT("%s"), *HitResult.GetActor()->GetActorNameOrLabel());
 
@@ -46,22 +54,67 @@ void UInteractorComponent::BeginInteraction()
 
 		CurrentInteractable = Interactable;
 		CurrentInteractable->OnEnterInteractDelegate.Broadcast(FInteractionInfo(this, HitResult));
-		IsInteracting = true;
+		bIsInteracting = true;
 	}
 }
 
 void UInteractorComponent::EndInteraction()
 {
+	if (bIsGrabbing)
+	{
+		return;
+	}
+
 	if (CurrentInteractable)
 	{
 		CurrentInteractable->OnExitInteractDelegate.Broadcast();
 		CurrentInteractable = nullptr;
 	}
 
-	IsInteracting = false;
+	bIsInteracting = false;
 }
 
-bool UInteractorComponent::DetectInteractable(FHitResult& OutHitResult)
+void UInteractorComponent::BeginGrab()
+{
+	if (bIsInteracting)
+	{
+		return;
+	}
+
+	FHitResult HitResult;
+	if (DetectInteractable(GrabTraceChannel, HitResult))
+	{
+		UE_LOG(LogTemp, Display, TEXT("%s"), *HitResult.GetActor()->GetActorNameOrLabel());
+
+		auto Interactable = HitResult.GetActor()->GetComponentByClass<UInteractableComponent>();
+		if (!Interactable)
+		{
+			return;
+		}
+
+		CurrentInteractable = Interactable;
+		CurrentInteractable->OnEnterGrabDelegate.Broadcast(FInteractionInfo(this, HitResult));
+		bIsGrabbing = true;
+	}
+}
+
+void UInteractorComponent::EndGrab()
+{
+	if (bIsInteracting)
+	{
+		return;
+	}
+
+	if (CurrentInteractable)
+	{
+		CurrentInteractable->OnExitGrabDelegate.Broadcast();
+		CurrentInteractable = nullptr;
+	}
+
+	bIsGrabbing = false;
+}
+
+bool UInteractorComponent::DetectInteractable(const TEnumAsByte<ECollisionChannel>& TraceChannel, FHitResult& OutHitResult)
 {
 	FVector Start = GetComponentLocation() + FVector::UpVector * DetectHeight;
 	FVector End = Start + GetForwardVector() * DetectDistance;

@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Interactions/Interactables/Interactable.h"
+#include "Interact.h"
 #include "InteractableActor.generated.h"
 
 class UInteractableComponent;
+class UBoxComponent;
 
 UCLASS()
-class BAKERY_API AInteractableActor : public AActor, public IInteractable
+class BAKERY_API AInteractableActor : public AActor, public IInteract
 {
 	GENERATED_BODY()
 	
@@ -33,6 +34,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Interaction")
 	UInteractableComponent* Interactable;
 
-private:
-
+	UPROPERTY(VisibleAnywhere, Category = "Interaction")
+	UBoxComponent* InteractionBox;
 };

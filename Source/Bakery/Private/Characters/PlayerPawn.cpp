@@ -52,15 +52,15 @@ void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 	verify(MoveAction);
 	verify(InteractAction);
-	verify(ThrowAction);
+	verify(GrabAction);
 
 	if (UEnhancedInputComponent* EnhancedInput = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		EnhancedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerPawn::Move);
 		EnhancedInput->BindAction(InteractAction, ETriggerEvent::Started, Interactor, &UInteractorComponent::BeginInteraction);
 		EnhancedInput->BindAction(InteractAction, ETriggerEvent::Completed, Interactor, &UInteractorComponent::EndInteraction);
-		EnhancedInput->BindAction(ThrowAction, ETriggerEvent::Started, Interactor->GetGrabber(), &UGrabberComponent::ReleaseBegin);
-		EnhancedInput->BindAction(ThrowAction, ETriggerEvent::Completed, Interactor->GetGrabber(), &UGrabberComponent::Release);
+		EnhancedInput->BindAction(GrabAction, ETriggerEvent::Started, Interactor, &UInteractorComponent::BeginGrab);
+		EnhancedInput->BindAction(GrabAction, ETriggerEvent::Completed, Interactor, &UInteractorComponent::EndGrab);
 	}
 }
 

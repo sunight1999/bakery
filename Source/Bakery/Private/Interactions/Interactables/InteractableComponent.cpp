@@ -2,7 +2,6 @@
 
 
 #include "Interactions/Interactables/InteractableComponent.h"
-#include "Interactions/InteractionDefines.h"
 
 UInteractableComponent::UInteractableComponent()
 {

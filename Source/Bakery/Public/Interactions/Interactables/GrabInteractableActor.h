@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Interactions/Interactables/InteractableActor.h"
+#include "Grab.h"
 #include "GrabInteractableActor.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class BAKERY_API AGrabInteractableActor : public AInteractableActor
+class BAKERY_API AGrabInteractableActor : public AInteractableActor, public IGrab
 {
 	GENERATED_BODY()
 	
@@ -18,14 +19,16 @@ public:
 	AGrabInteractableActor();
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void OnEnterInteract(const FInteractionInfo& InteractionInfo) override;
-	virtual void OnInteract() override;
-	virtual void OnExitInteract() override;
+	UFUNCTION(BlueprintCallable)
+	virtual void OnEnterGrab(const FInteractionInfo& InteractionInfo) override;
 
-protected:
-	UPROPERTY(VisibleAnywhere, Category="Interaction|Grab")
-	UStaticMeshComponent* StaticMesh;
+	UFUNCTION(BlueprintCallable)
+	virtual void OnGrab() override;
+
+	UFUNCTION(BlueprintCallable)
+	virtual void OnExitGrab() override;
 
 private:
-
+	UPROPERTY(EditAnywhere, Category="Interaction|Remodel")
+	bool bIsRemodelable = false;
 };

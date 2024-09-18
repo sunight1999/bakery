@@ -8,9 +8,8 @@
 
 struct FInteractionInfo;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEnterInteractDelegate, const FInteractionInfo&, InteractionInfo);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInteractDelegate);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnExitInteractDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInteractionInfoDelegate, const FInteractionInfo&, InteractionInfo);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInteractionDelegate);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class BAKERY_API UInteractableComponent : public UActorComponent
@@ -20,12 +19,27 @@ class BAKERY_API UInteractableComponent : public UActorComponent
 public:	
 	UInteractableComponent();
 
+	/*
+	 * 상호작용 델리게이트
+	 */
 	UPROPERTY(BlueprintAssignable, Category = "Interaction")
-	FOnEnterInteractDelegate OnEnterInteractDelegate;	// 상호작용 키를 눌렀을 때 콜백
+	FInteractionInfoDelegate OnEnterInteractDelegate;	// 상호작용 키를 눌렀을 때 콜백
 
 	UPROPERTY(BlueprintAssignable, Category="Interaction")
-	FOnInteractDelegate OnInteractDelegate;	// 상호작용 키를 누르고 있을 때 콜백
+	FInteractionDelegate OnInteractDelegate;	// 상호작용 키를 누르고 있을 때 콜백
 
 	UPROPERTY(BlueprintAssignable, Category="Interaction")
-	FOnExitInteractDelegate OnExitInteractDelegate;	// 상호작용 키를 뗐을 때 콜백
+	FInteractionDelegate OnExitInteractDelegate;	// 상호작용 키를 뗐을 때 콜백
+
+	/*
+	 * 잡기 델리게이트
+	 */
+	UPROPERTY(BlueprintAssignable, Category = "Interaction")
+	FInteractionInfoDelegate OnEnterGrabDelegate;	// 상호작용 키를 눌렀을 때 콜백
+
+	UPROPERTY(BlueprintAssignable, Category = "Interaction")
+	FInteractionDelegate OnGrabDelegate;	// 상호작용 키를 누르고 있을 때 콜백
+
+	UPROPERTY(BlueprintAssignable, Category = "Interaction")
+	FInteractionDelegate OnExitGrabDelegate;	// 상호작용 키를 뗐을 때 콜백
 };

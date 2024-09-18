@@ -5,7 +5,6 @@
 #include "PhysicsEngine/PhysicsHandleComponent.h"
 
 #include "Interactions/Interactables/InteractableComponent.h"
-#include "Interactions/InteractionDefines.h"
 
 UGrabberComponent::UGrabberComponent()
 {
@@ -78,6 +77,7 @@ void UGrabberComponent::Release()
 
 	Grabbed->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
+	/*
 	if (Interactable)
 	{
 		// 놓기 버튼 기능 구현을 IReleasable 인터페이스 만들어서 Interactable이 구현하게 변경하기
@@ -102,6 +102,7 @@ void UGrabberComponent::Release()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("InteractableComponent가 존재하지 않는 Actor(%s)를 잡고 있습니다."), *GrabbedOwner->GetActorNameOrLabel());
 	}
+	*/
 
 	PhysicsHandle->ReleaseComponent();
 	return;

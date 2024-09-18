@@ -12,8 +12,6 @@
 
 ACountertop::ACountertop()
 {
-	Interactable->ComponentTags.Add(INTERACTABLE_COMPONENT_KEEPABLE);
-
 	BottomSupportMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BottomSupportMesh"));
 	BottomSupportMesh->SetupAttachment(InteractionBox);
 
@@ -35,10 +33,29 @@ void ACountertop::Tick(float DeltaTime)
 {
 }
 
+/*
+ * Interaction Functions
+ */
 void ACountertop::OnEnterInteract(const FInteractionInfo& InteractionInfo)
 {
-	Super::OnEnterInteract(InteractionInfo);
+	UE_LOG(LogTemp, Display, TEXT("INTERACT ENTER"));
+}
 
+void ACountertop::OnInteract()
+{
+	UE_LOG(LogTemp, Display, TEXT("INTERACTING"));
+}
+
+void ACountertop::OnExitInteract()
+{
+	UE_LOG(LogTemp, Display, TEXT("ITNERACT EXIT"));
+}
+
+/*
+ * Grab Interaction Functions
+ */
+void ACountertop::OnEnterGrab(const FInteractionInfo& InteractionInfo)
+{
 	UGrabberComponent* Grabber = InteractionInfo.Interactor->GetGrabber();
 	UPrimitiveComponent* Grabbed = Grabber->GetGrabbed();
 
@@ -86,10 +103,12 @@ void ACountertop::OnEnterInteract(const FInteractionInfo& InteractionInfo)
 	}
 }
 
-void ACountertop::OnInteract()
+void ACountertop::OnGrab()
 {
+	UE_LOG(LogTemp, Display, TEXT("GRABBING"));
 }
 
-void ACountertop::OnExitInteract()
+void ACountertop::OnExitGrab()
 {
+	UE_LOG(LogTemp, Display, TEXT("GRAB EXIT"));
 }

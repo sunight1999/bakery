@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Interactions/Interactables/RemodelInteractableActor.h"
+#include "Interactions/Interactables/GrabInteractableActor.h"
 #include "Countertop.generated.h"
 
 /**
@@ -11,7 +11,7 @@
  * - 썰기 등 기본적인 손질 가능
  */
 UCLASS()
-class BAKERY_API ACountertop : public ARemodelInteractableActor
+class BAKERY_API ACountertop : public AGrabInteractableActor
 {
 	GENERATED_BODY()
 	
@@ -22,6 +22,10 @@ public:
 	virtual void OnEnterInteract(const FInteractionInfo& InteractionInfo) override;
 	virtual void OnInteract() override;
 	virtual void OnExitInteract() override;
+
+	virtual void OnEnterGrab(const FInteractionInfo& InteractionInfo) override;
+	virtual void OnGrab() override;
+	virtual void OnExitGrab() override;
 
 protected:
 	virtual void BeginPlay() override;

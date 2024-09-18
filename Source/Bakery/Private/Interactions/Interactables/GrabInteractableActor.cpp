@@ -2,18 +2,18 @@
 
 
 #include "Interactions/Interactables/GrabInteractableActor.h"
+#include "Components/BoxComponent.h"
+
 #include "Interactions/InteractionDefines.h"
-#include "Interactions/InteractorComponent.h"
-#include "Interactions/GrabberComponent.h"
 #include "Interactions/Interactables/InteractableComponent.h"
 
 AGrabInteractableActor::AGrabInteractableActor()
 {
-	Interactable->ComponentTags.Add(INTERACTABLE_COMPONENT_GRABBALE);
+	Interactable->OnEnterGrabDelegate.AddDynamic(this, &AGrabInteractableActor::OnEnterGrab);
+	Interactable->OnGrabDelegate.AddDynamic(this, &AGrabInteractableActor::OnGrab);
+	Interactable->OnExitGrabDelegate.AddDynamic(this, &AGrabInteractableActor::OnExitGrab);
 
-	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
-	StaticMesh->SetupAttachment(RootComponent);
-	StaticMesh->SetSimulatePhysics(true);
+	InteractionBox->SetCollisionProfileName(TEXT("Grabbable"));
 }
 
 void AGrabInteractableActor::Tick(float DeltaTime)
@@ -21,20 +21,17 @@ void AGrabInteractableActor::Tick(float DeltaTime)
 
 }
 
-void AGrabInteractableActor::OnEnterInteract(const FInteractionInfo& InteractionInfo)
+void AGrabInteractableActor::OnEnterGrab(const FInteractionInfo& InteractionInfo)
 {
-	// Interactor가 이 Interactable Actor를 잡도록 함
-	FHitResult HitResult = InteractionInfo.HitResult;
-	UGrabberComponent* Grabber = InteractionInfo.Interactor->GetGrabber();
-	Grabber->Grab(HitResult);
+	unimplemented();
 }
 
-void AGrabInteractableActor::OnInteract()
+void AGrabInteractableActor::OnGrab()
 {
-
+	unimplemented();
 }
 
-void AGrabInteractableActor::OnExitInteract()
+void AGrabInteractableActor::OnExitGrab()
 {
-
+	unimplemented();
 }

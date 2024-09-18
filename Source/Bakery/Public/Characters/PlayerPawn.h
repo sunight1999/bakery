@@ -41,7 +41,7 @@ private:
 	UInputAction* InteractAction;
 
 	UPROPERTY(EditAnywhere, Category = "Player|Interaction")
-	UInputAction* ThrowAction;
+	UInputAction* GrabAction;
 
 	UPROPERTY(VisibleAnywhere, Category = "Player|Interaction")
 	UInteractorComponent* Interactor;
