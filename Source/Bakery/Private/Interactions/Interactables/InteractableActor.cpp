@@ -9,7 +9,7 @@
 
 AInteractableActor::AInteractableActor()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	Interactable = CreateDefaultSubobject<UInteractableComponent>(TEXT("Interactable"));
 	Interactable->OnEnterInteractDelegate.AddDynamic(this, &AInteractableActor::OnEnterInteract);
@@ -17,7 +17,7 @@ AInteractableActor::AInteractableActor()
 	Interactable->OnExitInteractDelegate.AddDynamic(this, &AInteractableActor::OnExitInteract);
 
 	InteractionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("InteractionBox"));
-	InteractionBox->SetupAttachment(RootComponent);
+	RootComponent = InteractionBox;
 	InteractionBox->SetCollisionProfileName(TEXT("Interactable"));
 }
 
@@ -26,10 +26,6 @@ void AInteractableActor::BeginPlay()
 	Super::BeginPlay();
 }
 
-void AInteractableActor::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
 
 void AInteractableActor::OnEnterInteract(const FInteractionInfo& InteractionInfo)
 {

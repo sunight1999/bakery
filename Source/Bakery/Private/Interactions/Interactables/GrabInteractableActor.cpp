@@ -9,16 +9,16 @@
 
 AGrabInteractableActor::AGrabInteractableActor()
 {
+	InteractionBox->SetCollisionProfileName(TEXT("Grabbable"));
+
 	Interactable->OnEnterGrabDelegate.AddDynamic(this, &AGrabInteractableActor::OnEnterGrab);
 	Interactable->OnGrabDelegate.AddDynamic(this, &AGrabInteractableActor::OnGrab);
 	Interactable->OnExitGrabDelegate.AddDynamic(this, &AGrabInteractableActor::OnExitGrab);
-
-	InteractionBox->SetCollisionProfileName(TEXT("Grabbable"));
 }
 
-void AGrabInteractableActor::Tick(float DeltaTime)
+void AGrabInteractableActor::BeginPlay()
 {
-
+	Super::BeginPlay();
 }
 
 void AGrabInteractableActor::OnEnterGrab(const FInteractionInfo& InteractionInfo)

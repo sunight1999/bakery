@@ -17,7 +17,6 @@ class BAKERY_API AInteractableActor : public AActor, public IInteract
 	
 public:	
 	AInteractableActor();
-	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable)
 	virtual void OnEnterInteract(const FInteractionInfo& InteractionInfo) override;

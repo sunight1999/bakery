@@ -2,3 +2,5 @@
 
 
 #include "Interactions/InteractionDefines.h"
+
+const FInteractionInfo FInteractionInfo::NoneInteraction{};

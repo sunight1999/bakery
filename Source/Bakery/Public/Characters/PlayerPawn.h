@@ -43,11 +43,14 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Player|Interaction")
 	UInputAction* GrabAction;
 
+	/*
+	 * 상호작용 및 이동 관련
+	 */
 	UPROPERTY(VisibleAnywhere, Category = "Player|Interaction")
 	UInteractorComponent* Interactor;
 
 	UPROPERTY(EditAnywhere, Category = "Player|Movement")
-	float TurnSpeed = 3.f;
+	float TurnSpeed = 5.f;
 
 	UPROPERTY(EditAnywhere, Category = "Player|Movement")
 	float MeshTurnOffset = -90.f;

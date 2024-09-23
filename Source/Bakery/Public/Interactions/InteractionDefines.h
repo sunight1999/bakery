@@ -16,7 +16,7 @@ struct BAKERY_API FInteractionInfo
 	GENERATED_USTRUCT_BODY()
 
 public:
-	FInteractionInfo() {}
+	FInteractionInfo() { Interactor = nullptr; }
 	FInteractionInfo(UInteractorComponent* Interactor, const FHitResult& HitResult)
 		: Interactor(Interactor), HitResult(HitResult) {}
 
@@ -25,4 +25,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FHitResult HitResult;
+
+	static const FInteractionInfo NoneInteraction;
 };
