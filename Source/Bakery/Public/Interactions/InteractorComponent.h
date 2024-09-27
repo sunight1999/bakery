@@ -9,13 +9,6 @@
 class UGrabberComponent;
 class UInteractableComponent;
 
-UENUM(BlueprintType)
-enum class EInteractionType : uint8
-{
-	Interact,
-	Grab
-};
-
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class BAKERY_API UInteractorComponent : public USceneComponent
 {
