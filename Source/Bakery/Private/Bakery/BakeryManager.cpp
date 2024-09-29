@@ -3,20 +3,8 @@
 
 #include "Bakery/BakeryManager.h"
 
-ABakeryManager::ABakeryManager()
+UBakeryManager::UBakeryManager()
 {
-	PrimaryActorTick.bCanEverTick = true;
-}
-
-void ABakeryManager::BeginPlay()
-{
-	Super::BeginPlay();
 	
-}
-
-void ABakeryManager::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }
 

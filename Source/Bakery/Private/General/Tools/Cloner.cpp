@@ -41,6 +41,7 @@ void ACloner::Initialize()
 {
 	ISM->ClearInstances();
 	ISM->SetStaticMesh(StaticMesh);
+	ISM->SetCanEverAffectNavigation(true);
 
 	FVector OriginLocation = FVector(StartOffsetX, StartOffsetY, StartOffsetZ);
 	FTransform Transform(FQuat::Identity, OriginLocation, FVector::OneVector);

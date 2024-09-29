@@ -2,10 +2,21 @@
 
 #pragma once
 
+UENUM(BlueprintType)
 enum class EDirection : uint8
 {
 	Left,
 	Right,
 	Forward,
-	Back
+	Backward
+};
+
+UENUM(BlueprintType)
+enum class ECustomerState : uint8
+{
+	Idle,
+	Sitting,
+	Ordering,
+	WaitingDish,
+	Eating
 };

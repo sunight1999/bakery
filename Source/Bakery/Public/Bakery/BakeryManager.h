@@ -7,18 +7,12 @@
 #include "BakeryManager.generated.h"
 
 UCLASS()
-class BAKERY_API ABakeryManager : public AActor
+class BAKERY_API UBakeryManager : public UObject
 {
 	GENERATED_BODY()
 	
 public:	
-	ABakeryManager();
-
-	virtual void Tick(float DeltaTime) override;
-
-protected:
-	virtual void BeginPlay() override;
+	UBakeryManager();
 
 private:
-	
 };

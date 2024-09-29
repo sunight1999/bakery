@@ -2,7 +2,6 @@
 
 
 #include "Characters/PlayerPawn.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "InputMappingContext.h"
 #include "InputAction.h"
 #include "EnhancedInputComponent.h"
@@ -14,15 +13,6 @@
 
 APlayerPawn::APlayerPawn()
 {
-	PrimaryActorTick.bCanEverTick = true;
-
-	// 캐릭터 이동시 밀리는 조작감을 없애기 위해 가속도 제거
-	UCharacterMovementComponent* CharacterMovementComponent = GetCharacterMovement();
-	CharacterMovementComponent->MaxAcceleration = 2048000.f;
-	CharacterMovementComponent->BrakingDecelerationWalking = 2048000.f;
-	CharacterMovementComponent->bOrientRotationToMovement = true;
-	CharacterMovementComponent->RotationRate = FRotator(0.f, 1080.f, 0.f);
-
 	Interactor = CreateDefaultSubobject<UInteractorComponent>(TEXT("Interactor"));
 	Interactor->SetupAttachment(RootComponent);
 }

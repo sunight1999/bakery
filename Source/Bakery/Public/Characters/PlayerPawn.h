@@ -3,16 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "BaseCharacter.h"
 #include "PlayerPawn.generated.h"
 
 struct FInputActionValue;
+class UInputComponent;
 class UInputMappingContext;
 class UInputAction;
 class UInteractorComponent;
 
 UCLASS()
-class BAKERY_API APlayerPawn : public ACharacter
+class BAKERY_API APlayerPawn : public ABaseCharacter
 {
 	GENERATED_BODY()
 
@@ -20,7 +21,7 @@ public:
 	APlayerPawn();
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 protected:
 	virtual void BeginPlay() override;
