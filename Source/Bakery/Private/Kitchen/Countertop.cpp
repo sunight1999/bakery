@@ -168,23 +168,22 @@ void ACountertop::OnEnterInteract(const FInteractionInfo& InteractionInfo)
 	if (bIsCooking)
 	{
 		Cook();
+		return;
 	}
-	else
-	{
-		if (!CurrentKeptIngredient)
-		{
-			return;
-		}
 
-		// 현재 Countertop에서 사용 가능한 요리 도구 중 CurrentKeptIngredient와 맞는 게 있으면 요리 시작
-		const UIngredientData* IngredientData = CurrentKeptIngredient->GetIngredientData();
-		for (ECookingTool CookingTool : AvailableCookingTools)
+	if (!CurrentKeptIngredient)
+	{
+		return;
+	}
+
+	// 현재 Countertop에서 사용 가능한 요리 도구 중 CurrentKeptIngredient와 맞는 게 있으면 요리 시작
+	const UIngredientData* IngredientData = CurrentKeptIngredient->GetIngredientData();
+	for (ECookingTool CookingTool : AvailableCookingTools)
+	{
+		if (const UIngredientData* CookingTarget = IngredientData->CheckCookable(CookingTool))
 		{
-			if (const UIngredientData* CookingTarget = IngredientData->CheckCookable(CookingTool))
-			{
-				BeginCook(CookingTarget);
-				return;
-			}
+			BeginCook(CookingTarget);
+			return;
 		}
 	}
 }

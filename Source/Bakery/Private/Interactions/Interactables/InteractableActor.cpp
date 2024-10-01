@@ -17,8 +17,8 @@ AInteractableActor::AInteractableActor()
 	Interactable->OnExitInteractDelegate.AddDynamic(this, &AInteractableActor::OnExitInteract);
 
 	InteractionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("InteractionBox"));
-	RootComponent = InteractionBox;
 	InteractionBox->SetCollisionProfileName(TEXT("Interactable"));
+	RootComponent = InteractionBox;
 }
 
 void AInteractableActor::BeginPlay()

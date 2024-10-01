@@ -3,6 +3,7 @@
 
 #include "Characters/Customer.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/WidgetComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Animation/AnimInstance.h"
 #include "Animation/AnimMontage.h"
@@ -14,6 +15,18 @@
 #include "Bakery/HallManager.h"
 #include "Hall/Table.h"
 #include "Hall/Chair.h"
+#include "Widgets/Customer/OrderWaitingTimeBarWidget.h"
+
+/*
+ * 손님 행동 순서
+ * Idle -> Sitting -> Ordering -> WaitingDish -> Eating -> Idle
+ *    1. Idle: Spawn 후 HallManager로부터 자리를 할당받아 해당 위치로 이동. 자리가 없을 경우 지정 위치에서 대기 -> SitTo()
+ *	  2. Sitting: 지정 자리로 이동이 끝나면 앉기 애니메이션 수행 -> HandleIdle()
+ *	  3. Ordering: 주문 접수 대기 -> Table에 상호작용 시 TakeOrder()
+ *	  4. WaitingDish: 음식 서빙 대기 -> Table에 음식 놓기 시 ServeDish() -> Eat()
+ *	  5. Eating: EatingTime만큼 식사 -> FinishEating()
+ *	  6. Idle: 식사를 끝내고 카메라 바깥으로 이동, Destroy 또는 Disable 수행
+ */
 
 ACustomer::ACustomer()
 {
@@ -28,6 +41,10 @@ ACustomer::ACustomer()
 	Interactable = CreateDefaultSubobject<UInteractableComponent>(TEXT("Interactable"));
 	// TODO: Interactable Component 내부에서 (IInteract를 구현하는)Owner Actor의 함수 알아서 바인딩하기
 	Interactable->OnEnterInteractDelegate.AddDynamic(this, &ACustomer::OnEnterInteract);
+
+	DishWaitingTimeBarWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("DishWaitingTimeBarWidget"));
+	DishWaitingTimeBarWidget->SetVisibility(false);
+	DishWaitingTimeBarWidget->SetupAttachment(RootComponent);
 }
 
 void ACustomer::BeginPlay()
@@ -35,37 +52,46 @@ void ACustomer::BeginPlay()
 	Super::BeginPlay();
 
 	CustomerController = CastChecked<AAIController>(GetController());
+	TimerManager = &GetWorldTimerManager();
 }
 
 void ACustomer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	switch (CustomerState)
+	if (CustomerState == ECustomerState::Idle)
 	{
-	case ECustomerState::Idle:
 		HandleIdle();
-		break;
-
-	case ECustomerState::Sitting:
-		HandleSitting();
-		break;
-
-	case ECustomerState::Ordering:
-		HandleOrdering();
-		break;
-
-	case ECustomerState::WaitingDish:
-		HandleWaitingDish();
-		break;
-
-	case ECustomerState::Eating:
-		HandleEating();
-		break;
-
-	default:
-		break;
 	}
+	else if (CustomerState == ECustomerState::Sitting)
+	{
+		HandleSitting();
+	}
+	else if (CustomerState == ECustomerState::WaitingDish)
+	{
+		float CurrentTime = GetRemainingWaitingTime();
+		float WaitingTime = GetWaitingTime();
+		DishWaitingTimeBar->SetPercentage(CurrentTime / WaitingTime);
+	}
+}
+
+void ACustomer::SetOrder(const URecipeData* RecipeData)
+{
+	Order = RecipeData;
+
+	if (!DishWaitingTimeBar)
+	{
+		DishWaitingTimeBar = Cast<UDishWaitingTimeBarWidget>(DishWaitingTimeBarWidget->GetUserWidgetObject());
+	}
+
+	FString OrderName = Order->GetName().ToString();
+	FString OrderImagePath = "/Game/Textures/Orders/" + OrderName + "." + OrderName;
+	DishWaitingTimeBar->SetOrderImage(OrderImagePath);
+}
+
+void ACustomer::TakeOrder()
+{
+	OrderDish();
 }
 
 /*
@@ -77,9 +103,8 @@ void ACustomer::HandleIdle()
 	{
 		// TODO: 앉기 애니메이션 시작
 		CustomerState = ECustomerState::Sitting;
-		
-		// TODO: 앉기 애니메이션 끝난 후 주문 요청 아이콘 띄우기
-		CustomerState = ECustomerState::Ordering;
+
+		RequestTakeOrder();
 	}
 }
 
@@ -87,25 +112,48 @@ void ACustomer::HandleSitting()
 {
 }
 
-void ACustomer::HandleOrdering()
+void ACustomer::RequestTakeOrder()
 {
-	// TODO: 주문 대기 시간 측정
-	UE_LOG(LogTemp, Display, TEXT("%s 줘"), *Order->GetName().ToString());
+	CustomerState = ECustomerState::Ordering;
+
+	AssignedSeat->GetOwnerTable()->RequestTakeOrder(this);
+
+	SetWaitingTimer(OrderWaitingTime);
 }
 
-void ACustomer::HandleWaitingDish()
+void ACustomer::OrderDish()
 {
-	// TODO: 음식 대기 시간 측정
+	CustomerState = ECustomerState::WaitingDish;
+
+	DishWaitingTimeBarWidget->SetVisibility(true);
+
+	SetWaitingTimer(DishWaitingTime);
 }
 
-void ACustomer::HandleEating()
+void ACustomer::Eat(AIngredient* Dish)
 {
-	// TODO: 식사 시간 측정 후 AssignedTable->LeaveSeat 호출
+	ServedDish = Dish;
+	CustomerState = ECustomerState::Eating;
 
+	DishWaitingTimeBarWidget->SetVisibility(false);
+
+	TimerManager->SetTimer(EatingTimer, this, &ACustomer::FinishEating, EatingTime, false, EatingTime);
+}
+
+void ACustomer::FinishEating()
+{
+	ServedDish->Destroy();
+	ServedDish = nullptr;
+
+	Leave();
+}
+
+void ACustomer::Leave()
+{
 	ATable* AssignedTable = AssignedSeat->GetOwnerTable();
 	AssignedTable->LeaveSeat(AssignedSeat);
-
 	AssignedSeat = nullptr;
+
 	CustomerState = ECustomerState::Idle;
 
 	// TODO: CustomSpawner가 Spawn시 파괴 지점도 지정하도록 수정
@@ -115,19 +163,41 @@ void ACustomer::HandleEating()
 /*
  * 주문 처리 관련 함수
  */
+FORCEINLINE void ACustomer::SetWaitingTimer(float WaitingTime)
+{
+	ClearWaitingTimer();
+	TimerManager->SetTimer(WaitingTimer, this, &ACustomer::Disappoint, WaitingTime, false, WaitingTime);
+}
+
+FORCEINLINE void ACustomer::ClearWaitingTimer()
+{
+	TimerManager->ClearTimer(WaitingTimer);
+}
+
 bool ACustomer::ServeDish(AIngredient* Dish)
 {
+	if (CustomerState != ECustomerState::WaitingDish)
+	{
+		return false;
+	}
+	
 	if (Dish->GetAvailableRecipe() != Order)
 	{
 		return false;
 	}
 
-	CustomerState = ECustomerState::Eating;
-	Dish->Destroy();
-
-	UE_LOG(LogTemp, Display, TEXT("냠냠"));
+	Eat(Dish);
 
 	return true;
+}
+
+void ACustomer::Disappoint()
+{
+	ClearWaitingTimer();
+
+	Leave();
+
+	// TODO: 제시간에 서비스 제공 실패, 게임 종료
 }
 
 /*
@@ -151,19 +221,4 @@ bool ACustomer::IsInTargetPosition(const float ToleranceRadius) const
 {
 	float DistanceSquared = FVector::DistSquared2D(GetActorLocation(), TargetPosition);
 	return DistanceSquared <= ToleranceRadius * ToleranceRadius;
-}
-
-/*
- * Interaction Functions
- */
-void ACustomer::OnEnterInteract(const FInteractionInfo& InteractionInfo)
-{
-	if (CustomerState != ECustomerState::Ordering)
-	{
-		return;
-	}
-
-	// TODO: 주문 아이콘으로 띄우기
-
-	CustomerState = ECustomerState::WaitingDish;
 }

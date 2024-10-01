@@ -9,11 +9,13 @@
 
 class AHallManager;
 class UInteractableComponent;
+class UWidgetComponent;
 class UAnimMontage;
 class AAIController;
 class AChair;
 class AIngredient;
 class URecipeData;
+class UDishWaitingTimeBarWidget;
 
 UCLASS()
 class BAKERY_API ACustomer : public ABaseCharacter, public IInteract
@@ -28,25 +30,34 @@ public:
 	 * Getter & Setter
 	 */
 	const URecipeData* GetOrder() const { return Order; }
-	void SetOrder(const URecipeData* RecipeData) { Order = RecipeData; }
+	void SetOrder(const URecipeData* RecipeData);
 	void SetHallManager(AHallManager* InHallManager) { HallManager = InHallManager; }
 	ECustomerState GetState() const { return CustomerState; }
+	float GetRemainingWaitingTime() const { return TimerManager->GetTimerRemaining(WaitingTimer); }
+	float GetWaitingTime() const { return TimerManager->GetTimerRate(WaitingTimer); }
 
 	/*
 	 * 상태별 처리 함수
 	 */
+	void TakeOrder();
+
 private:
 	void HandleIdle();
 	void HandleSitting();
-	void HandleOrdering();
-	void HandleWaitingDish();
-	void HandleEating();
+	void RequestTakeOrder();
+	void OrderDish();
+	void Eat(AIngredient* Dish);
+	void FinishEating();
+	void Leave();
 
 	/*
 	 * 주문 처리 관련 함수
 	 */
 public:
+	FORCEINLINE void SetWaitingTimer(float WaitingTime);
+	FORCEINLINE void ClearWaitingTimer();
 	bool ServeDish(AIngredient* Dish);
+	void Disappoint();
 
 	/*
 	 * 이동 관련 함수
@@ -59,7 +70,7 @@ public:
 	 * Interaction Functions
 	 */
 	UFUNCTION(BlueprintCallable)
-	virtual void OnEnterInteract(const FInteractionInfo& InteractionInfo) override;
+	virtual void OnEnterInteract(const FInteractionInfo& InteractionInfo) {}
 
 	UFUNCTION(BlueprintCallable)
 	virtual void OnInteract() override {}
@@ -74,6 +85,9 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Customer");
 	UInteractableComponent* Interactable;
 
+	UPROPERTY(VisibleAnywhere, Category = "Customer");
+	UWidgetComponent* DishWaitingTimeBarWidget;
+
 	UPROPERTY(EditAnywhere, Category = "Customer");
 	float OrderWaitingTime = 30.f;
 
@@ -83,13 +97,25 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Customer");
 	float EatingTime = 10.f;
 
+	/*
+	 * AI 및 이동 관련
+	 */
 	AAIController* CustomerController;
 	ECustomerState CustomerState = ECustomerState::Idle;
 
-	const URecipeData* Order = nullptr;
-	
 	AHallManager* HallManager = nullptr;
 	AChair* AssignedSeat = nullptr;
-
 	FVector TargetPosition;
+
+	/*
+	 * 주문 및 식사 관련
+	 */
+	const URecipeData* Order = nullptr;
+	AIngredient* ServedDish = nullptr;
+
+	FTimerManager* TimerManager;
+	FTimerHandle WaitingTimer;
+	FTimerHandle EatingTimer;
+
+	UDishWaitingTimeBarWidget* DishWaitingTimeBar;
 };
