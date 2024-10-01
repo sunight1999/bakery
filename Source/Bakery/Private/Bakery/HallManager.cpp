@@ -26,6 +26,8 @@ void AHallManager::BeginPlay()
 void AHallManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	HandleHall();
 }
 
 void AHallManager::HandleHall()
