@@ -1,4 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -12,44 +11,74 @@ class BAKERY_API AAbnormalitiesReport : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// 위젯 클래스를 저장할 UPROPERTY
-	UPROPERTY(EditAnywhere, Category = "UI")
-	TSubclassOf<class UUserWidget> WidgetClass;
-
-	// 실제 UI 위젯을 참조할 변수
-	UPROPERTY()
-	UUserWidget* CurrentWidget;
-
-	// UMG의 TextBlock을 바인딩 (블루프린트에서 텍스트를 할당)
-	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* MyTextBlock;
-	
 	AAbnormalitiesReport();
-	UPROPERTY(EditAnywhere)
-	uint32 Situation = 5;
 
-	UPROPERTY(EditAnywhere)
-	uint32 SituationChoice=0;
+	/*
+	 * UI 기본 변수
+	 */
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cooldown")
-	float CooldownTime = 5;
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<class UUserWidget> OverlayWidgetClass;
 
+	UPROPERTY(EditAnywhere, Category = "UI")
+	class UUserWidget* OverlayWidgetInstance;
+
+	UPROPERTY(meta = (BindWidget), VisibleAnywhere, Category = "UI")
+	class UTextBlock* TextBlock;
+
+	UPROPERTY(meta = (BindWidget), VisibleAnywhere, Category = "UI")
+	class UButton* ExitButton;
+
+	/*
+	 * UI 관련 세팅 변수
+	 */
+
+	UPROPERTY(EditAnywhere, Category = "UI_Settings")
+	bool IsCreate;
+
+	UPROPERTY(EditAnywhere, Category = "UI_Settings")
+	float CooldownTime;
+
+	UPROPERTY(VisibleAnywhere, Category = "UI_Settings")
+	struct FTimerHandle CooldownTimerHandle;
+
+	UPROPERTY(EditAnywhere, Category = "UI_Settings")
+	int32 Situation;
+
+	/*
+	 * UI 확률 관련 세팅 변수
+	 */
+
+	UPROPERTY(EditAnywhere, Category = "UI_Settings_Random")
+	bool IsProbability;
+
+	UPROPERTY(EditAnywhere, Category = "UI_Settings_Random")
+	bool IsProbabilityStart;
+
+	UPROPERTY(EditAnywhere, Category = "UI_Settings_Random")
+	float Probability;
+
+	UPROPERTY(EditAnywhere, Category = "UI_Settings_Random")
+	float ProbabilityStat;
+
+	UPROPERTY()
+	int Random;
+public:
+	void SetFuncFlag();
+	void CreateOverlayWidget();
+	void CreateRandomAnswer();
+	void SituationCoolDown();
 	UFUNCTION()
-	void OnCooldown(); // 타이머 호출 함수
-
+	void OnOverlay();
 	UFUNCTION()
-	void ShowCooldownMessage(); // 타이머에 따른 메시지 표기 함수
+	void OffOverlay();
+	UFUNCTION()
+	void TestPrint();
+	void ChangeText(FString Text);
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-	
-	FTimerHandle SituationCountHandle;
-	void TimeCount(float Time);
 
-	void TestLog(int Choice1);
-	void Choice();
+public:	
+	virtual void Tick(float DeltaTime) override;
+
 };
