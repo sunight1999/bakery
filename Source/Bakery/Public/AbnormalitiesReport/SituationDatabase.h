@@ -10,8 +10,8 @@
  *  상황 보고 시스템을 위한 데이터베이스 구조체
  */
 
-USTRUCT()
-struct SituationData : public FTableRowBase
+USTRUCT(BlueprintType)
+struct FSituationData : public FTableRowBase
 {
 	GENERATED_BODY()
 public:

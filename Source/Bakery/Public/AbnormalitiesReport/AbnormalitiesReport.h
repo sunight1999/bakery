@@ -16,6 +16,10 @@ public:
 	/*
 	 * UI 기본 변수
 	 */
+	/*UPROPERTY(VisibleAnywhere, Category = "Data")
+	class UAbonomalitiesReportComponent* Database;*/
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=())
+	FDataTableRowHandle Situation;
 
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<class UUserWidget> OverlayWidgetClass;
@@ -43,7 +47,7 @@ public:
 	struct FTimerHandle CooldownTimerHandle;
 
 	UPROPERTY(EditAnywhere, Category = "UI_Settings")
-	int32 Situation;
+	int32 SituationNum;
 
 	/*
 	 * UI 확률 관련 세팅 변수

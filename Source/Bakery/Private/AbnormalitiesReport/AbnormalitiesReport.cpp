@@ -18,7 +18,7 @@ void AAbnormalitiesReport::BeginPlay()
         CreateOverlayWidget();
     }
     SituationCoolDown();
-    
+    //Database = CreateDefaultSubobject<UAbonomalitiesReportComponent>(TEXT("SituationData"));
 }
 void AAbnormalitiesReport::Tick(float DeltaTime)
 {
