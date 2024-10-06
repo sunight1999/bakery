@@ -16,10 +16,11 @@ public:
 	/*
 	 * UI 기본 변수
 	 */
-	/*UPROPERTY(VisibleAnywhere, Category = "Data")
-	class UAbonomalitiesReportComponent* Database;*/
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=())
-	FDataTableRowHandle Situation;
+	UPROPERTY(VisibleAnywhere, Category = "Data")
+	UDataTable* DataTable;
+										
+	//UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=())
+	//FDataTableRowHandle Situation;
 
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<class UUserWidget> OverlayWidgetClass;

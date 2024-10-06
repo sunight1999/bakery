@@ -4,12 +4,26 @@
 #include "Components/TextBlock.h"
 #include "Components/Button.h"
 #include "TimerManager.h"
+#include <AbnormalitiesReport/SituationDatabase.h>
 
 
 AAbnormalitiesReport::AAbnormalitiesReport()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
+    ConstructorHelpers::FObjectFinder<UDataTable> DialogueDataTableFinder(TEXT("/Game/Data/Situation/SituationData"));
+    if (DialogueDataTableFinder.Succeeded())
+    {
+        UE_LOG(LogTemp, Display, TEXT("데이터 접근 성공"));
+        DataTable = DialogueDataTableFinder.Object;
+        //FSituationData* SituationRow = DataTable->FindRow<FSituationData>(FName("1"), "");
+        FString SituationDataString = "Situation";
+        TArray<FSituationData*> SituationArray;
+        DataTable->GetAllRows<FSituationData>(SituationDataString, SituationArray);
+        
+    }
+    else {
+        UE_LOG(LogTemp, Display, TEXT("데이터 접근 실패!!"));
+    }
 }
 void AAbnormalitiesReport::BeginPlay()
 {
@@ -19,6 +33,8 @@ void AAbnormalitiesReport::BeginPlay()
     }
     SituationCoolDown();
     //Database = CreateDefaultSubobject<UAbonomalitiesReportComponent>(TEXT("SituationData"));
+    
+
 }
 void AAbnormalitiesReport::Tick(float DeltaTime)
 {
@@ -104,10 +120,15 @@ void AAbnormalitiesReport::SetFuncFlag()
 
 void AAbnormalitiesReport::CreateRandomAnswer() ///확률 시작
 {   
-    Probability = FMath::Clamp(Probability, 0.0f, 100.0f); // 확률 범위 제한 (0에서 100 사이로 제한)
-    srand((unsigned int)time(NULL)); // 난수 초기화
-     
-    int randnum = rand() % 100000 / 100.f; // 난수 생성
+    
+    int32 RandomNum = FMath::RandRange(0, 6);
+    // 데이터 테이블에서 해당 행을 찾음
+    //FString SecondColumnValue = DialogueDataTable->FindRow(RowName,);
+    //ChangeText(DialogueDataTable->GetTableAsCSV())
+    //Probability = FMath::Clamp(Probability, 0.0f, 100.0f); // 확률 범위 제한 (0에서 100 사이로 제한)
+    //srand((unsigned int)time(NULL)); // 난수 초기화
+    // 
+    //int randnum = rand() % 100000 / 100.f; // 난수 생성
     //std::random_device rd;
     //std::mt19937 mt(rd()); //난수 생성기
     //std::uniform_int_distribution<int> dist(0, 99);
@@ -115,8 +136,10 @@ void AAbnormalitiesReport::CreateRandomAnswer() ///확률 시작
 }
 
 
-//추후 할 작업
-//1.데이터 테이블 연결하기
-//2.
+// 코드 가동 순서
+//1.데이터 테이블 연결하기(미완)
+//2.array 생성 후 정렬(미완)
+//3.랜덤 값 추출(해결)
+//4.출력(해결)
 
 

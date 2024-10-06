@@ -16,8 +16,6 @@ struct FSituationData : public FTableRowBase
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
-	int32 Number;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
 	FString Situation;
 };
 UCLASS()
