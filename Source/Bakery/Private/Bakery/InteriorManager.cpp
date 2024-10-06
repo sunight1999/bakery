@@ -2,7 +2,7 @@
 
 
 #include "Bakery/InteriorManager.h"
-#include "Bakery/BakeryDefines.h"
+#include "General/BakeryDefines.h"
 #include "General/Tools/Cloner.h"
 
 AInteriorManager::AInteriorManager()

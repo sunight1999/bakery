@@ -6,6 +6,7 @@
 #include "General/Tools/Spawner.h"
 #include "CustomerSpawner.generated.h"
 
+class UBoxComponent;
 class AHallManager;
 class URecipeSubsystem;
 
@@ -22,10 +23,19 @@ public:
 
 	void PostSpawn(AActor* Actor) override;
 
+	UFUNCTION()
+	void OnDespawnBoxOverlap(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
 protected:
 	virtual void BeginPlay() override;
 
 private:
+	UPROPERTY(VisibleAnywhere, Category = "CustomerSpawner")
+	USceneComponent* Root;
+
+	UPROPERTY(VisibleAnywhere, Category="CustomerSpawner")
+	UBoxComponent* DespawnBox;
+
 	AHallManager* HallManager;
 	URecipeSubsystem* RecipeSubsystem;
 };

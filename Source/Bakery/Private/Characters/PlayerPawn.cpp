@@ -10,6 +10,8 @@
 
 #include "Interactions/InteractorComponent.h"
 #include "Interactions/GrabberComponent.h"
+#include "General/BakeryGameMode.h"
+#include "General/BakeryGameState.h"
 
 APlayerPawn::APlayerPawn()
 {
@@ -43,7 +45,7 @@ void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	verify(MoveAction);
 	verify(InteractAction);
 	verify(GrabAction);
-
+	
 	if (UEnhancedInputComponent* EnhancedInput = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		EnhancedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerPawn::Move);
@@ -51,6 +53,7 @@ void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 		EnhancedInput->BindAction(InteractAction, ETriggerEvent::Completed, Interactor, &UInteractorComponent::EndInteraction);
 		EnhancedInput->BindAction(GrabAction, ETriggerEvent::Started, Interactor, &UInteractorComponent::BeginGrab);
 		EnhancedInput->BindAction(GrabAction, ETriggerEvent::Completed, Interactor, &UInteractorComponent::EndGrab);
+		EnhancedInput->BindAction(StartBakeryAction, ETriggerEvent::Started, this, &APlayerPawn::StartBakery);
 	}
 }
 
@@ -60,4 +63,16 @@ void APlayerPawn::Move(const FInputActionValue& Value)
 
 	AddMovementInput(FVector::ForwardVector, MovementValue.Y);
 	AddMovementInput(FVector::RightVector, MovementValue.X);
+}
+
+void APlayerPawn::StartBakery()
+{
+	ABakeryGameState* BakeryGameState = Cast<ABakeryGameState>(GetWorld()->GetGameState());
+	if (BakeryGameState->GetBakeryState() == EBakeryState::Opened)
+	{
+		return;
+	}
+
+	ABakeryGameMode* BakeryGameMode = Cast<ABakeryGameMode>(GetWorld()->GetAuthGameMode());
+	BakeryGameMode->OpenBakery();
 }

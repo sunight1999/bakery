@@ -22,15 +22,13 @@ public:
 	void Stop();
 
 	void Spawn();
+	void Despawn(AActor* Actor);
 
 	virtual void PostSpawn(AActor* Actor) override {}
 
 protected:
 	virtual void BeginPlay() override;
 
-	UWorld* World;
-
-private:
 	UPROPERTY(EditAnywhere, Category = "Spawner")
 	TSubclassOf<AActor> SpawnActorClass;
 
@@ -43,6 +41,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Spawner")
 	int MaxSpawnNum = 15;
 	
+	UWorld* World;
 	FTimerManager* TimerManager;
 	FTimerHandle SpawnTimer;
 };

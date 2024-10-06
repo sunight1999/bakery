@@ -27,6 +27,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	void Move(const FInputActionValue& Value);
+	void StartBakery();
 
 private:
 	/*
@@ -43,6 +44,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Player|Interaction")
 	UInputAction* GrabAction;
+
+	UPROPERTY(EditAnywhere, Category = "Player|Interaction")
+	UInputAction* StartBakeryAction;
 
 	/*
 	 * 상호작용 및 이동 관련

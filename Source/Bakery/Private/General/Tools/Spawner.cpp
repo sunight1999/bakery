@@ -16,7 +16,6 @@ void ASpawner::BeginPlay()
 	World = GetWorld();
 
 	TimerManager = &GetWorldTimerManager();
-	TimerManager->SetTimer(SpawnTimer, this, &ASpawner::Spawn, SpawnInterval, true, 0.f);
 }
 
 void ASpawner::Tick(float DeltaTime)
@@ -27,12 +26,22 @@ void ASpawner::Tick(float DeltaTime)
 
 void ASpawner::Start()
 {
-	TimerManager->UnPauseTimer(SpawnTimer);
+	if (SpawnTimer.IsValid())
+	{
+		TimerManager->UnPauseTimer(SpawnTimer);
+	}
+	else
+	{
+		TimerManager->SetTimer(SpawnTimer, this, &ASpawner::Spawn, SpawnInterval, true, 0.f);
+	}
 }
 
 void ASpawner::Stop()
 {
-	TimerManager->PauseTimer(SpawnTimer);
+	if (SpawnTimer.IsValid())
+	{
+		TimerManager->PauseTimer(SpawnTimer);
+	}
 }
 
 void ASpawner::Spawn()
@@ -57,4 +66,8 @@ void ASpawner::Spawn()
 	Actor->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 
 	PostSpawn(Actor);
+}
+
+void ASpawner::Despawn(AActor* Actor)
+{
 }

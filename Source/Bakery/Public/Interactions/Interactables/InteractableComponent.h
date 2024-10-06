@@ -19,6 +19,8 @@ class BAKERY_API UInteractableComponent : public UActorComponent
 public:	
 	UInteractableComponent();
 
+	// TODO: Interactable Component 내부에서 (IInteract를 구현하는)Owner Actor의 함수 알아서 바인딩하기
+
 	/*
 	 * 상호작용 델리게이트
 	 */

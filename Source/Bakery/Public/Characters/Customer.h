@@ -4,11 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "BaseCharacter.h"
-#include "../Interactions/Interactables/Interact.h"
+#include "../General/BakeryDefines.h"
 #include "Customer.generated.h"
 
 class AHallManager;
-class UInteractableComponent;
 class UWidgetComponent;
 class UAnimMontage;
 class AAIController;
@@ -18,7 +17,7 @@ class URecipeData;
 class UDishWaitingTimeBarWidget;
 
 UCLASS()
-class BAKERY_API ACustomer : public ABaseCharacter, public IInteract
+class BAKERY_API ACustomer : public ABaseCharacter
 {
 	GENERATED_BODY()
 
@@ -35,6 +34,7 @@ public:
 	ECustomerState GetState() const { return CustomerState; }
 	float GetRemainingWaitingTime() const { return TimerManager->GetTimerRemaining(WaitingTimer); }
 	float GetWaitingTime() const { return TimerManager->GetTimerRate(WaitingTimer); }
+	void SetDespawnPosition(const FVector& Position) { DespawnPosition = Position; }
 
 	/*
 	 * 상태별 처리 함수
@@ -48,12 +48,13 @@ private:
 	void OrderDish();
 	void Eat(AIngredient* Dish);
 	void FinishEating();
+
+public:
 	void Leave();
 
 	/*
 	 * 주문 처리 관련 함수
 	 */
-public:
 	FORCEINLINE void SetWaitingTimer(float WaitingTime);
 	FORCEINLINE void ClearWaitingTimer();
 	bool ServeDish(AIngredient* Dish);
@@ -66,25 +67,10 @@ public:
 	void SitTo(AChair* Seat);
 	bool IsInTargetPosition(const float ToleranceRadius = 100.f) const;
 
-	/*
-	 * Interaction Functions
-	 */
-	UFUNCTION(BlueprintCallable)
-	virtual void OnEnterInteract(const FInteractionInfo& InteractionInfo) {}
-
-	UFUNCTION(BlueprintCallable)
-	virtual void OnInteract() override {}
-
-	UFUNCTION(BlueprintCallable)
-	virtual void OnExitInteract() override {}
-
 protected:
 	virtual void BeginPlay() override;
 
 private:
-	UPROPERTY(VisibleAnywhere, Category = "Customer");
-	UInteractableComponent* Interactable;
-
 	UPROPERTY(VisibleAnywhere, Category = "Customer");
 	UWidgetComponent* DishWaitingTimeBarWidget;
 
@@ -106,6 +92,8 @@ private:
 	AHallManager* HallManager = nullptr;
 	AChair* AssignedSeat = nullptr;
 	FVector TargetPosition;
+
+	FVector DespawnPosition;
 
 	/*
 	 * 주문 및 식사 관련

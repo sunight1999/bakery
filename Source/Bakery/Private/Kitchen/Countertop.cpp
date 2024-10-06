@@ -150,7 +150,7 @@ void ACountertop::OnEnterInteract(const FInteractionInfo& InteractionInfo)
 	}
 
 	// 플레이어가 잡고 있는 재료가 있을 경우 재료 합치기 시도
-	if (GrabbedIngredient)
+	if (GrabbedIngredient && CurrentKeptIngredient)
 	{
 		const UIngredientData* MergedIngredientData = CurrentKeptIngredient->MergeIngredient(GrabbedIngredient);
 		if (MergedIngredientData)

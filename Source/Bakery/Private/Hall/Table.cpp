@@ -6,7 +6,7 @@
 #include "Components/WidgetComponent.h"
 
 #include "Hall/Chair.h"
-#include "Bakery/BakeryDefines.h"
+#include "General/BakeryDefines.h"
 #include "Interactions/InteractionDefines.h"
 #include "Interactions/InteractorComponent.h"
 #include "Interactions/GrabberComponent.h"
@@ -103,6 +103,12 @@ void ATable::LeaveSeat(AChair* Seat)
 
 	UsingSeats.Remove(Seat);
 	EmptySeats.Emplace(Seat);
+
+	// 영업 종료 시 주문 접수를 못한 채 떠나는 손님이 있을 수 있으므로 UI 해제 추가 확인
+	if (UsingSeats.Num() == 0)
+	{
+		WaitingTimeBarWidget->SetVisibility(false);
+	}
 }
 
 void ATable::RequestTakeOrder(ACustomer* Customer)

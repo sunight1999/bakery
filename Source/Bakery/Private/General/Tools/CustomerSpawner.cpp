@@ -2,6 +2,7 @@
 
 
 #include "General/Tools/CustomerSpawner.h"
+#include "Components/BoxComponent.h"
 #include "EngineUtils.h"
 
 #include "Bakery/HallManager.h"
@@ -11,7 +12,16 @@
 
 ACustomerSpawner::ACustomerSpawner()
 {
+	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	RootComponent = Root;
 
+	DespawnBox = CreateDefaultSubobject<UBoxComponent>(TEXT("DespawnBox"));
+	DespawnBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	DespawnBox->SetCollisionResponseToAllChannels(ECR_Ignore);
+	DespawnBox->SetCollisionResponseToChannel(ECC_GameTraceChannel3, ECR_Overlap);
+	DespawnBox->SetupAttachment(RootComponent);
+
+	DespawnBox->OnComponentBeginOverlap.AddDynamic(this, &ACustomerSpawner::OnDespawnBoxOverlap);
 }
 
 void ACustomerSpawner::BeginPlay()
@@ -37,6 +47,7 @@ void ACustomerSpawner::PostSpawn(AActor* Actor)
 	}
 
 	Customer->SetHallManager(HallManager);
+	Customer->SetDespawnPosition(DespawnBox->GetComponentLocation());
 
 	// TODO: 랜덤으로 레시피 중 하나 지정
 	Customer->SetOrder(RecipeSubsystem->GetRecipe(FName("Injeolmi")));
@@ -53,5 +64,13 @@ void ACustomerSpawner::PostSpawn(AActor* Actor)
 	{
 		FVector WaitingPosition = HallManager->RequestWaiting(Customer);
 		Customer->MoveTo(WaitingPosition);
+	}
+}
+
+void ACustomerSpawner::OnDespawnBoxOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor->IsA(SpawnActorClass))
+	{
+		OtherActor->Destroy();
 	}
 }

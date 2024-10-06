@@ -9,7 +9,7 @@
 #include "Animation/AnimMontage.h"
 #include "AIController.h"
 
-#include "Interactions/Interactables/InteractableComponent.h"
+#include "General/BakeryGameMode.h"
 #include "Kitchen/Ingredient.h"
 #include "Kitchen/Data/RecipeData.h"
 #include "Bakery/HallManager.h"
@@ -37,10 +37,6 @@ ACustomer::ACustomer()
 	GetCapsuleComponent()->SetCollisionProfileName(FName("Customer"));
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
-
-	Interactable = CreateDefaultSubobject<UInteractableComponent>(TEXT("Interactable"));
-	// TODO: Interactable Component 내부에서 (IInteract를 구현하는)Owner Actor의 함수 알아서 바인딩하기
-	Interactable->OnEnterInteractDelegate.AddDynamic(this, &ACustomer::OnEnterInteract);
 
 	DishWaitingTimeBarWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("DishWaitingTimeBarWidget"));
 	DishWaitingTimeBarWidget->SetVisibility(false);
@@ -137,6 +133,7 @@ void ACustomer::Eat(AIngredient* Dish)
 
 	DishWaitingTimeBarWidget->SetVisibility(false);
 
+	ClearWaitingTimer();
 	TimerManager->SetTimer(EatingTimer, this, &ACustomer::FinishEating, EatingTime, false, EatingTime);
 }
 
@@ -150,14 +147,26 @@ void ACustomer::FinishEating()
 
 void ACustomer::Leave()
 {
+	// 타이머 및 UI 정리 (식사 완료 전 영업이 종료되는 경우를 위해)
+	ClearWaitingTimer();
+	TimerManager->ClearTimer(EatingTimer);
+	DishWaitingTimeBarWidget->SetVisibility(false);
+
+	// 테이블 정리
 	ATable* AssignedTable = AssignedSeat->GetOwnerTable();
 	AssignedTable->LeaveSeat(AssignedSeat);
 	AssignedSeat = nullptr;
 
+	// TODO: 영업 종료 시 이미 서빙된 음식 어떻게 할 건지 기획 필요
+	if (ServedDish)
+	{
+		ServedDish->Destroy();
+		ServedDish = nullptr;
+	}
+
 	CustomerState = ECustomerState::Idle;
 
-	// TODO: CustomSpawner가 Spawn시 파괴 지점도 지정하도록 수정
-	MoveTo(FVector(180, -860, 0));
+	MoveTo(DespawnPosition);
 }
 
 /*
@@ -197,7 +206,8 @@ void ACustomer::Disappoint()
 
 	Leave();
 
-	// TODO: 제시간에 서비스 제공 실패, 게임 종료
+	ABakeryGameMode* BakeryGameMode = Cast<ABakeryGameMode>(GetWorld()->GetAuthGameMode());
+	BakeryGameMode->Disappointed(this);
 }
 
 /*
@@ -206,7 +216,7 @@ void ACustomer::Disappoint()
 void ACustomer::MoveTo(const FVector& InTargetPosition)
 {
 	TargetPosition = InTargetPosition;
-	CustomerController->MoveToLocation(TargetPosition);
+	CustomerController->MoveToLocation(TargetPosition, 10.f);
 }
 
 void ACustomer::SitTo(AChair* Seat)

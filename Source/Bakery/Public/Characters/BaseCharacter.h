@@ -4,8 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-
-#include "../Bakery/BakeryDefines.h"
 #include "BaseCharacter.generated.h"
 
 UCLASS()

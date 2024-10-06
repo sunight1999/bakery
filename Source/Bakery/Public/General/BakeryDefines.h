@@ -3,6 +3,13 @@
 #pragma once
 
 UENUM(BlueprintType)
+enum class EBakeryState : uint8
+{
+	Preparing,
+	Opened
+};
+
+UENUM(BlueprintType)
 enum class EDirection : uint8
 {
 	Left,
