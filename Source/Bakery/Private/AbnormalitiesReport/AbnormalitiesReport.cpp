@@ -4,7 +4,6 @@
 #include "Components/TextBlock.h"
 #include "Components/Button.h"
 #include "TimerManager.h"
-#include <AbnormalitiesReport/SituationDatabase.h>
 
 
 AAbnormalitiesReport::AAbnormalitiesReport()
@@ -14,12 +13,17 @@ AAbnormalitiesReport::AAbnormalitiesReport()
     if (DialogueDataTableFinder.Succeeded())
     {
         UE_LOG(LogTemp, Display, TEXT("데이터 접근 성공"));
+
         DataTable = DialogueDataTableFinder.Object;
-        //FSituationData* SituationRow = DataTable->FindRow<FSituationData>(FName("1"), "");
+
         FString SituationDataString = "Situation";
-        TArray<FSituationData*> SituationArray;
-        DataTable->GetAllRows<FSituationData>(SituationDataString, SituationArray);
-        
+        TArray<FSituationData*> SituationPtrArray;
+        DataTable->GetAllRows<FSituationData>(SituationDataString, SituationPtrArray);
+
+       for (FSituationData* Data : SituationPtrArray)
+       {
+           SituationArray.Add(*Data);
+       }
     }
     else {
         UE_LOG(LogTemp, Display, TEXT("데이터 접근 실패!!"));
@@ -122,6 +126,9 @@ void AAbnormalitiesReport::CreateRandomAnswer() ///확률 시작
 {   
     
     int32 RandomNum = FMath::RandRange(0, 6);
+    ChangeText(SituationArray[RandomNum].Situation); // 행이 우선
+        
+
     // 데이터 테이블에서 해당 행을 찾음
     //FString SecondColumnValue = DialogueDataTable->FindRow(RowName,);
     //ChangeText(DialogueDataTable->GetTableAsCSV())

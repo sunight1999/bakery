@@ -13,14 +13,11 @@
 USTRUCT(BlueprintType)
 struct FSituationData : public FTableRowBase
 {
-	GENERATED_BODY()
+	GENERATED_USTRUCT_BODY()
+
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
+	FSituationData(){}
+
+	UPROPERTY(EditAnywhere, Category = "Data")
 	FString Situation;
-};
-UCLASS()
-class BAKERY_API USituationDatabase : public UGameInstance
-{
-	GENERATED_BODY()
-	
 };
