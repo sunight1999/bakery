@@ -15,15 +15,6 @@ AAbnormalitiesReport::AAbnormalitiesReport()
         UE_LOG(LogTemp, Display, TEXT("데이터 접근 성공"));
 
         DataTable = DialogueDataTableFinder.Object;
-
-        FString SituationDataString = "Situation";
-        TArray<FSituationData*> SituationPtrArray;
-        DataTable->GetAllRows<FSituationData>(SituationDataString, SituationPtrArray);
-
-       for (FSituationData* Data : SituationPtrArray)
-       {
-           SituationArray.Add(*Data);
-       }
     }
     else {
         UE_LOG(LogTemp, Display, TEXT("데이터 접근 실패!!"));
@@ -34,11 +25,8 @@ void AAbnormalitiesReport::BeginPlay()
     Super::BeginPlay();
     if (IsCreate) {
         CreateOverlayWidget();
+        SituationCoolDown();
     }
-    SituationCoolDown();
-    //Database = CreateDefaultSubobject<UAbonomalitiesReportComponent>(TEXT("SituationData"));
-    
-
 }
 void AAbnormalitiesReport::Tick(float DeltaTime)
 {
@@ -61,7 +49,7 @@ void AAbnormalitiesReport::CreateOverlayWidget()
             {
                 // 위젯을 화면에 추가
                 OverlayWidgetInstance->AddToViewport();
-                //OverlayWidgetInstance->SetVisibility(ESlateVisibility::Hidden);
+                OverlayWidgetInstance->SetVisibility(ESlateVisibility::Hidden);
 
                 UWidget* TextBlock1 = (OverlayWidgetInstance->GetWidgetFromName(TEXT("TextBlock")));
                 TextBlock = Cast<UTextBlock>(TextBlock1);
@@ -72,19 +60,14 @@ void AAbnormalitiesReport::CreateOverlayWidget()
                 //MyActor->SetActorHiddenInGame(true);
 
                     if (TextBlock) {
-                        ChangeText("Test1");
+                        ChangeText("상황 보고가 들어갈 예정입니다.");
                     }
-                
             }
         }
     }
 }
 void AAbnormalitiesReport::SituationCoolDown()
 {
-    //GetWorldTimerManager().SetTimer(
-    //    CooldownTimerHandle, this,
-    //    &AAbnormalitiesReport::TestPrint, CooldownTime,
-    //    true, 0);
     GetWorldTimerManager().SetTimer(
         CooldownTimerHandle, this,
         &AAbnormalitiesReport::SetFuncFlag, CooldownTime,
@@ -100,13 +83,6 @@ void AAbnormalitiesReport::OffOverlay()
 {       
     OverlayWidgetInstance->SetVisibility(ESlateVisibility::Hidden);
 }
-void AAbnormalitiesReport::TestPrint()
-{
-    UE_LOG(LogTemp, Display, TEXT("YEEEEEEEEE"));
-    UE_LOG(LogTemp, Display, TEXT("YEEEEEEEEE"));
-    UE_LOG(LogTemp, Display, TEXT("YEEEEEEEEE"));
-
-}
 void AAbnormalitiesReport::ChangeText(FString Text)
 {
     if (TextBlock)
@@ -114,32 +90,20 @@ void AAbnormalitiesReport::ChangeText(FString Text)
 }
 void AAbnormalitiesReport::SetFuncFlag()
 {
-    if (IsProbability == true) {
-        //CreateRandomAnswer()  ;
-    }
-    else{
+    if (IsView) {
         OnOverlay();
     }
 }
 
 void AAbnormalitiesReport::CreateRandomAnswer() ///확률 시작
-{   
-    
+{
     int32 RandomNum = FMath::RandRange(0, 6);
-    ChangeText(SituationArray[RandomNum].Situation); // 행이 우선
-        
-
-    // 데이터 테이블에서 해당 행을 찾음
-    //FString SecondColumnValue = DialogueDataTable->FindRow(RowName,);
-    //ChangeText(DialogueDataTable->GetTableAsCSV())
-    //Probability = FMath::Clamp(Probability, 0.0f, 100.0f); // 확률 범위 제한 (0에서 100 사이로 제한)
-    //srand((unsigned int)time(NULL)); // 난수 초기화
-    // 
-    //int randnum = rand() % 100000 / 100.f; // 난수 생성
-    //std::random_device rd;
-    //std::mt19937 mt(rd()); //난수 생성기
-    //std::uniform_int_distribution<int> dist(0, 99);
-    //auto randNum = dist(mt);
+    
+    FSituationData* Row = DataTable->FindRow<FSituationData>(*FString::FromInt(RandomNum),"");
+    if (Row) {
+        FString Name = Row->Situation;
+        ChangeText(Name); // 행이 우선
+    }
 }
 
 

@@ -6,7 +6,6 @@
 #include "AbnormalitiesReport/SituationDatabase.h"
 #include "AbnormalitiesReport.generated.h"
 
-
 UCLASS()
 class BAKERY_API AAbnormalitiesReport : public AActor
 {
@@ -21,8 +20,8 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Data")
 	UDataTable* DataTable;
 
-	UPROPERTY(VisibleAnywhere, Category = "Data")
-	TArray<FSituationData&> SituationArray;
+	/*UPROPERTY(VisibleAnywhere, Category = "Data")
+	TArray<FSituationData&> SituationArray;*/
 
 	//UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=())
 	//FDataTableRowHandle Situation;
@@ -45,6 +44,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "UI_Settings")
 	bool IsCreate;
+	UPROPERTY(EditAnywhere, Category = "UI_Settings")
+	bool IsView;
+
 
 	UPROPERTY(EditAnywhere, Category = "UI_Settings")
 	float CooldownTime;
