@@ -7,6 +7,7 @@
 #include "TimerManager.h"
 
 #include "General/BakeryGameState.h"
+#include "Subsystems/UISubsystem.h"
 #include "Characters/BakeryPlayerController.h"
 #include "Characters/Customer.h"
 #include "Widgets/HUD/BakeryHUDWidget.h"
@@ -22,6 +23,11 @@ void ABakeryGameMode::BeginPlay()
 	Super::BeginPlay();
 
 	BakeryGameState = Cast<ABakeryGameState>(GameState);
+	UUISubsystem* UISubsystem = GetGameInstance()->GetSubsystem<UUISubsystem>();
+	UISubsystem->LoadAllUI();
+
+	UUserWidget* HUDWidget = UISubsystem->SetUIVisibility(FName("BakeryHUD"), ESlateVisibility::SelfHitTestInvisible);
+	BakeryHUDWidget = Cast<UBakeryHUDWidget>(HUDWidget);
 
 	PlayerController = Cast<ABakeryPlayerController>(GetWorld()->GetFirstPlayerController());
 
@@ -38,7 +44,7 @@ void ABakeryGameMode::Tick(float DeltaSeconds)
 	if (BakeryGameState->GetBakeryState() == EBakeryState::Opened)
 	{
 		CurrentOperatingTime += DeltaSeconds;
-		PlayerController->GetBakeryHUD()->SetDayProgress(CurrentOperatingTime / OperatingTime);
+		BakeryHUDWidget->SetDayProgress(CurrentOperatingTime / OperatingTime);
 
 		if (CurrentOperatingTime >= OperatingTime)
 		{
@@ -50,7 +56,7 @@ void ABakeryGameMode::Tick(float DeltaSeconds)
 void ABakeryGameMode::OpenBakery()
 {
 	BakeryGameState->SetBakeryState(EBakeryState::Opened);
-	PlayerController->GetBakeryHUD()->SetHUDState(true);
+	BakeryHUDWidget->SetHUDState(true);
 	CurrentOperatingTime = 0.f;
 
 	for (ACustomerSpawner* Spawner : CustomerSpawners)
@@ -62,7 +68,7 @@ void ABakeryGameMode::OpenBakery()
 void ABakeryGameMode::CloseBakery()
 {
 	BakeryGameState->SetBakeryState(EBakeryState::Preparing);
-	PlayerController->GetBakeryHUD()->SetHUDState(false);
+	BakeryHUDWidget->SetHUDState(false);
 
 	for (TActorIterator<ACustomer>It(GetWorld()); It; ++It)
 	{

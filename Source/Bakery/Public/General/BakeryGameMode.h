@@ -7,6 +7,8 @@
 #include "BakeryGameMode.generated.h"
 
 class ABakeryGameState;
+class UUISubsystem;
+class UBakeryHUDWidget;
 class ABakeryPlayerController;
 class ACustomerSpawner;
 
@@ -29,6 +31,7 @@ protected:
 private:
 	ABakeryGameState* BakeryGameState;
 
+	UBakeryHUDWidget* BakeryHUDWidget;
 	ABakeryPlayerController* PlayerController;
 	TArray<ACustomerSpawner*> CustomerSpawners;
 

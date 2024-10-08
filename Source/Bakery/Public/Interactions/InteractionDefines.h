@@ -13,7 +13,7 @@ class UInteractorComponent;
 USTRUCT(BlueprintType)
 struct BAKERY_API FInteractionInfo
 {
-	GENERATED_USTRUCT_BODY()
+	GENERATED_BODY()
 
 public:
 	FInteractionInfo() { Interactor = nullptr; }

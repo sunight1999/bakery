@@ -6,8 +6,6 @@
 #include "GameFramework/PlayerController.h"
 #include "BakeryPlayerController.generated.h"
 
-class UBakeryHUDWidget;
-
 /**
  * 
  */
@@ -17,21 +15,14 @@ class BAKERY_API ABakeryPlayerController : public APlayerController
 	GENERATED_BODY()
 	
 public:
-	FORCEINLINE UBakeryHUDWidget* GetBakeryHUD() const { return BakeryHUDWidget; }
-
 	void GameHasEnded(AActor* EndGameFocus, bool bIsWinner) override;
 
 protected:
 	void BeginPlay() override;
 
 private:
-	UPROPERTY(EditAnywhere, Category = "UI")
-	TSubclassOf<UBakeryHUDWidget> BakeryHUDWidgetClass;
-
 	UPROPERTY(EditAnywhere, Category="GameOver")
 	float RestartDelay = 5.f;
-
-	UBakeryHUDWidget* BakeryHUDWidget;
 
 	FTimerHandle RestartTimer;
 };
