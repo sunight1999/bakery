@@ -85,7 +85,6 @@ public:
 	UFUNCTION()
 	void OffOverlay();
 	UFUNCTION()
-	void TestPrint();
 	void ChangeText(FString Text);
 protected:
 	virtual void BeginPlay() override;

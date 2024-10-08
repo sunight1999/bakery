@@ -12,5 +12,4 @@ UCLASS()
 class BAKERY_API UAbnormalitiesReportWidget : public UUserWidget
 {
 	GENERATED_BODY()
-
 };

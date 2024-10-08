@@ -35,7 +35,7 @@ void AAbnormalitiesReport::Tick(float DeltaTime)
 
 void AAbnormalitiesReport::CreateOverlayWidget()
 {
-    if (OverlayWidgetClass)
+    if (OverlayWidgetClass != NULL)
     {
         // 월드 가져오기
         UWorld* World = GetWorld();
@@ -64,6 +64,9 @@ void AAbnormalitiesReport::CreateOverlayWidget()
                     }
             }
         }
+    }
+    else {
+        UE_LOG(LogTemp, Display, TEXT("위젯이 할당되지 않았습니다. 위젯을 할당해 주세요."));
     }
 }
 void AAbnormalitiesReport::SituationCoolDown()
@@ -105,8 +108,6 @@ void AAbnormalitiesReport::CreateRandomAnswer() ///확률 시작
         ChangeText(Name); // 행이 우선
     }
 }
-
-
 // 코드 가동 순서
 //1.데이터 테이블 연결하기(미완)
 //2.array 생성 후 정렬(미완)
