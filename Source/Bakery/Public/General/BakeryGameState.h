@@ -7,6 +7,11 @@
 #include "BakeryDefines.h"
 #include "BakeryGameState.generated.h"
 
+class UBakerySaveGame;
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FMoneyChangedDelegate, int32)
+DECLARE_MULTICAST_DELEGATE_OneParam(FDayChangedDelegate, int32)
+
 /**
  * 
  */
@@ -17,8 +22,25 @@ class BAKERY_API ABakeryGameState : public AGameStateBase
 	
 public:
 	EBakeryState GetBakeryState() const { return BakeryState; }
-	void SetBakeryState(EBakeryState NewState) { BakeryState = NewState; }
+	void SetBakeryStateOpened() { BakeryState = EBakeryState::Opened; }
+	void SetBakeryStateClosed() { BakeryState = EBakeryState::Closed; }
+
+	void LoadGame();
+	void SaveGame();
+
+	void AddMoney(int32 InMoney);
+	void AddDay(int32 InDay);
+	void AddDay();
+
+	FMoneyChangedDelegate OnMoneyChanged;
+	FDayChangedDelegate OnDayChanged;
+
+protected:
+	void BeginPlay() override;
 
 private:
-	EBakeryState BakeryState = EBakeryState::Preparing;
+	int32 Money;
+	int32 Day;
+
+	EBakeryState BakeryState = EBakeryState::Closed;
 };

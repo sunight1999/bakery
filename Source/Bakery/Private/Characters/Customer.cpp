@@ -10,9 +10,9 @@
 #include "AIController.h"
 
 #include "General/BakeryGameMode.h"
+#include "General/BakeryGameState.h"
 #include "Kitchen/Ingredient.h"
 #include "Kitchen/Data/RecipeData.h"
-#include "Bakery/HallManager.h"
 #include "Hall/Table.h"
 #include "Hall/Chair.h"
 #include "Widgets/Customer/OrderWaitingTimeBarWidget.h"
@@ -142,6 +142,10 @@ void ACustomer::FinishEating()
 	ServedDish->Destroy();
 	ServedDish = nullptr;
 
+	// 먹은 음식 계산
+	ABakeryGameState* BakeryGameState = Cast<ABakeryGameState>(GetWorld()->GetGameState());
+	BakeryGameState->AddMoney(Order->GetPrice());
+
 	Leave();
 }
 
@@ -153,9 +157,12 @@ void ACustomer::Leave()
 	DishWaitingTimeBarWidget->SetVisibility(false);
 
 	// 테이블 정리
-	ATable* AssignedTable = AssignedSeat->GetOwnerTable();
-	AssignedTable->LeaveSeat(AssignedSeat);
-	AssignedSeat = nullptr;
+	if (AssignedSeat)
+	{
+		ATable* AssignedTable = AssignedSeat->GetOwnerTable();
+		AssignedTable->LeaveSeat(AssignedSeat);
+		AssignedSeat = nullptr;
+	}
 
 	// TODO: 영업 종료 시 이미 서빙된 음식 어떻게 할 건지 기획 필요
 	if (ServedDish)

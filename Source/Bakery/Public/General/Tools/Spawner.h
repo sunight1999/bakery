@@ -20,6 +20,7 @@ public:
 
 	void Start();
 	void Stop();
+	void Clear();
 
 	void Spawn();
 	void Despawn(AActor* Actor);

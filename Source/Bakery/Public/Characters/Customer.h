@@ -30,7 +30,6 @@ public:
 	 */
 	const URecipeData* GetOrder() const { return Order; }
 	void SetOrder(const URecipeData* RecipeData);
-	void SetHallManager(AHallManager* InHallManager) { HallManager = InHallManager; }
 	ECustomerState GetState() const { return CustomerState; }
 	float GetRemainingWaitingTime() const { return TimerManager->GetTimerRemaining(WaitingTimer); }
 	float GetWaitingTime() const { return TimerManager->GetTimerRate(WaitingTimer); }
@@ -89,7 +88,6 @@ private:
 	AAIController* CustomerController;
 	ECustomerState CustomerState = ECustomerState::Idle;
 
-	AHallManager* HallManager = nullptr;
 	AChair* AssignedSeat = nullptr;
 	FVector TargetPosition;
 

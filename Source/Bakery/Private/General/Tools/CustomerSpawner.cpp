@@ -5,6 +5,7 @@
 #include "Components/BoxComponent.h"
 #include "EngineUtils.h"
 
+#include "General/BakeryGameMode.h"
 #include "Bakery/HallManager.h"
 #include "Subsystems/RecipeSubsystem.h"
 #include "Characters/Customer.h"
@@ -28,14 +29,14 @@ void ACustomerSpawner::BeginPlay()
 {
 	Super::BeginPlay();
 
-	for (TActorIterator<AHallManager> It(World); It; ++It)
-	{
-		HallManager = *It;
-		break;
-	}
+	HallManager = AHallManager::GetInstance(World);
 
 	UGameInstance* GameInstance = World->GetGameInstance();
 	RecipeSubsystem = GameInstance->GetSubsystem<URecipeSubsystem>();
+
+	ABakeryGameMode* BakeryGameMode = Cast<ABakeryGameMode>(World->GetAuthGameMode());
+	BakeryGameMode->OnBakeryOpened.AddUObject(this, &ASpawner::Start);
+	BakeryGameMode->OnBakeryClosed.AddUObject(this, &ASpawner::Clear);
 }
 
 void ACustomerSpawner::PostSpawn(AActor* Actor)
@@ -46,7 +47,6 @@ void ACustomerSpawner::PostSpawn(AActor* Actor)
 		return;
 	}
 
-	Customer->SetHallManager(HallManager);
 	Customer->SetDespawnPosition(DespawnBox->GetComponentLocation());
 
 	// TODO: 랜덤으로 레시피 중 하나 지정

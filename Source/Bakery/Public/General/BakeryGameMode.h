@@ -6,6 +6,9 @@
 #include "GameFramework/GameModeBase.h"
 #include "BakeryGameMode.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FBakeryOpendDelegate);
+DECLARE_MULTICAST_DELEGATE(FBakeryClosedDelegate);
+
 class ABakeryGameState;
 class UUISubsystem;
 class UBakeryHUDWidget;
@@ -24,6 +27,10 @@ public:
 	virtual void OpenBakery();
 	virtual void CloseBakery();
 	virtual void Disappointed(APawn* Pawn) {}
+
+	FBakeryOpendDelegate OnBakeryPreOpened;
+	FBakeryOpendDelegate OnBakeryOpened;
+	FBakeryClosedDelegate OnBakeryClosed;
 
 protected:
 	virtual void BeginPlay() override;

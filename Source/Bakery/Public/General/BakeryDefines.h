@@ -2,10 +2,12 @@
 
 #pragma once
 
+#define BAKERY_SAVEGAME_SLOT_NAME FString("Bakery")
+
 UENUM(BlueprintType)
 enum class EBakeryState : uint8
 {
-	Preparing,
+	Closed,
 	Opened
 };
 

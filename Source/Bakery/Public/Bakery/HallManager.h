@@ -17,6 +17,15 @@ class BAKERY_API AHallManager : public AActor
 	
 public:	
 	AHallManager();
+	~AHallManager();
+	static AHallManager* GetInstance(UWorld* World);
+
+#if WITH_EDITOR
+	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+	void PostEditMove(bool bFinished);
+	void EnsureSingleton();
+#endif
+
 	virtual void Tick(float DeltaTime) override;
 
 	void RefreshHall();
@@ -29,6 +38,8 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+	static AHallManager* Instance;
+
 	void HandleHall();
 
 	FVector CalulateWaitingPosition(int WaitingIndex = -1);
@@ -36,14 +47,18 @@ private:
 	/*
 	 * 대기열 관련
 	 */
+
+	// 대기열 시작 위치
 	UPROPERTY(EditDefaultsOnly, Category="Hall")
-	USceneComponent* WaitingPoint;	// 대기열 시작 위치
+	USceneComponent* WaitingPoint;
 
+	// 대기열을 오른쪽으로 늘어뜨릴지 왼쪽으로 늘어뜨릴지 여부
 	UPROPERTY(EditDefaultsOnly, Category = "Hall")
-	bool bWaitingToTheRight = true;	// 대기열을 오른쪽으로 늘어뜨릴지 왼쪽으로 늘어뜨릴지 여부
+	bool bWaitingToTheRight = true;
 
+	// 대기열 간격
 	UPROPERTY(EditDefaultsOnly, Category = "Hall")
-	float WaitingDistance = 100.f;	// 대기열 간격
+	float WaitingDistance = 100.f;
 
 	TArray<ACustomer*> WaitingQueue;
 

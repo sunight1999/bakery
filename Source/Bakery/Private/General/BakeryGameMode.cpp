@@ -55,19 +55,15 @@ void ABakeryGameMode::Tick(float DeltaSeconds)
 
 void ABakeryGameMode::OpenBakery()
 {
-	BakeryGameState->SetBakeryState(EBakeryState::Opened);
 	BakeryHUDWidget->SetHUDState(true);
 	CurrentOperatingTime = 0.f;
 
-	for (ACustomerSpawner* Spawner : CustomerSpawners)
-	{
-		Spawner->Start();
-	}
+	OnBakeryPreOpened.Broadcast();
+	OnBakeryOpened.Broadcast();
 }
 
 void ABakeryGameMode::CloseBakery()
 {
-	BakeryGameState->SetBakeryState(EBakeryState::Preparing);
 	BakeryHUDWidget->SetHUDState(false);
 
 	for (TActorIterator<ACustomer>It(GetWorld()); It; ++It)
@@ -75,9 +71,6 @@ void ABakeryGameMode::CloseBakery()
 		(*It)->Leave();
 	}
 
-	for (ACustomerSpawner* Spawner : CustomerSpawners)
-	{
-		Spawner->Stop();
-	}
+	OnBakeryClosed.Broadcast();
 }
 

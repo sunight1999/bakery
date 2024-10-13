@@ -4,9 +4,12 @@
 #include "Bakery/HallManager.h"
 #include "EngineUtils.h"
 
+#include "General/BakeryGameMode.h"
 #include "Characters/Customer.h"
 #include "Hall/Table.h"
 #include "Hall/Chair.h"
+
+AHallManager* AHallManager::Instance = nullptr;
 
 AHallManager::AHallManager()
 {
@@ -16,11 +19,74 @@ AHallManager::AHallManager()
 	RootComponent = WaitingPoint;
 }
 
+AHallManager::~AHallManager()
+{
+	Instance = nullptr;
+}
+
+AHallManager* AHallManager::GetInstance(UWorld* World)
+{
+	// World 유효성 검사
+	if (!World || World->IsPreviewWorld() || World->bIsTearingDown)
+	{
+		return nullptr;
+	}
+
+	if (!Instance)
+	{
+		for (TActorIterator<AHallManager> It(World); It; ++It)
+		{
+			if (!Instance)
+			{
+				Instance = *It;
+			}
+			else
+			{
+				It->Destroy();
+			}
+		}
+
+		if (!Instance)
+		{
+			Instance = World->SpawnActor<AHallManager>();
+		}
+	}
+
+	return Instance;
+}
+
+#if WITH_EDITOR
+void AHallManager::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	EnsureSingleton();
+}
+
+void AHallManager::PostEditMove(bool bFinished)
+{
+	Super::PostEditMove(bFinished);
+
+	EnsureSingleton();
+}
+
+void AHallManager::EnsureSingleton()
+{
+	if (Instance && Instance != this)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("다수의 싱글톤 액터가 확인되어, 불필요한 액터를 제거합니다."));
+		Destroy();
+	}
+}
+#endif
+
 void AHallManager::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	RefreshHall();
+
+	// TODO: RefreshHall 호출 시점을 인테리어 수정을 완료 했을 때로 변경하고 OnBakeryPreOpened는 제거
+	ABakeryGameMode* BakeryGameMode = Cast<ABakeryGameMode>(GetWorld()->GetAuthGameMode());
+	BakeryGameMode->OnBakeryPreOpened.AddUObject(this, &AHallManager::RefreshHall);
 }
 
 void AHallManager::Tick(float DeltaTime)
@@ -79,6 +145,8 @@ void AHallManager::RefreshHall()
 	{
 		Tables.Emplace(*It);
 	}
+
+	UE_LOG(LogTemp, Display, TEXT("TABLES : %d"), Tables.Num());
 }
 
 int AHallManager::GetEmptySeatNum()

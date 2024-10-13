@@ -51,9 +51,9 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Table")
 	UWidgetComponent* WaitingTimeBarWidget;
 
-	TArray<AChair*> EmptySeats;
-	TSet<AChair*> UsingSeats;
-
 	UWaitingTimeBarWidget* WaitingTimeBar;
 	ACustomer* WaitingTrackedCustomer = nullptr;
+
+	TArray<AChair*> EmptySeats;
+	TSet<AChair*> UsingSeats;
 };

@@ -19,6 +19,8 @@ class BAKERY_API UBakeryHUDWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	void NativeConstruct() override;
+
 	void SetHUDState(bool bIsOpened);
 	
 	FORCEINLINE FText IntToFText(int32 Value) { return FText::FromString(FString::FromInt(Value)); }

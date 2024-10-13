@@ -14,7 +14,6 @@ void ASpawner::BeginPlay()
 	Super::BeginPlay();
 	
 	World = GetWorld();
-
 	TimerManager = &GetWorldTimerManager();
 }
 
@@ -42,6 +41,11 @@ void ASpawner::Stop()
 	{
 		TimerManager->PauseTimer(SpawnTimer);
 	}
+}
+
+void ASpawner::Clear()
+{
+	TimerManager->ClearTimer(SpawnTimer);
 }
 
 void ASpawner::Spawn()

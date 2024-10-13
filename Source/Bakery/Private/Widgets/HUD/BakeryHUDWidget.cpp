@@ -4,7 +4,16 @@
 #include "Widgets/HUD/BakeryHUDWidget.h"
 #include "Components/TextBlock.h"
 #include "Components/CanvasPanel.h"
+
+#include "General/BakeryGameState.h"
 #include "Widgets/Hall/WaitingTimeBarWidget.h"
+
+void UBakeryHUDWidget::NativeConstruct()
+{
+	ABakeryGameState* BakeryGameState = Cast<ABakeryGameState>(GetWorld()->GetGameState());
+	BakeryGameState->OnMoneyChanged.AddUObject(this, &UBakeryHUDWidget::SetMoney);
+	BakeryGameState->OnDayChanged.AddUObject(this, &UBakeryHUDWidget::SetDay);
+}
 
 void UBakeryHUDWidget::SetHUDState(bool bIsOpened)
 {

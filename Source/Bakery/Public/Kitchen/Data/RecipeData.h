@@ -25,6 +25,7 @@ public:
 	const FName GetName() const { return Name; }
 	const TSet<URecipeData*>& GetNextRecipes() const { return NextRecipes; }
 	const UIngredientData* GetResult() const { return ItselfResult; }
+	int GetPrice() const { return Price; }
 
 	bool Includes(const UIngredientData* Ingredient) const { return Ingredients.Contains(Ingredient); }
 
@@ -37,6 +38,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kitchen|Recipe", meta = (AllowPrivateAccess = "true"))
 	TSet<UIngredientData*> Ingredients;	// 이 레시피의 요리를 제작하기 위해 필요한 재료
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kitchen|Recipe", meta = (AllowPrivateAccess = "true"))
+	int32 Price;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kitchen|Recipe", meta = (AllowPrivateAccess = "true"))
 	TSet<URecipeData*> PrevRecipes;	// 이 레시피를 해금하기 위해 필요한 하위 레시피
