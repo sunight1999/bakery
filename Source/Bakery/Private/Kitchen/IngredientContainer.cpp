@@ -28,21 +28,6 @@ void AIngredientContainer::BeginPlay()
 }
 
 /*
- * Interaction Functions
- */
-void AIngredientContainer::OnEnterInteract(const FInteractionInfo& InteractionInfo)
-{
-}
-
-void AIngredientContainer::OnInteract()
-{
-}
-
-void AIngredientContainer::OnExitInteract()
-{
-}
-
-/*
  * Grab Interaction Functions
  */
 void AIngredientContainer::OnEnterGrab(const FInteractionInfo& InteractionInfo)
@@ -61,18 +46,9 @@ void AIngredientContainer::OnEnterGrab(const FInteractionInfo& InteractionInfo)
 	AIngredient* Ingredient = World->SpawnActor<AIngredient>();
 	Ingredient->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
 	Ingredient->SetActorLocationAndRotation(GetActorLocation(), FRotator::ZeroRotator);
+	Ingredient->SetActorScale3D(FVector(IngredientMeshSizeMultiplier));
 	Ingredient->ChangeIngredient(ContainedIngredient.Get());
 
 	UPrimitiveComponent* Primitive = Ingredient->GetComponentByClass<UPrimitiveComponent>();
 	Grabber->Grab(Primitive, Ingredient->GetActorLocation());
 }
-
-void AIngredientContainer::OnGrab()
-{
-}
-
-void AIngredientContainer::OnExitGrab()
-{
-}
-
-

@@ -20,13 +20,13 @@ public:
 	AIngredientContainer();
 	void Tick(float DeltaTime) override;
 
-	void OnEnterInteract(const FInteractionInfo& InteractionInfo) override;
-	void OnInteract() override;
-	void OnExitInteract() override;
+	void OnEnterInteract(const FInteractionInfo& InteractionInfo) override {}
+	void OnInteract() override {}
+	void OnExitInteract() override {}
 
 	void OnEnterGrab(const FInteractionInfo& InteractionInfo) override;
-	void OnGrab() override;
-	void OnExitGrab() override;
+	void OnGrab() override {}
+	void OnExitGrab() override {}
 
 protected:
 	void BeginPlay() override;
@@ -37,6 +37,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category="Kitchen|Ingredient")
 	TObjectPtr<UIngredientData> ContainedIngredient;
+
+	UPROPERTY(EditAnywhere, Category = "Kitchen|Ingredient")
+	float IngredientMeshSizeMultiplier = 1.f;
 
 	UWorld* World;
 

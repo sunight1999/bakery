@@ -45,21 +45,21 @@ void ATable::BeginPlay()
 		{
 		case (uint8)EDirection::Left:
 			Direction = FVector::LeftVector;
+			Rotation.Yaw = 90.f;
 			break;
 
 		case (uint8)EDirection::Right:
 			Direction = FVector::RightVector;
-			Rotation.Yaw = 180.f;
+			Rotation.Yaw = 270.f;
 			break;
 
 		case (uint8)EDirection::Forward:
 			Direction = FVector::ForwardVector;
-			Rotation.Yaw = 90.f;
+			Rotation.Yaw = 180.f;
 			break;
 
 		case (uint8)EDirection::Backward:
 			Direction = FVector::BackwardVector;
-			Rotation.Yaw = 270.f;
 			break;
 		}
 
