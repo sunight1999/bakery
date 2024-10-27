@@ -1,12 +1,12 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "AbnormalitiesReport/AbnormalitiesReport.h"
+#include "AbnormalitiesReport/AbnormalitiesReportManager.h"
 #include "AbnormalitiesReportWidget.generated.h"
 /**
  * AbnormalitiesReport클래스의 위젯을 담당하는 UAbnormalitiesReportWidget
  */
-class AAbnormalitiesReport;
+class AAbnormalitiesReportManager;
 UCLASS()
 class BAKERY_API UAbnormalitiesReportWidget : public UUserWidget
 {
@@ -26,6 +26,5 @@ public:
 	void ChangeReportHeadText(FString Text);
 	UFUNCTION()
 	void ChangeReportText(FString Text);
-	void ExitButtonBinding();
 	bool Initialize() override;
 };

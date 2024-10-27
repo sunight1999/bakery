@@ -4,15 +4,15 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "AbnormalitiesReport/SituationDatabase.h"
-#include "AbnormalitiesReport.generated.h"
+#include "AbnormalitiesReportManager.generated.h"
 
 UCLASS()
-class BAKERY_API AAbnormalitiesReport : public AActor
+class BAKERY_API AAbnormalitiesReportManager : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
-	AAbnormalitiesReport();
+	AAbnormalitiesReportManager();
 
 	/*
 	 * UI 기본 변수
@@ -47,8 +47,11 @@ public:
 
 	void SetFuncFlag();
 	void CreateOverlayWidget();
-	void CreateRandomAnswer();
+	//void CreateRandomAnswer();
+	void GetRandomAnswer(int Randnum);
+	void ClearUI();
 	void SituationCoolDown();
+
 protected:
 	virtual void BeginPlay() override;
 public:
