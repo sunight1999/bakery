@@ -5,6 +5,7 @@
 #include "PhysicsEngine/PhysicsHandleComponent.h"
 
 #include "Interactions/Interactables/InteractableComponent.h"
+#include "Subsystems/SoundManager.h"
 
 UGrabberComponent::UGrabberComponent()
 {
@@ -57,6 +58,8 @@ void UGrabberComponent::Grab(UPrimitiveComponent* Primitive, const FVector& Impa
 		ImpactPoint,
 		GrabPoint->GetComponentRotation()
 	);
+
+	USoundManager::GetInstance(GetWorld())->PlaySoundAtLocationByTag(FName("PickUp"), GetComponentLocation());
 }
 
 void UGrabberComponent::ReleaseBegin()
@@ -105,6 +108,9 @@ void UGrabberComponent::Release()
 	*/
 
 	PhysicsHandle->ReleaseComponent();
+
+	USoundManager::GetInstance(GetWorld())->PlaySoundAtLocationByTag(FName("Put"), GetComponentLocation());
+
 	return;
 }
 

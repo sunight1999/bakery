@@ -10,6 +10,7 @@ enum class ECookingTool : uint8;
 class AIngredient;
 class UIngredientData;
 class URecipeSubsystem;
+class UNiagaraComponent;
 
 /**
  * 재료를 올려두거나 요리할 수 있는 조리대
@@ -76,6 +77,12 @@ private:
 	/*
 	 * 요리 관련
 	 */
+	UPROPERTY(EditAnywhere, Category = "Countertop|Cooking")
+	UNiagaraComponent* PrimaryCookingEffect;
+
+	UPROPERTY(EditAnywhere, Category = "Countertop|Cooking")
+	UNiagaraComponent* SecondaryCookingEffect;
+
 	UPROPERTY(EditAnywhere, Category = "Countertop|Cooking")
 	TSet<ECookingTool> AvailableCookingTools;
 

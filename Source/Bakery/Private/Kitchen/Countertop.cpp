@@ -3,6 +3,7 @@
 
 #include "Kitchen/Countertop.h"
 #include "Components/BoxComponent.h"
+#include "NiagaraComponent.h"
 
 #include "Interactions/InteractionDefines.h"
 #include "Interactions/InteractorComponent.h"
@@ -30,6 +31,14 @@ ACountertop::ACountertop()
 
 	KeepPoint = CreateDefaultSubobject<USceneComponent>(TEXT("KeepPoint"));
 	KeepPoint->SetupAttachment(TopPlateMesh);
+
+	PrimaryCookingEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("PrimaryCookingEffect"));
+	PrimaryCookingEffect->SetAutoActivate(false);
+	PrimaryCookingEffect->SetupAttachment(InteractionBox);
+
+	SecondaryCookingEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("SecondaryCookingEffect"));
+	SecondaryCookingEffect->SetAutoActivate(false);
+	SecondaryCookingEffect->SetupAttachment(InteractionBox);
 }
 
 void ACountertop::BeginPlay()
@@ -69,6 +78,7 @@ void ACountertop::ResetCooking()
 	CurrentAutoCookingTime = 0.f;
 	CurrentHandCookingTime = 0;
 	CurrentCookingTarget = nullptr;
+	PrimaryCookingEffect->Deactivate();
 }
 
 /*
@@ -83,6 +93,7 @@ void ACountertop::BeginCook(const UIngredientData* CookingTarget)
 	// TODO: 요리 진행바 UI 띄우기
 
 	bIsCooking = true;
+	PrimaryCookingEffect->Activate();
 
 	Cook();
 }
@@ -121,6 +132,7 @@ void ACountertop::EndCook()
 	CurrentHandCookingTime = 0;
 
 	UE_LOG(LogTemp, Display, TEXT("COOKING DONE!"));
+	PrimaryCookingEffect->Deactivate();
 
 	// 더 이상 요리가 불가능 할 때까지 자동으로 요리 진행
 	if (bIsAutomatic)

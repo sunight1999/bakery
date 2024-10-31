@@ -50,7 +50,7 @@ void ACustomerSpawner::PostSpawn(AActor* Actor)
 	Customer->SetDespawnPosition(DespawnBox->GetComponentLocation());
 
 	// TODO: 랜덤으로 레시피 중 하나 지정
-	Customer->SetOrder(RecipeSubsystem->GetRecipe(FName("Injeolmi")));
+	Customer->SetOrder(RecipeSubsystem->GetRecipe(FName("InjeolmiToast")));
 
 	// 홀에 자리가 있을 경우 지정된 좌석으로 Customer 이동
 	AChair* Seat = HallManager->RequestSeat();
