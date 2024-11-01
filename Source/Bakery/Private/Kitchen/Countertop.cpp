@@ -15,6 +15,8 @@
 #include "Kitchen/Data/IngredientData.h"
 #include "Subsystems/RecipeSubsystem.h"
 #include "Characters/PlayerPawn.h"
+#include "Subsystems/SoundManager.h"
+#include "Components/AudioComponent.h"
 
 ACountertop::ACountertop()
 {
@@ -77,24 +79,33 @@ void ACountertop::ResetCooking()
 	bIsCooking = false;
 	CurrentAutoCookingTime = 0.f;
 	CurrentHandCookingTime = 0;
+	CurrentCookingTool = ECookingTool::None;
 	CurrentCookingTarget = nullptr;
 	PrimaryCookingEffect->Deactivate();
+
+	if (CurrentAudio)
+	{
+		CurrentAudio->Stop();
+		CurrentAudio = nullptr;
+	}
 }
 
 /*
  * 요리 관련 함수
  */
-void ACountertop::BeginCook(const UIngredientData* CookingTarget)
+void ACountertop::BeginCook(ECookingTool CookingTool, const UIngredientData* CookingTarget)
 {
 	verify(CookingTarget);
 
+	CurrentCookingTool = CookingTool;
 	CurrentCookingTarget = CookingTarget;
 
 	// TODO: 요리 진행바 UI 띄우기
 
-	bIsCooking = true;
+	// 요리 이펙트 재생
 	PrimaryCookingEffect->Activate();
 
+	bIsCooking = true;
 	Cook();
 }
 
@@ -103,6 +114,19 @@ void ACountertop::Cook()
 	if (!bIsCooking)
 	{
 		return;
+	}
+	
+	// 효과음 재생
+	if (!CurrentAudio)
+	{
+		USoundManager* SoundManager = USoundManager::GetInstance(GetWorld());
+		const FName* CookingSoundTag = CurrentKeptIngredient->GetIngredientData()->GetCookingSoundTag(CurrentCookingTool);
+		const FVector& CookingSoundLocation = GetActorLocation();
+
+		if (CookingSoundTag)
+		{
+			CurrentAudio = SoundManager->PlaySoundAtLocationByTag(*CookingSoundTag, CookingSoundLocation);
+		}
 	}
 
 	// 요리 상호작용 횟수 증가 또는 시간 단축
@@ -124,15 +148,11 @@ void ACountertop::Cook()
 
 void ACountertop::EndCook()
 {
-	bIsCooking = false;
+	USoundManager::GetInstance(GetWorld())->PlaySoundAtLocationByTag(FName("CookingDone"), GetActorLocation());
 
 	CurrentKeptIngredient->ChangeIngredient(CurrentCookingTarget);
-	CurrentCookingTarget = nullptr;
-	CurrentAutoCookingTime = 0.f;
-	CurrentHandCookingTime = 0;
 
-	UE_LOG(LogTemp, Display, TEXT("COOKING DONE!"));
-	PrimaryCookingEffect->Deactivate();
+	ResetCooking();
 
 	// 더 이상 요리가 불가능 할 때까지 자동으로 요리 진행
 	if (bIsAutomatic)
@@ -176,7 +196,7 @@ void ACountertop::OnEnterInteract(const FInteractionInfo& InteractionInfo)
 		}
 	}
 
-	// 요리 진행
+	// 진행 중인 요리가 있다면 요리 진행
 	if (bIsCooking)
 	{
 		Cook();
@@ -194,7 +214,7 @@ void ACountertop::OnEnterInteract(const FInteractionInfo& InteractionInfo)
 	{
 		if (const UIngredientData* CookingTarget = IngredientData->CheckCookable(CookingTool))
 		{
-			BeginCook(CookingTarget);
+			BeginCook(CookingTool, CookingTarget);
 			return;
 		}
 	}

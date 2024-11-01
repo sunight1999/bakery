@@ -38,7 +38,7 @@ public:
 	/*
 	 * 요리 관련 함수
 	 */
-	void BeginCook(const UIngredientData* TargetIngredient);
+	void BeginCook(ECookingTool CookingTool, const UIngredientData* TargetIngredient);
 	void Cook();
 	void EndCook();
 
@@ -107,7 +107,9 @@ private:
 	 * 현재 보관 중인 재료 또는 요리 관련
 	 */
 	AIngredient* CurrentKeptIngredient;
+	UAudioComponent* CurrentAudio;
 
+	ECookingTool CurrentCookingTool;
 	const UIngredientData* CurrentCookingTarget;
 	float CurrentAutoCookingTime = 0.f;
 	int CurrentHandCookingTime = 0;

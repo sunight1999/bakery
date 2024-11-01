@@ -50,18 +50,29 @@ void USoundManager::ResetAudio(UAudioComponent* Audio)
 	}
 }
 
-void USoundManager::PlaySoundAtLocationByTag(const FName& SoundTag, const FVector& Location, float Volume, float Pitch)
+/// <summary>
+/// 'Content/Data/DT_Sound'에 정의된 효과음을 재생한다.
+/// </summary>
+/// <param name="SoundTag">DT_Sound 데이터 테이블 RowName</param>
+/// <param name="Location">효과음 재생 위치</param>
+/// <param name="Volume">Volume Multiplier</param>
+/// <param name="Pitch">Pitch Multiplier</param>
+/// <returns>효과음이 Loop일 경우 해당 효과음을 재생하고 있는 UAudioComponent* 반환. 아니면 nullptr 반환.
+/// 반환된 UAudioComponent*는 Stop하면 자동으로 SoundManager의 풀로 다시 반환된다.</returns>
+UAudioComponent* USoundManager::PlaySoundAtLocationByTag(const FName& SoundTag, const FVector& Location, float Volume, float Pitch)
 {
 	if (FSoundData* SoundData = SoundDataTable->FindRow<FSoundData>(SoundTag, FString()))
 	{
 		if (SoundData->Sound)
 		{
-			PlaySoundAtLocation(SoundData->Sound, Location, Volume, Pitch);
+			return PlaySoundAtLocation(SoundData->Sound, Location, Volume, Pitch, SoundData->bIsLoop);
 		}
 	}
+
+	return nullptr;
 }
 
-void USoundManager::PlaySoundAtLocation(USoundBase* Sound, const FVector& Location, float Volume, float Pitch)
+UAudioComponent* USoundManager::PlaySoundAtLocation(USoundBase* Sound, const FVector& Location, float Volume, float Pitch, bool bIsLoop)
 {
 	UAudioComponent* Audio = Cast<UAudioComponent>(AudioPool.Get());
 	if (Audio && Sound)
@@ -72,5 +83,12 @@ void USoundManager::PlaySoundAtLocation(USoundBase* Sound, const FVector& Locati
 		Audio->SetPitchMultiplier(Pitch);
 		Audio->OnAudioFinishedNative.AddUObject(this, &USoundManager::ResetAudio);
 		Audio->Play();
+
+		if (bIsLoop)
+		{
+			return Audio;
+		}
 	}
+
+	return nullptr;
 }

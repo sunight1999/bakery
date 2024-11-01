@@ -11,6 +11,7 @@
 
 #include "General/BakeryGameMode.h"
 #include "General/BakeryGameState.h"
+#include "Subsystems/SoundManager.h"
 #include "Kitchen/Ingredient.h"
 #include "Kitchen/Data/RecipeData.h"
 #include "Hall/Table.h"
@@ -113,6 +114,7 @@ void ACustomer::RequestTakeOrder()
 	CustomerState = ECustomerState::Ordering;
 
 	AssignedSeat->GetOwnerTable()->RequestTakeOrder(this);
+	USoundManager::GetInstance(GetWorld())->PlaySoundAtLocationByTag(FName("Order"), GetActorLocation());
 
 	SetWaitingTimer(OrderWaitingTime);
 }

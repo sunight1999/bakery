@@ -20,6 +20,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	USoundBase* Sound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIsLoop = false;
 };
 
 /**
@@ -38,10 +41,11 @@ public:
 	void InitializeAudio(UObject* AudioObject);
 	void ResetAudio(UAudioComponent* Audio);
 
-	void PlaySoundAtLocationByTag(const FName& SoundTag, const FVector& Location, float Volume = 1.f, float Pitch = 1.f);
-	void PlaySoundAtLocation(USoundBase* Sound, const FVector& Location, float Volume = 1.f, float Pitch = 1.f);
+	UAudioComponent* PlaySoundAtLocationByTag(const FName& SoundTag, const FVector& Location, float Volume = 1.f, float Pitch = 1.f);
 
 private:
+	UAudioComponent* PlaySoundAtLocation(USoundBase* Sound, const FVector& Location, float Volume = 1.f, float Pitch = 1.f, bool bIsLoop = false);
+
 	static USoundManager* Instance;
 
 	UDataTable* SoundDataTable = nullptr;

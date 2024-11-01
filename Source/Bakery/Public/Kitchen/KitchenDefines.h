@@ -8,8 +8,9 @@
 UENUM(BlueprintType)
 enum class ECookingTool : uint8
 {
+	None,
 	Knife,
 	PatternMold,
 	Oven,
-	Steamer,
+	Steamer
 };

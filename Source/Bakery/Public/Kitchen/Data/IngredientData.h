@@ -24,6 +24,7 @@ public:
 	 * Getter
 	 */
 	const FName& GetName() const { return Name; }
+	const FName* GetCookingSoundTag(ECookingTool CookingTool) const { return CookingSoundTagMap.Find(CookingTool); }
 	UStaticMesh* GetIngredientMesh() const { return IngredientMesh; }
 
 	const UIngredientData* CheckCookable(ECookingTool CookingTool) const
@@ -44,6 +45,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kitchen|Ingredient", meta = (AllowPrivateAccess = "true"))
 	UStaticMesh* IngredientMesh;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kitchen|Ingredient", meta = (AllowPrivateAccess = "true"))
+	TMap<ECookingTool, FName> CookingSoundTagMap;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kitchen|Ingredient", meta = (AllowPrivateAccess = "true"))
 	TMap<ECookingTool, const UIngredientData*> CookedIngredientMap;
