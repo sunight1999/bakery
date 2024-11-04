@@ -20,8 +20,10 @@ class BAKERY_API APlayerPawn : public ABaseCharacter
 public:
 	APlayerPawn();
 	virtual void Tick(float DeltaTime) override;
-
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+
+	void HandsUp() { PlayAnimMontage(GrabbingMontage, 2.f); }
+	void HandsDown() { StopAnimMontage(GrabbingMontage); }
 
 protected:
 	virtual void BeginPlay() override;
@@ -59,4 +61,6 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Player|Movement")
 	float MeshTurnOffset = -90.f;
+
+	UAnimMontage* GrabbingMontage;
 };

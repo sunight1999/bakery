@@ -2,6 +2,7 @@
 
 
 #include "Characters/PlayerPawn.h"
+#include "UObject/ConstructorHelpers.h"
 #include "InputMappingContext.h"
 #include "InputAction.h"
 #include "EnhancedInputComponent.h"
@@ -17,6 +18,12 @@ APlayerPawn::APlayerPawn()
 {
 	Interactor = CreateDefaultSubobject<UInteractorComponent>(TEXT("Interactor"));
 	Interactor->SetupAttachment(RootComponent);
+
+	ConstructorHelpers::FObjectFinder<UAnimMontage> GrabbingMontageFinder(TEXT("/Game/Characters/Player/Animations/AM_Grabbing"));
+	if (GrabbingMontageFinder.Succeeded())
+	{
+		GrabbingMontage = GrabbingMontageFinder.Object;
+	}
 }
 
 void APlayerPawn::BeginPlay()
@@ -30,6 +37,9 @@ void APlayerPawn::BeginPlay()
 			Subsystem->AddMappingContext(InputMappingContext, 0);
 		}
 	}
+
+	Interactor->GetGrabber()->OnGrab.AddUObject(this, &APlayerPawn::HandsUp);
+	Interactor->GetGrabber()->OnRelease.AddUObject(this, &APlayerPawn::HandsDown);
 }
 
 void APlayerPawn::Tick(float DeltaTime)

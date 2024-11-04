@@ -60,6 +60,7 @@ void UGrabberComponent::Grab(UPrimitiveComponent* Primitive, const FVector& Impa
 	);
 
 	USoundManager::GetInstance(GetWorld())->PlaySoundAtLocationByTag(FName("PickUp"), GetComponentLocation());
+	OnGrab.Broadcast();
 }
 
 void UGrabberComponent::ReleaseBegin()
@@ -110,6 +111,7 @@ void UGrabberComponent::Release()
 	PhysicsHandle->ReleaseComponent();
 
 	USoundManager::GetInstance(GetWorld())->PlaySoundAtLocationByTag(FName("Put"), GetComponentLocation());
+	OnRelease.Broadcast();
 
 	return;
 }

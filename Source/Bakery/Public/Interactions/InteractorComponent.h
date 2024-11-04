@@ -35,20 +35,26 @@ private:
 	UPROPERTY(VisibleAnywhere, Category="Interaction|Grabber")
 	UGrabberComponent* Grabber;
 
+	// 상호작용 가능 액터를 트레이스 할 때 사용할 채널
 	UPROPERTY(EditAnywhere, Category="Interaction")
-	TEnumAsByte<ECollisionChannel> InteractTraceChannel;	// 상호작용 가능 액터를 트레이스 할 때 사용할 채널
+	TEnumAsByte<ECollisionChannel> InteractTraceChannel;
 
+	// 잡기 가능 액터를 트레이스 할 때 사용할 채널
 	UPROPERTY(EditAnywhere, Category = "Interaction")
-	TEnumAsByte<ECollisionChannel> GrabTraceChannel;	// 잡기 가능 액터를 트레이스 할 때 사용할 채널
+	TEnumAsByte<ECollisionChannel> GrabTraceChannel;
 
+	// 상호작용 가능 액터 탐지 트레이스 시작 높이
 	UPROPERTY(EditAnywhere, Category="Interaction")
-	float DetectHeight = 0.f;	// 상호작용 가능 액터 탐지 트레이스 시작 높이
+	float DetectHeight = 0.f;
 
+	// 상호작용 가능 액터 탐지 트레이스 거리
 	UPROPERTY(EditAnywhere, Category="Interaction")
-	float DetectDistance = 65.f;	// 상호작용 가능 액터 탐지 트레이스 거리
+	float DetectDistance = 65.f;
 
-
-	bool bIsInteracting = false;	// 현재 상호작용 중(키를 누르고 있는 중) 여부
-	bool bIsGrabbing = false; // 현재 잡기 중 여부
-	UInteractableComponent* CurrentInteractable;	// 현재 상호작용 중인 액터의 InteractableComponent
+	// 현재 상호작용 중(키를 누르고 있는 중) 여부
+	bool bIsInteracting = false;
+	// 현재 잡기 중 여부
+	bool bIsGrabbing = false;
+	// 현재 상호작용 중인 액터의 InteractableComponent
+	UInteractableComponent* CurrentInteractable;
 };
