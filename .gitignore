@@ -74,11 +74,8 @@ Plugins/*/Intermediate/*
 DerivedDataCache/*
 
 
-
-# Megascan Assets
-Content/Megascans/*
-
 # External Assets
+# Megascan Assets
 Content/External
 
 # Playground Assets
