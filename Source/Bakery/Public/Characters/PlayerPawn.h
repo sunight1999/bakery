@@ -22,8 +22,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
-	void HandsUp() { PlayAnimMontage(GrabbingMontage, 2.f); }
-	void HandsDown() { StopAnimMontage(GrabbingMontage); }
+	void HandsUp() { if (GrabbingMontage) PlayAnimMontage(GrabbingMontage, 2.f); }
+	void HandsDown() { if (GrabbingMontage) StopAnimMontage(GrabbingMontage); }
 
 protected:
 	virtual void BeginPlay() override;
@@ -62,5 +62,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Player|Movement")
 	float MeshTurnOffset = -90.f;
 
+	/*
+	 * 애니메이션 관련
+	 */
+	UPROPERTY(EditAnywhere, Category = "Player|Animation")
 	UAnimMontage* GrabbingMontage;
 };

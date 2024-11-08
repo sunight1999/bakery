@@ -18,12 +18,6 @@ APlayerPawn::APlayerPawn()
 {
 	Interactor = CreateDefaultSubobject<UInteractorComponent>(TEXT("Interactor"));
 	Interactor->SetupAttachment(RootComponent);
-
-	ConstructorHelpers::FObjectFinder<UAnimMontage> GrabbingMontageFinder(TEXT("/Game/Characters/Player/Animations/AM_Grabbing"));
-	if (GrabbingMontageFinder.Succeeded())
-	{
-		GrabbingMontage = GrabbingMontageFinder.Object;
-	}
 }
 
 void APlayerPawn::BeginPlay()
