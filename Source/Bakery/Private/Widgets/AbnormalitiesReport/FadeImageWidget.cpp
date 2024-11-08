@@ -13,14 +13,12 @@ void UFadeImageWidget::OnImage()
 {
     FLinearColor Opacity = BlurImage->ColorAndOpacity;
     Opacity.A = 1.0;
-    //BlurImage->SetRenderOpacity(0);
     BlurImage->SetColorAndOpacity(Opacity);
 }
 void UFadeImageWidget::OffImage()
 {
     FLinearColor Opacity = BlurImage->ColorAndOpacity;
     Opacity.A = 0;
-    //BlurImage->SetRenderOpacity(0);
     BlurImage->SetColorAndOpacity(Opacity);
 }
 void UFadeImageWidget::VisibleImage()

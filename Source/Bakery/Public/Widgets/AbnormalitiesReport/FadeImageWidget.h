@@ -21,8 +21,6 @@ public:
 	int ImageNum;
 	UPROPERTY(meta = (BindWidget), VisibleAnywhere, Category = "Image")
 	UImage* BlurImage;
-	UPROPERTY(meta = (BindWidget), EditAnywhere, Category = "Canvas")
-	UCanvasPanel* BlurImageCanvas;
 	UPROPERTY(meta = (BindWidgetAnim), EditAnywhere, Transient, Category = "Animation")
 	UWidgetAnimation* OnFadeImageAnim;
 	UPROPERTY(meta = (BindWidgetAnim), EditAnywhere, Transient, Category = "Animation")

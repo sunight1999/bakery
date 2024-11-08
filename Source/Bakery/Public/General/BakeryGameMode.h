@@ -26,6 +26,7 @@ public:
 
 	virtual void OpenBakery();
 	virtual void CloseBakery();
+	void GetOperatingTime();
 	virtual void Disappointed(APawn* Pawn) {}
 
 	FBakeryOpendDelegate OnBakeryPreOpened;
