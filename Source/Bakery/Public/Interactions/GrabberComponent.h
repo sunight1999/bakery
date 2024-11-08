@@ -6,6 +6,9 @@
 #include "Components/SceneComponent.h"
 #include "GrabberComponent.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FGrabbedDelegate)
+DECLARE_MULTICAST_DELEGATE(FReleasedDelegate)
+
 class UPhysicsHandleComponent;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -24,6 +27,9 @@ public:
 
 	bool IsGrabbing();
 	UPrimitiveComponent* GetGrabbed();
+
+	FGrabbedDelegate OnGrab;
+	FReleasedDelegate OnRelease;
 
 protected:
 	virtual void BeginPlay() override;
