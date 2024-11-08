@@ -2,6 +2,7 @@
 #include "Components/TextBlock.h"
 #include "Components/Button.h"
 #include <AbnormalitiesReport/AbnormalitiesReportManager.h>
+#include "AbnormalitiesReport/\AbnormalityEvent.h"
 #include "Widgets/AbnormalitiesReport/AbnormalitiesReportWidget.h"
 void UAbnormalitiesReportWidget::OnOverlay()
 {
@@ -19,6 +20,7 @@ void UAbnormalitiesReportWidget::ChangeReportText(FString Text)
 {
     TextBlock->SetText(FText::FromString(Text));
 }
+
 bool UAbnormalitiesReportWidget::Initialize()
 {
     Super::Initialize();

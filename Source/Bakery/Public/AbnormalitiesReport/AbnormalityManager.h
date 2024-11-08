@@ -6,7 +6,7 @@
 #include "AbnormalityManager.generated.h"
 
 class AAbnormalitiesReportManager;
-class UAbnormalityEvent;
+class AAbnormalityEvent;
 
 //DECLARE_MULTICAST_DELEGATE(FAbnomalityReportDelegate);
 //DECLARE_MULTICAST_DELEGATE_OneParam(FSetReportUIDelegate, FString);
@@ -27,8 +27,8 @@ public:
 	int CreateRandomAnswer(int& number);
 	UPROPERTY(EditAnywhere, Category = "UI")
 	AAbnormalitiesReportManager* Report;
-	UAbnormalityEvent* Event;
-private:
+	UPROPERTY(EditAnywhere, Category = "Event")
+	AAbnormalityEvent* Event;
 	
 };
 /*

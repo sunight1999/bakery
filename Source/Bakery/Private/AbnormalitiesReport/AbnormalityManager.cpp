@@ -31,7 +31,7 @@ void AAbnormalityManager::Tick(float DeltaTime)
 
 int AAbnormalityManager::CreateRandomAnswer(int& number)
 {
-	number = FMath::RandRange(0, 6);
+	number = FMath::RandRange(1, 2);
 	return number;
 }
 

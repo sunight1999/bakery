@@ -45,11 +45,7 @@ void AAbnormalitiesReportManager::CreateOverlayWidget()
             {
                 // 위젯을 화면에 추가
                 OverlayWidgetInstance->AddToViewport();
-                //OverlayWidgetInstance->SetVisibility(ESlateVisibility::Hidden);
-                //OverlayWidgetInstance->ExitButtonBinding();
                 OverlayWidgetInstance->ChangeReportText("Test");
-                //SituationCoolDown();
-
             }
         }
     }
@@ -90,10 +86,17 @@ void AAbnormalitiesReportManager::SetFuncFlag()
 void AAbnormalitiesReportManager::GetRandomAnswer(int Randnum)
 {
     FSituationData* Row = DataTable->FindRow<FSituationData>(*FString::FromInt(Randnum), "데이터테이블 다운 실패");
-    FString HeadName = Row->Situation;
-    FString Name = Row->Explanation;
-    OverlayWidgetInstance->ChangeReportHeadText(HeadName); // 행이 우선
-    OverlayWidgetInstance->ChangeReportText(Name); // 행이 우선
+    FString HeadName;
+    FString Name;
+    if (Row->Situation.IsEmpty()|| Row->Explanation.IsEmpty()) { 
+        UE_LOG(LogTemp, Display, TEXT("HeadName 혹은 Situation이 null입니다."));
+    }
+    else {
+        HeadName = Row->Situation;
+        Name = Row->Explanation;
+        OverlayWidgetInstance->ChangeReportHeadText(HeadName); // 행이 우선
+        OverlayWidgetInstance->ChangeReportText(Name); // 행이 우선
+    }
 }
 void AAbnormalitiesReportManager::ClearUI()
 {

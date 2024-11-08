@@ -1,7 +1,7 @@
 #pragma once
 #include "AbnormalitiesReport/AbnormalityManager.h"
 #include "CoreMinimal.h"
-#include "Engine/DataAsset.h"
+#include "GameFramework/Actor.h"
 #include "Components/Image.h"
 #include "AbnormalityEvent.generated.h"
 
@@ -9,6 +9,7 @@
 /**
  * 상황보고 이벤트 관리 시스템
  */
+class UFadeImageWidget;
 
 enum EEventType
 {
@@ -18,28 +19,33 @@ enum EEventType
 };
 
 UCLASS()
-class BAKERY_API UAbnormalityEvent : public UPrimaryDataAsset
+class BAKERY_API AAbnormalityEvent : public AActor
 {
 	GENERATED_BODY()
 public:
-	UAbnormalityEvent();
-
+	UPROPERTY(EditAnywhere, Category = "Fade")
+	float RandomPosMin = 0.1;
+	UPROPERTY(EditAnywhere, Category = "Fade")
+	float RandomPosMax = 0.9;
+	UPROPERTY(EditAnywhere, Category = "Fade")
+	float RandomSizeMin	= 0.5;
+	UPROPERTY(EditAnywhere, Category = "Fade")
+	float RandomSizeMax = 2.5;
 	int RandNum;
 	UPROPERTY(EditAnywhere, Category = "Fade")
-	TSubclassOf<UUserWidget> FadeWidgetClass;
+	TArray<TSubclassOf<UUserWidget>> FadeWidgetClass;
 	UPROPERTY(EditAnywhere, Category = "Fade")
-	int MaxFadeArrayNum = 3;
+	int MaxFadeArrayNum = 5;
 	UPROPERTY(EditAnywhere, Category = "Fade")
 	class UFadeImageWidget* FadeWidgetInstance;
 	UPROPERTY(EditAnywhere, Category = "Fade")
 	TArray<UFadeImageWidget*> FadeWidgetInstanceArray;
-
+	bool EventPlay;
 public:
 	void PlayEvent(int num);
 	void TestPlayEvent(); // 이벤트 실행
 public:
 	void TriggerBlurEffect(); // 시야 방해;
 	void TriggerBlurEffectInitialize(); // 초기화
-	void RandomlyPlaceImage(UStaticMeshComponent* Image, FVector2D MinBounds, FVector2D MaxBounds);
 };
  

@@ -74,3 +74,7 @@ void ABakeryGameMode::CloseBakery()
 	OnBakeryClosed.Broadcast();
 }
 
+void ABakeryGameMode::GetOperatingTime()
+{
+}
+

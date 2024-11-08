@@ -18,6 +18,7 @@ public:
 	class UTextBlock* TextBlock;
 	UPROPERTY(meta = (BindWidget), VisibleAnywhere, Category = "UI")
 	class UButton* ExitButton;
+	int32 ChoiceImage;
 	UFUNCTION()
 	void OnOverlay();
 	UFUNCTION()
