@@ -22,6 +22,7 @@ public:
 	void NativeConstruct() override;
 
 	void SetHUDState(bool bIsOpened);
+	bool GetHUDState() const { return bIsOpenedHUD; }
 	
 	FORCEINLINE FText IntToFText(int32 Value) { return FText::FromString(FString::FromInt(Value)); }
 	FORCEINLINE FText FloatToFText(float Value) { return FText::FromString(FString::SanitizeFloat(Value)); }

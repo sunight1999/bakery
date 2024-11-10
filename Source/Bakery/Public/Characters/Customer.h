@@ -13,6 +13,7 @@ class UAnimMontage;
 class AAIController;
 class AChair;
 class AIngredient;
+class ADish;
 class URecipeData;
 class UDishWaitingTimeBarWidget;
 
@@ -45,7 +46,7 @@ private:
 	void HandleSitting();
 	void RequestTakeOrder();
 	void OrderDish();
-	void Eat(AIngredient* Dish);
+	void Eat(ADish* Dish);
 	void FinishEating();
 
 public:
@@ -56,7 +57,7 @@ public:
 	 */
 	FORCEINLINE void SetWaitingTimer(float WaitingTime);
 	FORCEINLINE void ClearWaitingTimer();
-	bool ServeDish(AIngredient* Dish);
+	bool ServeDish(ADish* Dish);
 	void Disappoint();
 
 	/*
@@ -97,7 +98,7 @@ private:
 	 * 주문 및 식사 관련
 	 */
 	const URecipeData* Order = nullptr;
-	AIngredient* ServedDish = nullptr;
+	ADish* ServedDish = nullptr;
 
 	FTimerManager* TimerManager;
 	FTimerHandle WaitingTimer;

@@ -2,16 +2,27 @@
 
 
 #include "Kitchen/TrashBin.h"
+#include "EngineUtils.h"
 
 #include "Interactions/InteractionDefines.h"
 #include "Interactions/InteractorComponent.h"
 #include "Interactions/GrabberComponent.h"
 #include "Kitchen/Ingredient.h"
+#include "Kitchen/IngredientContainer.h"
+#include "Kitchen/Dish.h"
 
 ATrashBin::ATrashBin()
 {
 	TrashBinMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TrashBinMesh"));
 	TrashBinMesh->SetupAttachment(RootComponent);
+}
+
+void ATrashBin::BeginPlay()
+{
+	for (TActorIterator<AIngredientContainer> It(GetWorld()); It; ++It)
+	{
+		IngredientContainers.Emplace(*It);
+	}
 }
 
 void ATrashBin::OnEnterGrab(const FInteractionInfo& InteractionInfo)
@@ -24,9 +35,36 @@ void ATrashBin::OnEnterGrab(const FInteractionInfo& InteractionInfo)
 	}
 
 	AActor* GrabbedActor = Grabbed->GetOwner();
-	if (GrabbedActor->IsA(AIngredient::StaticClass()))
+	if (GrabbedActor->IsA(ADish::StaticClass()))
 	{
-		Grabber->Release();
-		GrabbedActor->Destroy(); // TODO: 추후 풀링 시스템 넣으면 Despawn으로 변경
+		ADish* Dish = Cast<ADish>(GrabbedActor);
+		if (Dish->PeekDessert())
+		{
+			Dish->Eat();
+		}
+
+		return;
 	}
+
+	if (!GrabbedActor->IsA(AIngredient::StaticClass()))
+	{
+		return;
+	}
+
+	bool bIsReturned = false;
+	for (AIngredientContainer* Container : IngredientContainers)
+	{
+		bIsReturned = Container->TryReturnIngredient(GrabbedActor);
+		if (bIsReturned)
+		{
+			break;
+		}
+	}
+
+	if (!bIsReturned)
+	{
+		return;
+	}
+
+	Grabber->Release();
 }

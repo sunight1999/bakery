@@ -22,9 +22,45 @@ void AIngredientContainer::BeginPlay()
 {
 	Super::BeginPlay();
 
-	World = GetWorld();
-
 	verify(ContainedIngredient);
+
+	IngredientPool.OnPostSpawned.BindUObject(this, &AIngredientContainer::InitializeIngredient);
+	IngredientPool.Initialize(GetWorld(), AIngredient::StaticClass(), this);
+}
+
+void AIngredientContainer::InitializeIngredient(UObject* IngredientObj)
+{
+	AIngredient* Ingredient = Cast<AIngredient>(IngredientObj);
+	if (!Ingredient)
+	{
+		return;
+	}
+
+	Ingredient->SetActorLocationAndRotation(GetActorLocation(), FRotator::ZeroRotator);
+	Ingredient->SetActorScale3D(FVector(IngredientMeshSizeMultiplier));
+	Ingredient->ChangeIngredient(ContainedIngredient);
+
+	UPrimitiveComponent* Primitive = Ingredient->GetComponentByClass<UPrimitiveComponent>();
+	if (!Primitive)
+	{
+		return;
+	}
+
+	Primitive->SetConstraintMode(EDOFMode::XYPlane);
+}
+
+bool AIngredientContainer::TryReturnIngredient(UObject* IngredientObj)
+{
+	AIngredient* Ingredient = Cast<AIngredient>(IngredientObj);
+	if (!Ingredient)
+	{
+		return false;
+	}
+
+	UPrimitiveComponent* Primitive = Ingredient->GetComponentByClass<UPrimitiveComponent>();
+	Primitive->SetSimulatePhysics(true);
+
+	return IngredientPool.Put(IngredientObj);
 }
 
 /*
@@ -41,13 +77,9 @@ void AIngredientContainer::OnEnterGrab(const FInteractionInfo& InteractionInfo)
 		return;
 	}
 
-	// Ingredient 액터를 생성해 플레이어에게 Grab
-	// TODO: 풀링으로 변경
-	AIngredient* Ingredient = World->SpawnActor<AIngredient>();
-	Ingredient->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
-	Ingredient->SetActorLocationAndRotation(GetActorLocation(), FRotator::ZeroRotator);
-	Ingredient->SetActorScale3D(FVector(IngredientMeshSizeMultiplier));
-	Ingredient->ChangeIngredient(ContainedIngredient.Get());
+	// Ingredient 액터를 플레이어가 쥐도록 설정
+	AIngredient* Ingredient = Cast<AIngredient>(IngredientPool.Get());
+	Ingredient->ChangeIngredient(ContainedIngredient);
 
 	UPrimitiveComponent* Primitive = Ingredient->GetComponentByClass<UPrimitiveComponent>();
 	Grabber->Grab(Primitive, Ingredient->GetActorLocation());

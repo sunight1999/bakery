@@ -26,6 +26,8 @@ public:
 
 	virtual void OpenBakery();
 	virtual void CloseBakery();
+
+	bool IsOpened();
 	void GetOperatingTime();
 	virtual void Disappointed(APawn* Pawn) {}
 

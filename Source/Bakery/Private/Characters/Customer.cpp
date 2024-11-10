@@ -13,6 +13,7 @@
 #include "General/BakeryGameState.h"
 #include "Subsystems/SoundManager.h"
 #include "Kitchen/Ingredient.h"
+#include "Kitchen/Dish.h"
 #include "Kitchen/Data/RecipeData.h"
 #include "Hall/Table.h"
 #include "Hall/Chair.h"
@@ -128,7 +129,7 @@ void ACustomer::OrderDish()
 	SetWaitingTimer(DishWaitingTime);
 }
 
-void ACustomer::Eat(AIngredient* Dish)
+void ACustomer::Eat(ADish* Dish)
 {
 	ServedDish = Dish;
 	CustomerState = ECustomerState::Eating;
@@ -141,7 +142,7 @@ void ACustomer::Eat(AIngredient* Dish)
 
 void ACustomer::FinishEating()
 {
-	ServedDish->Destroy();
+	ServedDish->Eat();
 	ServedDish = nullptr;
 
 	// 먹은 음식 계산
@@ -166,10 +167,8 @@ void ACustomer::Leave()
 		AssignedSeat = nullptr;
 	}
 
-	// TODO: 영업 종료 시 이미 서빙된 음식 어떻게 할 건지 기획 필요
 	if (ServedDish)
 	{
-		ServedDish->Destroy();
 		ServedDish = nullptr;
 	}
 
@@ -192,14 +191,19 @@ FORCEINLINE void ACustomer::ClearWaitingTimer()
 	TimerManager->ClearTimer(WaitingTimer);
 }
 
-bool ACustomer::ServeDish(AIngredient* Dish)
+bool ACustomer::ServeDish(ADish* Dish)
 {
 	if (CustomerState != ECustomerState::WaitingDish)
 	{
 		return false;
 	}
+
+	if (!Dish || !Dish->PeekDessert())
+	{
+		return false;
+	}
 	
-	if (Dish->GetAvailableRecipe() != Order)
+	if (Dish->PeekDessert()->GetAvailableRecipe() != Order)
 	{
 		return false;
 	}

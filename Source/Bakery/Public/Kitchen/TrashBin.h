@@ -6,6 +6,8 @@
 #include "Interactions/Interactables/GrabInteractableActor.h"
 #include "TrashBin.generated.h"
 
+class AIngredientContainer;
+
 /**
  * 
  */
@@ -17,11 +19,20 @@ class BAKERY_API ATrashBin : public AGrabInteractableActor
 public:
 	ATrashBin();
 
+	void OnEnterInteract(const FInteractionInfo& InteractionInfo) override {}
+	void OnInteract() override {}
+	void OnExitInteract() override {}
+
 	void OnEnterGrab(const FInteractionInfo& InteractionInfo) override;
 	void OnGrab() override {}
 	void OnExitGrab() override {}
 
+protected:
+	void BeginPlay() override;
+
 private:
 	UPROPERTY(VisibleAnywhere, Category = "TrashBin")
 	UStaticMeshComponent* TrashBinMesh;
+
+	TArray<AIngredientContainer*> IngredientContainers;
 };

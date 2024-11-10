@@ -23,6 +23,9 @@ public:
 	ACustomer* GetAssignedCustomer() const { return AssignedCustomer; }
 	void SetAssignedCustomer(ACustomer* Customer) { AssignedCustomer = Customer; }
 
+	void SetChairDirection(const FVector& Direction) { ChairDirection = Direction; }
+	const FVector& GetChairDirection() const { return ChairDirection; }
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -35,4 +38,6 @@ private:
 
 	ATable* OwnerTable = nullptr;
 	ACustomer* AssignedCustomer = nullptr;
+
+	FVector ChairDirection;
 };

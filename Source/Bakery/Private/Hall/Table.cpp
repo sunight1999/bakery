@@ -10,7 +10,9 @@
 #include "Interactions/InteractionDefines.h"
 #include "Interactions/InteractorComponent.h"
 #include "Interactions/GrabberComponent.h"
+#include "General/BakeryGameMode.h"
 #include "Kitchen/Ingredient.h"
+#include "Kitchen/Dish.h"
 #include "Characters/Customer.h"
 #include "Widgets/Hall/WaitingTimeBarWidget.h"
 
@@ -24,6 +26,9 @@ ATable::ATable()
 	InteractionBox->SetupAttachment(RootComponent);
 	InteractionBox->SetCanEverAffectNavigation(false);
 
+	DishServingCenterPoint = CreateDefaultSubobject<USceneComponent>(TEXT("DishServingCenterPoint"));
+	DishServingCenterPoint->SetupAttachment(StaticMesh);
+
 	WaitingTimeBarWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("WaitingTimeBarWidget"));
 	WaitingTimeBarWidget->SetVisibility(false);
 	WaitingTimeBarWidget->SetupAttachment(RootComponent);
@@ -32,6 +37,8 @@ ATable::ATable()
 void ATable::BeginPlay()
 {
 	Super::BeginPlay();
+
+	BakeryGameMode = Cast<ABakeryGameMode>(GetWorld()->GetAuthGameMode());
 
 	// 테이블 주변으로 의자 생성
 	// TODO: 테이블이 가까이 있으면 의자가 하나만 생성되도록 해야 함
@@ -44,28 +51,28 @@ void ATable::BeginPlay()
 		switch (i)
 		{
 		case (uint8)EDirection::Left:
-			Direction = FVector::LeftVector;
+			Chair->SetChairDirection(FVector::LeftVector);
 			Rotation.Yaw = 90.f;
 			break;
 
 		case (uint8)EDirection::Right:
-			Direction = FVector::RightVector;
+			Chair->SetChairDirection(FVector::RightVector);
 			Rotation.Yaw = 270.f;
 			break;
 
 		case (uint8)EDirection::Forward:
-			Direction = FVector::ForwardVector;
+			Chair->SetChairDirection(FVector::ForwardVector);
 			Rotation.Yaw = 180.f;
 			break;
 
 		case (uint8)EDirection::Backward:
-			Direction = FVector::BackwardVector;
+			Chair->SetChairDirection(FVector::BackwardVector);
 			break;
 		}
 
 		Chair->SetOwnerTable(this);
 		Chair->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-		Chair->SetActorLocationAndRotation(GetActorLocation() + Direction * ChairDistance, Rotation);
+		Chair->SetActorLocationAndRotation(GetActorLocation() + Chair->GetChairDirection() * ChairDistance, Rotation);
 
 		EmptySeats.Emplace(Chair);
 	}
@@ -151,16 +158,30 @@ void ATable::OnEnterInteract(const FInteractionInfo& InteractionInfo)
 
 void ATable::OnEnterGrab(const FInteractionInfo& InteractionInfo)
 {
-	// 플레이어의 Grabbed 가져와서 주변 손님의 레시피와 확인
 	UGrabberComponent* Grabber = InteractionInfo.Interactor->GetGrabber();
 	UPrimitiveComponent* Grabbed = Grabber->GetGrabbed();
+
+	// 플레이어가 빈 손이면 테이블에 빈 접시가 있는지 확인 후 Grab 설정
 	if (!Grabbed)
 	{
+		for (int i = 0; i < ServedDishes.Num(); i++)
+		{
+			ADish* Dish = ServedDishes[i];
+			if (!Dish->PeekDessert() || !BakeryGameMode->IsOpened())
+			{
+				UPrimitiveComponent* Primitive = Dish->GetComponentByClass<UPrimitiveComponent>();
+				Grabber->Grab(Primitive, Dish->GetActorLocation());
+
+				ServedDishes.RemoveAt(i);
+				break;
+			}
+		}
+
 		return;
 	}
 
-	AIngredient* Ingredient = Cast<AIngredient>(Grabbed->GetOwner());
-	if (!Ingredient)
+	ADish* Dish = Cast<ADish>(Grabbed->GetOwner());
+	if (!Dish)
 	{
 		return;
 	}
@@ -174,12 +195,19 @@ void ATable::OnEnterGrab(const FInteractionInfo& InteractionInfo)
 			continue;
 		}
 
-		if (Customer->ServeDish(Ingredient))
+		if (Customer->ServeDish(Dish))
 		{
 			Grabber->Release();
 
-			// TODO: 좌석 위치에 따라 접시를 테이블 위에 배치
+			FVector TableCenterLocation = DishServingCenterPoint->GetComponentLocation();
+			FVector DishLocation = TableCenterLocation + Seat->GetChairDirection() * DishesDistance;
+			Dish->SetActorLocation(DishLocation);
 
+			UPrimitiveComponent* Primitive = Dish->GetComponentByClass<UPrimitiveComponent>();
+			Primitive->SetPhysicsLinearVelocity(FVector::ZeroVector);
+			Primitive->SetPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
+
+			ServedDishes.Emplace(Dish);
 			return;
 		}
 	}

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Interactions/Interactables/GrabInteractableActor.h"
+#include "General/Tools/Pool.h"
 #include "IngredientContainer.generated.h"
 
 class UIngredientData;
@@ -28,6 +29,9 @@ public:
 	void OnGrab() override {}
 	void OnExitGrab() override {}
 
+	void InitializeIngredient(UObject* IngredientObj);
+	bool TryReturnIngredient(UObject* IngredientObj);
+
 protected:
 	void BeginPlay() override;
 
@@ -36,21 +40,10 @@ private:
 	UStaticMeshComponent* ContainerMesh;
 
 	UPROPERTY(EditAnywhere, Category="Kitchen|Ingredient")
-	TObjectPtr<UIngredientData> ContainedIngredient;
+	UIngredientData* ContainedIngredient;
 
 	UPROPERTY(EditAnywhere, Category = "Kitchen|Ingredient")
 	float IngredientMeshSizeMultiplier = 1.f;
 
-	UWorld* World;
-
-	/* TODO: 풀링으로 변경 시 활성화
-	UPROPERTY(EditAnywhere, Category = "Kitchen|Ingredient")
-	uint8 PoolingInitNum = 10;	// Ingredient 액터 풀링 초기 개수
-
-	UPROPERTY(EditAnywhere, Category = "Kitchen|Ingredient")
-	uint8 PoolingStepNum = 10;	// Ingredient 액터 풀의 액터를 모두 사용 중일 경우 풀링 개수를 늘릴 단위
-
-	uint8 MaxPoolingNum = 0;	// 현재 풀링 개수
-	uint8 UsingPoolingNum = 0;	// 현재 풀에서 사용 중인 액터 수
-	*/
+	TPool IngredientPool;
 };

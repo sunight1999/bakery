@@ -74,6 +74,11 @@ void ABakeryGameMode::CloseBakery()
 	OnBakeryClosed.Broadcast();
 }
 
+bool ABakeryGameMode::IsOpened()
+{
+	return BakeryHUDWidget->GetHUDState();
+}
+
 void ABakeryGameMode::GetOperatingTime()
 {
 }

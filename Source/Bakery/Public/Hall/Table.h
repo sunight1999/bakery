@@ -8,8 +8,10 @@
 
 class ACustomer;
 class AChair;
+class ADish;
 class UWidgetComponent;
 class UWaitingTimeBarWidget;
+class ABakeryGameMode;
 
 /**
  * 
@@ -42,11 +44,17 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Table")
 	UStaticMeshComponent* StaticMesh;
 
+	UPROPERTY(VisibleAnywhere, Category = "Table")
+	USceneComponent* DishServingCenterPoint;
+
 	UPROPERTY(EditAnywhere, Category="Table")
 	TSubclassOf<AChair> ChairClass;
 
 	UPROPERTY(EditAnywhere, Category = "Table")
 	float ChairDistance = 15.f;
+
+	UPROPERTY(EditAnywhere, Category = "Table")
+	float DishesDistance = 5.f;
 
 	UPROPERTY(VisibleAnywhere, Category = "Table")
 	UWidgetComponent* WaitingTimeBarWidget;
@@ -54,6 +62,10 @@ private:
 	UWaitingTimeBarWidget* WaitingTimeBar;
 	ACustomer* WaitingTrackedCustomer = nullptr;
 
+	ABakeryGameMode* BakeryGameMode;
+
 	TArray<AChair*> EmptySeats;
 	TSet<AChair*> UsingSeats;
+
+	TArray<ADish*> ServedDishes;
 };

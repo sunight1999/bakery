@@ -20,13 +20,21 @@ void TPool::Initialize(UWorld* InWorld, TSubclassOf<UObject> InObjectClass, AAct
 	PoolScaleStep = InPoolScaleStep;
 	CurrentIndex = -1;
 
-	Expand(InPoolSize);
-
 	bIsInitialized = true;
+	bIsActorClass = ObjectClass.Get()->IsChildOf(AActor::StaticClass());
+	bIsComponentClass = ObjectClass.Get()->IsChildOf(UActorComponent::StaticClass());
+
+	Expand(InPoolSize);
 }
 
 UObject* TPool::Get()
 {
+	if (!bIsInitialized)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Pool이 초기화되지 않았습니다. TPool::Initialize를 먼저 호출해주세요."));
+		return nullptr;
+	}
+
 	int Left = PoolSize;
 
 	while (Left--)
@@ -37,6 +45,7 @@ UObject* TPool::Get()
 		if (ObjectAvailableMap[Object])
 		{
 			ObjectAvailableMap[Object] = false;
+			Enable(Object);
 			return Object;
 		}
 	}
@@ -46,19 +55,34 @@ UObject* TPool::Get()
 	return Get();
 }
 
-void TPool::Put(UObject* Object)
+bool TPool::Put(UObject* Object)
 {
+	if (!bIsInitialized)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Pool이 초기화되지 않았습니다. TPool::Initialize를 먼저 호출해주세요."));
+		return false;
+	}
+
 	if (!Object->IsA(ObjectClass) || !ObjectAvailableMap.Contains(Object))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("유효하지 않은 오브젝트입니다."));
-		return;
+		return false;
 	}
 
+	Disable(Object);
+
 	ObjectAvailableMap[Object] = true;
+	return true;
 }
 
 void TPool::Expand(int Size)
 {
+	if (!bIsInitialized)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Pool이 초기화되지 않았습니다. TPool::Initialize를 먼저 호출해주세요."));
+		return;
+	}
+
 	if (Size == -1)
 	{
 		Size = PoolScaleStep;
@@ -78,22 +102,21 @@ UObject* TPool::Spawn()
 {
 	UObject* Object = nullptr;
 
-	if (ObjectClass.Get()->IsChildOf(AActor::StaticClass()))
+	if (bIsActorClass)
 	{
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 		
 		AActor* Actor = World->SpawnActor(ObjectClass, &FVector::ZeroVector, &FRotator::ZeroRotator, SpawnParams);
-
 		if (ParentActor)
 		{
-			Actor->AttachToActor(ParentActor, FAttachmentTransformRules::SnapToTargetIncludingScale);
+			//Actor->AttachToActor(ParentActor, FAttachmentTransformRules::KeepWorldTransform);
 		}
 
 		Object = Actor;
 	}
 	// 풀링 대상이 컴포넌트일 경우 World에 등록
-	else if (ObjectClass.Get()->IsChildOf(UActorComponent::StaticClass()))
+	else if (bIsComponentClass)
 	{
 		Object = NewObject<UActorComponent>(World, ObjectClass);
 		UActorComponent* Component = Cast<UActorComponent>(Object);
@@ -109,5 +132,36 @@ UObject* TPool::Spawn()
 		OnPostSpawned.Execute(Object);
 	}
 
+	Disable(Object);
+
 	return Object;
+}
+
+void TPool::Enable(UObject* Object)
+{
+	if (bIsActorClass)
+	{
+		AActor* Actor = Cast<AActor>(Object);
+		Actor->SetActorHiddenInGame(false);
+		Actor->SetActorTickEnabled(true);
+	}
+}
+
+void TPool::Disable(UObject* Object)
+{
+	if (bIsActorClass)
+	{
+		AActor* Actor = Cast<AActor>(Object);
+		UPrimitiveComponent* Primitive = Actor->GetComponentByClass<UPrimitiveComponent>();
+
+		Primitive->SetPhysicsLinearVelocity(FVector::ZeroVector);
+		Primitive->SetPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
+		Actor->SetActorHiddenInGame(true);
+		Actor->SetActorTickEnabled(false);
+		
+		if (ParentActor)
+		{
+			Actor->SetActorLocationAndRotation(ParentActor->GetActorLocation(), FRotator::ZeroRotator);
+		}
+	}
 }

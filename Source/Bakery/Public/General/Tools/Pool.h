@@ -16,17 +16,22 @@ public:
 	~TPool();
 
 	void Initialize(UWorld* InWorld, TSubclassOf<UObject> InObjectClass, AActor* InParentActor = nullptr, int32 InPoolSize = 10, int32 InPoolScaleStep = 10);
+	void Expand(int Size = -1);
 
 	UObject* Get();
-	void Put(UObject* PoolObject);
+	bool Put(UObject* PoolObject);
 
+	// 오브젝트 생성 후 추가로 수행할 작업 델리게이트. 반드시 Initialize 호출 전에 바인딩해야 함.
 	FPostSpawnDelegate OnPostSpawned;
 
 private:
-	void Expand(int Size = -1);
 	UObject* Spawn();
+	void Enable(UObject* Object);
+	void Disable(UObject* Object);
 
 	bool bIsInitialized = false;
+	bool bIsActorClass = false;
+	bool bIsComponentClass = false;
 
 	TArray<UObject*> ObjectPool;
 	TMap<UObject*, bool> ObjectAvailableMap;

@@ -19,7 +19,7 @@ UCLASS()
 class BAKERY_API ACountertop : public AGrabInteractableActor
 {
 	GENERATED_BODY()
-	
+
 public:
 	ACountertop();
 	void Tick(float DeltaTime) override;
@@ -28,12 +28,12 @@ public:
 	void ResetCooking();
 
 	virtual void OnEnterInteract(const FInteractionInfo& InteractionInfo) override;
-	virtual void OnInteract() override;
-	virtual void OnExitInteract() override;
+	virtual void OnInteract() override {}
+	virtual void OnExitInteract() override {}
 
 	virtual void OnEnterGrab(const FInteractionInfo& InteractionInfo) override;
-	virtual void OnGrab() override;
-	virtual void OnExitGrab() override;
+	virtual void OnGrab() override {}
+	virtual void OnExitGrab() override {}
 
 	/*
 	 * 요리 관련 함수
@@ -42,8 +42,8 @@ public:
 	void Cook();
 	void EndCook();
 
-	FORCEINLINE float CalculateAutoShorten() { return AutoCookingTime / HandCookingTime * AutoCookingReduceMultiplier; }
-	FORCEINLINE bool IsCookingDone()
+	FORCEINLINE float CalculateAutoShorten() const { return AutoCookingTime / HandCookingTime * AutoCookingReduceMultiplier; }
+	FORCEINLINE bool IsCookingDone() const
 	{
 		if (bIsAutomatic)
 		{
@@ -106,6 +106,7 @@ private:
 	/*
 	 * 현재 보관 중인 재료 또는 요리 관련
 	 */
+	AActor* CurrentKeptObject;
 	AIngredient* CurrentKeptIngredient;
 	UAudioComponent* CurrentAudio;
 
