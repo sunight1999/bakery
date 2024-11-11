@@ -17,7 +17,6 @@ class BAKERY_API UFadeImageWidget : public UUserWidget
 {
 	GENERATED_BODY()
 public:
-	
 	int ImageNum;
 	UPROPERTY(meta = (BindWidget), VisibleAnywhere, Category = "Image")
 	UImage* BlurImage;
@@ -25,9 +24,18 @@ public:
 	UWidgetAnimation* OnFadeImageAnim;
 	UPROPERTY(meta = (BindWidgetAnim), EditAnywhere, Transient, Category = "Animation")
 	UWidgetAnimation* OffFadeImageAnim;
-	
+	UPROPERTY(meta = (BindWidgetAnim), EditAnywhere, Transient, Category = "Animation")
+	UWidgetAnimation* LoopFadeImageAnim;
+
+	float RandomPosMin;
+	float RandomPosMax;
+	float RandomSizeMin;
+	float RandomSizeMax;
+	FBox2D Bound;
+
+	float LoopInterval = 5.0f;
 	int32 ChoiceImage;
-	bool IsFade;
+	bool IsLoop;
 public:
 	void OnFadeImage();
 	void OffFadeImage();
@@ -36,11 +44,15 @@ public:
 	void VisibleImage();
 	void HiddenImage();
 	FVector2D GetrandomPercentage(float MinPercentage, float MaxPercentage);
-	void SetRandomImagePosition(float RandomPosMin, float RandomPosMax);
-	void SetRandomImageScale(float RandomSizeMin, float RandomSizeMax);
+	void SetRandomImagePosition();
+	void SetRandomImageScale();
+	void GetWidgetBounds();
+	void SetSetting();
 	void RandomChoiceImage(int32 Min, int32 Max);
+
+	void SetRandomPosMinMax(float PosMin, float PosMax);
+	void SetRandomSizeMinMax(float SizeMin, float SizeMax);
 private:
-	
 	bool Initialize();
 	
 };

@@ -79,7 +79,8 @@ bool ABakeryGameMode::IsOpened()
 	return BakeryHUDWidget->GetHUDState();
 }
 
-void ABakeryGameMode::GetOperatingTime()
+float ABakeryGameMode::GetOperatingTime() const
 {
+	return OperatingTime;
 }
 

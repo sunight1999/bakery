@@ -6,7 +6,6 @@
 AAbnormalityManager::AAbnormalityManager()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
 }
 
 void AAbnormalityManager::BeginPlay()
@@ -20,13 +19,14 @@ void AAbnormalityManager::BeginPlay()
 	Report->CreateOverlayWidget();
 	CreateRandomAnswer(SituationNum);
 	Report->GetRandomAnswer(SituationNum);
-	Event->TestPlayEvent();
+	Event->SetEventNum(SituationNum);
+	Event->ChoiceEvent();
+	//Event->TestPlayEvent();
 }
 
 void AAbnormalityManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 int AAbnormalityManager::CreateRandomAnswer(int& number)

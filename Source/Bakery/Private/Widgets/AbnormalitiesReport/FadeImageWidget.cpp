@@ -1,6 +1,7 @@
 #include "Widgets/AbnormalitiesReport/FadeImageWidget.h"
 #include "Components/CanvasPanelSlot.h"
 
+
 void UFadeImageWidget::OnFadeImage()
 {
     PlayAnimation(OnFadeImageAnim);
@@ -8,6 +9,11 @@ void UFadeImageWidget::OnFadeImage()
 void UFadeImageWidget::OffFadeImage()
 {
     PlayAnimation(OffFadeImageAnim);
+}
+void UFadeImageWidget::SetSetting() {
+    SetRandomImagePosition();
+    SetRandomImageScale();
+    PlayAnimation(LoopFadeImageAnim);
 }
 void UFadeImageWidget::OnImage()
 {
@@ -32,6 +38,16 @@ void UFadeImageWidget::RandomChoiceImage(int32 Min, int32 Max)
 {
     ChoiceImage = FMath::RandRange(Min, Max);
 }
+void UFadeImageWidget::SetRandomPosMinMax(float PosMin, float PosMax)
+{
+    RandomPosMin = PosMin;
+    RandomPosMax = PosMax;
+}
+void UFadeImageWidget::SetRandomSizeMinMax(float SizeMin, float SizeMax)
+{
+    RandomSizeMin = SizeMin;
+    RandomSizeMax = SizeMax;
+}
 bool UFadeImageWidget::Initialize()
 {
     Super::Initialize();
@@ -49,27 +65,46 @@ FVector2D UFadeImageWidget::GetrandomPercentage(float MinPercentage, float MaxPe
 
     return FVector2D(RandomX, RandomY);
 }
-void UFadeImageWidget::SetRandomImagePosition(float RandomPosMin, float RandomPosMax)
+void UFadeImageWidget::SetRandomImagePosition()
 {
-    // 1. 이 함수 잘 동작하는지 확인
-    // 2. 안 되면 캔버스 바인딩해서 걔 쓰기
-    FVector2D RandomPosition = GetrandomPercentage(RandomPosMin, RandomPosMax);
-    //BlurImageCanvas->RenderTransform.Translation = RandomPosition;
-    BlurImage->SetRenderTranslation(RandomPosition);
-}
-void UFadeImageWidget::SetRandomImageScale(float RandomSizeMin, float RandomSizeMax)
-{
-    // 3. CanvasSlot->GetSize()로 현재 캔버스 사이즈 가져오기
-    // 4. 원하는 범위 내 랜덤 float 값 2개 추출 ex) .7f ~ 1.3f 범위 내 랜덤 float 2개
-    // 5. 현재 캔버스 사이즈 x, y에 각각 뽑은 랜덤 float 값 곱하기
-    float RandomSize = FMath::FRandRange(RandomSizeMin, RandomSizeMax);
-    FVector2D ChoiceSize;
-    ChoiceSize = FVector2D(RandomSize, RandomSize);
-    if (BlurImage) {
-        /*if (UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(BlurImage->Slot))
-        {
-            CanvasSlot->SetSize(FVector2D(ChangeSize, ChangeSize));
-        }*/
-        BlurImage->SetRenderScale(ChoiceSize);
+    if ((RandomPosMin && RandomPosMax) != 0) {
+        FVector2D RandomPosition = GetrandomPercentage(RandomPosMin, RandomPosMax);
+        BlurImage->SetRenderTranslation(RandomPosition);
+        GetWidgetBounds();
+    }
+    else {
+        UE_LOG(LogTemp, Display, TEXT("RandomPosMin && RandomPosMax의 값을 선언부에 지정해야합니다. Setter 사용을 권장드립니다."));
     }
 }
+void UFadeImageWidget::SetRandomImageScale()
+{
+    if((RandomSizeMin && RandomSizeMax)!=0){
+        float RandomSize = FMath::FRandRange(RandomSizeMin, RandomSizeMax);
+        FVector2D ChoiceSize;
+        ChoiceSize = FVector2D(RandomSize, RandomSize);
+        if (BlurImage) {
+            BlurImage->SetRenderScale(ChoiceSize);
+        }
+    }
+    else {
+        UE_LOG(LogTemp, Display, TEXT("RandomSizeMin && RandomSizeMax의 값을 선언부에 지정해야합니다. Setter 사용을 권장드립니다."));
+    }   
+}
+void UFadeImageWidget::GetWidgetBounds()
+{
+    // 위젯의 슬롯 가져오기
+    UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(Slot);
+    if (!CanvasSlot)
+    {
+        // CanvasSlot이 없으면 Bound를 빈 박스로 초기화
+        Bound = FBox2D();
+        return;
+    }
+    // 위치 및 크기 가져오기
+    FVector2D Position = CanvasSlot->GetPosition();
+    FVector2D Size = CanvasSlot->GetSize();
+
+    // Bound 멤버 변수에 바운딩 박스 할당
+    Bound = FBox2D(Position, Position + Size);
+}
+

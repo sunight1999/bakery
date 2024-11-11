@@ -28,7 +28,7 @@ public:
 	virtual void CloseBakery();
 
 	bool IsOpened();
-	void GetOperatingTime();
+	float GetOperatingTime() const;
 	virtual void Disappointed(APawn* Pawn) {}
 
 	FBakeryOpendDelegate OnBakeryPreOpened;
