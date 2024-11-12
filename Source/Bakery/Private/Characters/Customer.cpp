@@ -97,7 +97,7 @@ void ACustomer::TakeOrder()
  */
 void ACustomer::HandleIdle()
 {
-	if (AssignedSeat && IsInTargetPosition())
+	if (AssignedSeat && IsInTargetPosition(AcceptanceRadius))
 	{
 		// TODO: 앉기 애니메이션 시작
 		CustomerState = ECustomerState::Sitting;
@@ -229,7 +229,7 @@ void ACustomer::Disappoint()
 void ACustomer::MoveTo(const FVector& InTargetPosition)
 {
 	TargetPosition = InTargetPosition;
-	CustomerController->MoveToLocation(TargetPosition, 10.f);
+	CustomerController->MoveToLocation(TargetPosition, AcceptanceRadius, false);
 }
 
 void ACustomer::SitTo(AChair* Seat)

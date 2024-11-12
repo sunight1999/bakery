@@ -65,7 +65,7 @@ public:
 	 */
 	void MoveTo(const FVector& InTargetPosition);
 	void SitTo(AChair* Seat);
-	bool IsInTargetPosition(const float ToleranceRadius = 100.f) const;
+	bool IsInTargetPosition(const float ToleranceRadius = 10.f) const;
 
 protected:
 	virtual void BeginPlay() override;
@@ -86,6 +86,9 @@ private:
 	/*
 	 * AI 및 이동 관련
 	 */
+	UPROPERTY(EditAnywhere, Category = "Customer");
+	float AcceptanceRadius = 10.f;
+
 	AAIController* CustomerController;
 	ECustomerState CustomerState = ECustomerState::Idle;
 
