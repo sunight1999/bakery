@@ -73,7 +73,7 @@ void ATable::BeginPlay()
 		Chair->SetOwnerTable(this);
 		Chair->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		Chair->SetActorLocationAndRotation(GetActorLocation() + Chair->GetChairDirection() * ChairDistance, Rotation);
-
+		Chair->Initialize();
 		EmptySeats.Emplace(Chair);
 	}
 }

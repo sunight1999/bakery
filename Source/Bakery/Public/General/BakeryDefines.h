@@ -27,5 +27,7 @@ enum class ECustomerState : uint8
 	Sitting,
 	Ordering,
 	WaitingDish,
-	Eating
+	Eating,
+	Standing,
+	Leaving
 };

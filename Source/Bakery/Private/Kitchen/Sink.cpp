@@ -75,6 +75,8 @@ void ASink::OnEnterGrab(const FInteractionInfo& InteractionInfo)
 				Grabber->Grab(Primitive, Dish->GetActorLocation());
 
 				KeepingDishes.RemoveAt(i);
+
+				break;
 			}
 		}
 
@@ -82,7 +84,6 @@ void ASink::OnEnterGrab(const FInteractionInfo& InteractionInfo)
 		{
 			return;
 		}
-
 
 		// 빈 공간 채우기
 		for (int i = GrabbedDishIndex; i < KeepingDishes.Num(); i++)

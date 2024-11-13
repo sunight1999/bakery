@@ -19,14 +19,3 @@ ABaseCharacter::ABaseCharacter()
 void ABaseCharacter::Tick(float DeltaSeconds)
 {
 }
-
-
-void ABaseCharacter::PlayMoveMontage(const FName& SectionName)
-{
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if (AnimInstance && MoveMontage)
-	{
-		AnimInstance->Montage_Play(MoveMontage);
-		AnimInstance->Montage_JumpToSection(SectionName, MoveMontage);
-	}
-}

@@ -17,11 +17,4 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 
 protected:
-	/*
-	 * Montage Functions
-	 */
-	void PlayMoveMontage(const FName& SectionName);
-
-	UPROPERTY(EditAnywhere, Category = "Customer")
-	UAnimMontage* MoveMontage;
 };
