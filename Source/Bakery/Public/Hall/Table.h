@@ -23,13 +23,12 @@ class BAKERY_API ATable : public AGrabInteractableActor
 
 public:
 	ATable();
-	void Tick(float DeltaTime) override;
+	//void Tick(float DeltaTime) override;
 
 	int GetEmptySeatNum() const { return EmptySeats.Num(); }
 
 	AChair* RequestSeat();
 	void LeaveSeat(AChair* Seat);
-	void RequestTakeOrder(ACustomer* Customer);
 
 	void OnEnterInteract(const FInteractionInfo& InteractionInfo) override;
 	void OnInteract() override {}
@@ -55,12 +54,6 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Table")
 	float DishesDistance = 5.f;
-
-	UPROPERTY(VisibleAnywhere, Category = "Table")
-	UWidgetComponent* WaitingTimeBarWidget;
-
-	UWaitingTimeBarWidget* WaitingTimeBar;
-	ACustomer* WaitingTrackedCustomer = nullptr;
 
 	ABakeryGameMode* BakeryGameMode;
 

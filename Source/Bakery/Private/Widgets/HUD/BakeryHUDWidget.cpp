@@ -4,6 +4,7 @@
 #include "Widgets/HUD/BakeryHUDWidget.h"
 #include "Components/TextBlock.h"
 #include "Components/CanvasPanel.h"
+#include "Components/ProgressBar.h"
 
 #include "General/BakeryGameState.h"
 #include "Widgets/Hall/WaitingTimeBarWidget.h"
@@ -13,6 +14,7 @@ void UBakeryHUDWidget::NativeConstruct()
 	ABakeryGameState* BakeryGameState = Cast<ABakeryGameState>(GetWorld()->GetGameState());
 	BakeryGameState->OnMoneyChanged.AddUObject(this, &UBakeryHUDWidget::SetMoney);
 	BakeryGameState->OnDayChanged.AddUObject(this, &UBakeryHUDWidget::SetDay);
+	BakeryGameState->OnTimeChanged.AddUObject(this, &UBakeryHUDWidget::SetTime);
 }
 
 void UBakeryHUDWidget::SetHUDState(bool bIsOpened)
@@ -37,9 +39,9 @@ void UBakeryHUDWidget::SetHUDState(bool bIsOpened)
 		OppositeHUDVisibility = ESlateVisibility::Collapsed;
 	}
 
-	CustomerPredictCanvas->SetVisibility(HUDVisibility);
-	GoalProgressBarCanvas->SetVisibility(HUDVisibility);
-	DayProgressBarCanvas->SetVisibility(OppositeHUDVisibility);
+	// CustomerPredictCanvas의 경우 아직 미구현 기능이므로 Collapsed 처리
+	CustomerPredictCanvas->SetVisibility(ESlateVisibility::Collapsed);
+	SatisfactionBarCanvas->SetVisibility(OppositeHUDVisibility);
 	PrepareDisplay->SetVisibility(HUDVisibility);
 }
 
@@ -60,14 +62,9 @@ void UBakeryHUDWidget::SetCustomerPredict(uint8 CustomerGroupNum, uint8 Customer
 /*
  * 중간 HUD 값 Setter
  */
-void UBakeryHUDWidget::SetGoalProgress(float Progress)
+void UBakeryHUDWidget::SetSatisfactionProgress(float Progress)
 {
-	GoalProgressBar->SetPercentage(Progress);
-}
-
-void UBakeryHUDWidget::SetDayProgress(float Progress)
-{
-	DayProgressBar->SetPercentage(Progress);
+	SatisfactionBar->SetPercent(Progress);
 }
 
 /*
@@ -75,5 +72,30 @@ void UBakeryHUDWidget::SetDayProgress(float Progress)
  */
 void UBakeryHUDWidget::SetDay(int Day)
 {
-	DayText->SetText(IntToFText(Day));
+	DayText->SetText(FText::FromString(FString::Printf(TEXT("영업 %d일차"), Day)));
+}
+
+/// <summary>
+/// 경과한 분에 맞게 시간 표시
+/// </summary>
+/// <param name="Minute">현재 하루 중 경과한 분. 0 ~ 1439 (00:00 ~ 23:59)</param>
+void UBakeryHUDWidget::SetTime(int Minute)
+{
+	int CurrentHour = Minute / 60;
+	int CurrentMinute = Minute % 60;
+	if (CurrentHour > 12)
+	{
+		CurrentHour -= 12;
+	}
+
+	TimeText->SetText(FText::FromString(FString::Printf(TEXT("%02d:%02d"), CurrentHour, CurrentMinute)));
+
+	if (Minute < 720)
+	{
+		AMPMText->SetText(FText::FromString("AM"));
+	}
+	else
+	{
+		AMPMText->SetText(FText::FromString("PM"));
+	}
 }

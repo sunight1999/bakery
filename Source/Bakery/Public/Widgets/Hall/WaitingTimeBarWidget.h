@@ -17,11 +17,12 @@ class BAKERY_API UWaitingTimeBarWidget : public UUserWidget
 	GENERATED_BODY()
 	
 public:
-	void Reset();
-	void SetPercentage(float CurrentValue, float MaxValue);
-	void SetPercentage(float Percentage);
+	UFUNCTION(BlueprintCallable)
+	float GetWaitingTimeBarPercentage() const { return Percentage; }
+
+	void Reset() { Percentage = 1.f; }
+	void SetPercentage(float InPercentage) { Percentage = InPercentage; }
 
 private:
-	UPROPERTY(meta = (BindWidget))
-	UProgressBar* WaitingTimeBar;
+	float Percentage = 1.f;
 };

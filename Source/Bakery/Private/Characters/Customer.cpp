@@ -16,7 +16,7 @@
 #include "Hall/Table.h"
 #include "Hall/Chair.h"
 #include "Characters/PlayerPawn.h"
-#include "Widgets/Customer/OrderWaitingTimeBarWidget.h"
+#include "Widgets/Customer/CustomerWaitingTimeBarWidget.h"
 
 /*
  * 손님 행동 순서
@@ -41,9 +41,9 @@ ACustomer::ACustomer()
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
-	DishWaitingTimeBarWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("DishWaitingTimeBarWidget"));
-	DishWaitingTimeBarWidget->SetVisibility(false);
-	DishWaitingTimeBarWidget->SetupAttachment(RootComponent);
+	CustomerWaitingTimeBarWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("CustomerWaitingTimeBarWidget"));
+	CustomerWaitingTimeBarWidget->SetVisibility(false);
+	CustomerWaitingTimeBarWidget->SetupAttachment(RootComponent);
 }
 
 void ACustomer::BeginPlay()
@@ -69,11 +69,11 @@ void ACustomer::Tick(float DeltaTime)
 		FRotator NewRotation = FMath::RInterpConstantTo(GetActorRotation(), SitTargetTransform.Rotator(), DeltaTime, SitRotationSpeed);
 		SetActorLocationAndRotation(NewLocation, NewRotation);
 	}
-	else if (CustomerState == ECustomerState::WaitingDish)
+	else if (CustomerState == ECustomerState::Ordering || CustomerState == ECustomerState::WaitingDish)
 	{
 		float CurrentTime = GetRemainingWaitingTime();
 		float WaitingTime = GetWaitingTime();
-		DishWaitingTimeBar->SetPercentage(CurrentTime / WaitingTime);
+		CustomerWaitingTimeBar->SetPercentage(CurrentTime / WaitingTime);
 	}
 	else if (CustomerState == ECustomerState::Standing)
 	{
@@ -96,14 +96,10 @@ void ACustomer::SetOrder(const URecipeData* RecipeData)
 {
 	Order = RecipeData;
 
-	if (!DishWaitingTimeBar)
+	if (!CustomerWaitingTimeBar)
 	{
-		DishWaitingTimeBar = Cast<UDishWaitingTimeBarWidget>(DishWaitingTimeBarWidget->GetUserWidgetObject());
+		CustomerWaitingTimeBar = Cast<UCustomerWaitingTimeBarWidget>(CustomerWaitingTimeBarWidget->GetUserWidgetObject());
 	}
-
-	FString OrderName = Order->GetName().ToString();
-	FString OrderImagePath = "/Game/Textures/Orders/" + OrderName + "." + OrderName;
-	DishWaitingTimeBar->SetOrderImage(OrderImagePath);
 }
 
 /*
@@ -113,10 +109,9 @@ void ACustomer::RequestTakeOrder()
 {
 	CustomerState = ECustomerState::Ordering;
 
-	AssignedSeat->GetOwnerTable()->RequestTakeOrder(this);
-	USoundManager::GetInstance(GetWorld())->PlaySoundAtLocationByTag(FName("Order"), GetActorLocation());
+	SetWaitingTimer(WAITING_ORDER_ICON_ORDERING_PATH, OrderWaitingTime);
 
-	SetWaitingTimer(OrderWaitingTime);
+	USoundManager::GetInstance(GetWorld())->PlaySoundAtLocationByTag(FName("Order"), GetActorLocation());
 }
 
 void ACustomer::TakeOrder()
@@ -169,7 +164,6 @@ void ACustomer::Leave()
 	// 타이머 및 UI 정리 (식사 완료 전 영업이 종료되는 경우를 위해)
 	ClearWaitingTimer();
 	TimerManager->ClearTimer(EatingTimer);
-	DishWaitingTimeBarWidget->SetVisibility(false);
 
 	// 테이블 정리
 	if (AssignedSeat)
@@ -218,9 +212,10 @@ void ACustomer::OrderDish()
 {
 	CustomerState = ECustomerState::WaitingDish;
 
-	DishWaitingTimeBarWidget->SetVisibility(true);
+	FString OrderName = Order->GetName().ToString();
+	FString OrderIconImagePath = WAITING_ORDER_ICON_BASE_PATH + OrderName + "." + OrderName;
 
-	SetWaitingTimer(DishWaitingTime);
+	SetWaitingTimer(OrderIconImagePath, DishWaitingTime);
 }
 
 void ACustomer::Eat(ADish* Dish)
@@ -228,7 +223,6 @@ void ACustomer::Eat(ADish* Dish)
 	CustomerState = ECustomerState::Eating;
 
 	ServedDish = Dish;
-	DishWaitingTimeBarWidget->SetVisibility(false);
 
 	ClearWaitingTimer();
 	TimerManager->SetTimer(EatingTimer, this, &ACustomer::FinishEating, EatingTime, false, EatingTime);
@@ -251,14 +245,18 @@ void ACustomer::FinishEating()
 /*
  * 주문 처리 관련 함수
  */
-FORCEINLINE void ACustomer::SetWaitingTimer(float WaitingTime)
+FORCEINLINE void ACustomer::SetWaitingTimer(FString WaitingIconPath, float WaitingTime)
 {
 	ClearWaitingTimer();
+
+	CustomerWaitingTimeBarWidget->SetVisibility(true);
+	CustomerWaitingTimeBar->SetWaitingIconImage(WaitingIconPath);
 	TimerManager->SetTimer(WaitingTimer, this, &ACustomer::Disappoint, WaitingTime, false, WaitingTime);
 }
 
 FORCEINLINE void ACustomer::ClearWaitingTimer()
 {
+	CustomerWaitingTimeBarWidget->SetVisibility(false);
 	TimerManager->ClearTimer(WaitingTimer);
 }
 

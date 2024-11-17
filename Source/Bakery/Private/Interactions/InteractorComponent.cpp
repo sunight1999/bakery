@@ -120,8 +120,6 @@ bool UInteractorComponent::DetectInteractable(const TEnumAsByte<ECollisionChanne
 	FVector Start = GetComponentLocation() + FVector::UpVector * DetectHeight;
 	FVector End = Start + GetForwardVector() * DetectDistance;
 
-	DrawDebugLine(GetWorld(), Start, End, FColor::Red, true);
-
 	return GetWorld()->LineTraceSingleByChannel(OutHitResult, Start, End, TraceChannel);
 }
 

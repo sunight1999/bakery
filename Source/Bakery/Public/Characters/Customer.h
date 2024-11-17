@@ -15,7 +15,7 @@ class AChair;
 class AIngredient;
 class ADish;
 class URecipeData;
-class UDishWaitingTimeBarWidget;
+class UCustomerWaitingTimeBarWidget;
 
 UCLASS()
 class BAKERY_API ACustomer : public ABaseCharacter
@@ -69,7 +69,7 @@ public:
 	/*
 	 * 주문 대기 UI 관련 함수
 	 */
-	FORCEINLINE void SetWaitingTimer(float WaitingTime);
+	FORCEINLINE void SetWaitingTimer(FString WaitingIconPath, float WaitingTime);
 	FORCEINLINE void ClearWaitingTimer();
 
 	/*
@@ -88,7 +88,7 @@ private:
 	 * 주문 대기 및 식사 시간 관련
 	 */
 	UPROPERTY(VisibleAnywhere, Category = "Customer");
-	UWidgetComponent* DishWaitingTimeBarWidget;
+	UWidgetComponent* CustomerWaitingTimeBarWidget;
 
 	UPROPERTY(EditAnywhere, Category = "Customer");
 	float OrderWaitingTime = 30.f;
@@ -132,5 +132,5 @@ private:
 	FTimerHandle WaitingTimer;
 	FTimerHandle EatingTimer;
 
-	UDishWaitingTimeBarWidget* DishWaitingTimeBar;
+	UCustomerWaitingTimeBarWidget* CustomerWaitingTimeBar;
 };
