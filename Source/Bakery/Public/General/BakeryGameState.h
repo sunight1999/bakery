@@ -11,6 +11,7 @@ class UBakerySaveGame;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FMoneyChangedDelegate, int32)
 DECLARE_MULTICAST_DELEGATE_OneParam(FDayChangedDelegate, int32)
+DECLARE_MULTICAST_DELEGATE_OneParam(FTimeChangedDelegate, int32)
 
 /**
  * 
@@ -31,16 +32,25 @@ public:
 	void AddMoney(int32 InMoney);
 	void AddDay(int32 InDay);
 	void AddDay();
+	void SetTime(int Minute);
+	void AddTime();
+
+	int32 GetElapsedTime() const { return ElapsedTime; }
 
 	FMoneyChangedDelegate OnMoneyChanged;
 	FDayChangedDelegate OnDayChanged;
+	FTimeChangedDelegate OnTimeChanged;
 
 protected:
 	void BeginPlay() override;
 
 private:
+	// 보유 자본
 	int32 Money;
+	// 영업일
 	int32 Day;
+	// 경과 시간 (단위: 분)
+	int32 ElapsedTime;
 
 	EBakeryState BakeryState = EBakeryState::Closed;
 };

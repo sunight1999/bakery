@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Widgets/Customer/OrderWaitingTimeBarWidget.h"
+#include "Widgets/Customer/CustomerWaitingTimeBarWidget.h"
 #include "Components/Image.h"
 
-void UDishWaitingTimeBarWidget::SetOrderImage(FString ImagePath)
+void UCustomerWaitingTimeBarWidget::SetWaitingIconImage(FString ImagePath)
 {
 	UTexture2D* OrderTexture = LoadObject<UTexture2D>(nullptr, *ImagePath);
 	if (!OrderTexture)
@@ -12,5 +12,5 @@ void UDishWaitingTimeBarWidget::SetOrderImage(FString ImagePath)
 		UE_LOG(LogTexture, Warning, TEXT("There is no '%s' texture asset."), *ImagePath);
 	}
 
-	OrderImage->SetBrushFromTexture(OrderTexture);
+	WaitingIconImage->SetBrushFromTexture(OrderTexture);
 }

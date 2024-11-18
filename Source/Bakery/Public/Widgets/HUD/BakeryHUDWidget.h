@@ -8,7 +8,7 @@
 
 class UTextBlock;
 class UCanvasPanel;
-class UWaitingTimeBarWidget;
+class UProgressBar;
 
 /**
  *
@@ -36,13 +36,13 @@ public:
 	/*
 	 * 중간 HUD 값 Setter
 	 */
-	void SetGoalProgress(float Progress);
-	void SetDayProgress(float Progress);
+	void SetSatisfactionProgress(float Progress);
 
 	/*
 	 * 오른쪽 HUD 값 Setter
 	 */
 	void SetDay(int Day);
+	void SetTime(int Minute);
 
 private:
 	/*
@@ -64,16 +64,10 @@ private:
 	 * 중간 HUD 변수
 	 */
 	UPROPERTY(meta = (BindWidget))
-	UCanvasPanel* GoalProgressBarCanvas;
+	UCanvasPanel* SatisfactionBarCanvas;
 
 	UPROPERTY(meta = (BindWidget))
-	UWaitingTimeBarWidget* GoalProgressBar;
-
-	UPROPERTY(meta = (BindWidget))
-	UCanvasPanel* DayProgressBarCanvas;
-
-	UPROPERTY(meta = (BindWidget))
-	UWaitingTimeBarWidget* DayProgressBar;
+	UProgressBar* SatisfactionBar;
 
 	UPROPERTY(meta = (BindWidget))
 	UCanvasPanel* PrepareDisplay;
@@ -83,6 +77,12 @@ private:
 	 */
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* DayText;
+
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* TimeText;
+
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* AMPMText;
 
 	/*
 	 * 기타

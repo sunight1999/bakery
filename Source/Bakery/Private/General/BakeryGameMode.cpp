@@ -35,6 +35,10 @@ void ABakeryGameMode::BeginPlay()
 	{
 		CustomerSpawners.Add(*It);
 	}
+
+	float TimeTickRate = 1.f / GameTimeMultiplier;
+	BakeryGameState->SetTime(GameStartTime);
+	GetWorldTimerManager().SetTimer(GameTimeHandle, BakeryGameState, &ABakeryGameState::AddTime, TimeTickRate, true, TimeTickRate);
 }
 
 void ABakeryGameMode::Tick(float DeltaSeconds)
@@ -43,12 +47,16 @@ void ABakeryGameMode::Tick(float DeltaSeconds)
 
 	if (BakeryGameState->GetBakeryState() == EBakeryState::Opened)
 	{
-		CurrentOperatingTime += DeltaSeconds;
-		BakeryHUDWidget->SetDayProgress(CurrentOperatingTime / OperatingTime);
-
-		if (CurrentOperatingTime >= OperatingTime)
+		if (BakeryGameState->GetElapsedTime() >= BakeryCloseTime)
 		{
 			CloseBakery();
+		}
+	}
+	else if (BakeryGameState->GetBakeryState() == EBakeryState::Closed)
+	{
+		if (BakeryGameState->GetElapsedTime() >= BakeryOpenTime)
+		{
+			OpenBakery();
 		}
 	}
 }
@@ -56,7 +64,8 @@ void ABakeryGameMode::Tick(float DeltaSeconds)
 void ABakeryGameMode::OpenBakery()
 {
 	BakeryHUDWidget->SetHUDState(true);
-	CurrentOperatingTime = 0.f;
+
+	BakeryGameState->SetTime(BakeryOpenTime);
 
 	OnBakeryPreOpened.Broadcast();
 	OnBakeryOpened.Broadcast();
@@ -65,6 +74,8 @@ void ABakeryGameMode::OpenBakery()
 void ABakeryGameMode::CloseBakery()
 {
 	BakeryHUDWidget->SetHUDState(false);
+
+	BakeryGameState->SetTime(BakeryCloseTime);
 
 	for (TActorIterator<ACustomer>It(GetWorld()); It; ++It)
 	{
@@ -78,9 +89,3 @@ bool ABakeryGameMode::IsOpened()
 {
 	return BakeryHUDWidget->GetHUDState();
 }
-
-float ABakeryGameMode::GetOperatingTime() const
-{
-	return OperatingTime;
-}
-

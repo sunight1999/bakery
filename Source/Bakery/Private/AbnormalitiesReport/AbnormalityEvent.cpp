@@ -50,7 +50,7 @@ void AAbnormalityEvent::ChoiceEvent() {
                 RoundTimerHandle,                // 타이머 핸들
                 this,                       // 호출할 객체
                 &AAbnormalityEvent::TriggerBlurEffectStop,           // 호출할 함수
-                BakeryGameMode->GetOperatingTime(),                     // 호출 간격 (초 단위)
+                30,                     // 호출 간격 (초 단위)
                 false                         // 반복 여부 (true면 반복, false면 한 번만 실행)
             );
         }

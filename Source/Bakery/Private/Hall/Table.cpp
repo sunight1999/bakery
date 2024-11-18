@@ -18,7 +18,7 @@
 
 ATable::ATable()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	RootComponent = StaticMesh;
@@ -28,10 +28,6 @@ ATable::ATable()
 
 	DishServingCenterPoint = CreateDefaultSubobject<USceneComponent>(TEXT("DishServingCenterPoint"));
 	DishServingCenterPoint->SetupAttachment(StaticMesh);
-
-	WaitingTimeBarWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("WaitingTimeBarWidget"));
-	WaitingTimeBarWidget->SetVisibility(false);
-	WaitingTimeBarWidget->SetupAttachment(RootComponent);
 }
 
 void ATable::BeginPlay()
@@ -78,17 +74,12 @@ void ATable::BeginPlay()
 	}
 }
 
+/*
 void ATable::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	if (WaitingTrackedCustomer)
-	{
-		float CurrentTime = WaitingTrackedCustomer->GetRemainingWaitingTime();
-		float WaitingTime = WaitingTrackedCustomer->GetWaitingTime();
-		WaitingTimeBar->SetPercentage(CurrentTime / WaitingTime);
-	}
 }
+*/
 
 AChair* ATable::RequestSeat()
 {
@@ -105,44 +96,14 @@ AChair* ATable::RequestSeat()
 
 void ATable::LeaveSeat(AChair* Seat)
 {
-	WaitingTrackedCustomer = nullptr;
 	Seat->SetAssignedCustomer(nullptr);
 
 	UsingSeats.Remove(Seat);
 	EmptySeats.Emplace(Seat);
-
-	// 영업 종료 시 주문 접수를 못한 채 떠나는 손님이 있을 수 있으므로 UI 해제 추가 확인
-	if (UsingSeats.Num() == 0)
-	{
-		WaitingTimeBarWidget->SetVisibility(false);
-	}
 }
-
-void ATable::RequestTakeOrder(ACustomer* Customer)
-{
-	if (WaitingTrackedCustomer)
-	{
-		return;
-	}
-
-	if (!WaitingTimeBar)
-	{
-		WaitingTimeBar = Cast<UWaitingTimeBarWidget>(WaitingTimeBarWidget->GetUserWidgetObject());
-	}
-	
-	WaitingTimeBar->Reset();
-	WaitingTimeBarWidget->SetVisibility(true);
-	WaitingTrackedCustomer = Customer;
-}
-
 
 void ATable::OnEnterInteract(const FInteractionInfo& InteractionInfo)
 {
-	if (!WaitingTrackedCustomer)
-	{
-		return;
-	}
-
 	for (AChair* Seat : UsingSeats)
 	{
 		ACustomer* Customer = Seat->GetAssignedCustomer();
@@ -151,9 +112,6 @@ void ATable::OnEnterInteract(const FInteractionInfo& InteractionInfo)
 			Customer->TakeOrder();
 		}
 	}
-
-	WaitingTrackedCustomer = nullptr;
-	WaitingTimeBarWidget->SetVisibility(false);
 }
 
 void ATable::OnEnterGrab(const FInteractionInfo& InteractionInfo)

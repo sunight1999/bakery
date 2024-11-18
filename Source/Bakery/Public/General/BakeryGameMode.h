@@ -28,8 +28,10 @@ public:
 	virtual void CloseBakery();
 
 	bool IsOpened();
-	float GetOperatingTime() const;
 	virtual void Disappointed(APawn* Pawn) {}
+
+	float GetBakeryOpenTime() const { return BakeryOpenTime; }
+	float GetBakeryCloseTime() const { return BakeryCloseTime; }
 
 	FBakeryOpendDelegate OnBakeryPreOpened;
 	FBakeryOpendDelegate OnBakeryOpened;
@@ -39,13 +41,27 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+	// 게임 시간 배속
+	UPROPERTY(EditAnywhere, Category = "GameSetting")
+	float GameTimeMultiplier = 2;
+
+	// 게임 시작 시 설정 시간 (분)
+	UPROPERTY(EditAnywhere, Category = "GameSetting")
+	int GameStartTime = 7 * 60;
+
+	// 영업 시작 시간 (분)
+	UPROPERTY(EditAnywhere, Category = "GameSetting")
+	int BakeryOpenTime = 9 * 60;
+
+	// 영업 종료 시간 (분)
+	UPROPERTY(EditAnywhere, Category = "GameSetting")
+	int BakeryCloseTime = 18 * 60;
+
 	ABakeryGameState* BakeryGameState;
 
 	UBakeryHUDWidget* BakeryHUDWidget;
 	ABakeryPlayerController* PlayerController;
 	TArray<ACustomerSpawner*> CustomerSpawners;
 
-	UPROPERTY(EditAnywhere, Category="GameSetting")
-	float OperatingTime = 30.f;
-	float CurrentOperatingTime = 0.f;
+	FTimerHandle GameTimeHandle;
 };

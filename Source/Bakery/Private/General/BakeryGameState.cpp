@@ -61,3 +61,20 @@ void ABakeryGameState::AddDay()
 {
 	AddDay(1);
 }
+
+void ABakeryGameState::SetTime(int Minute)
+{
+	ElapsedTime = Minute;
+
+	OnTimeChanged.Broadcast(ElapsedTime);
+}
+
+void ABakeryGameState::AddTime()
+{
+	if (++ElapsedTime >= 1440)
+	{
+		ElapsedTime = 0;
+	}
+
+	OnTimeChanged.Broadcast(ElapsedTime);
+}
