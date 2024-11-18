@@ -35,7 +35,8 @@ public:
 	float RandomSizeMax = 2.5;
 	UPROPERTY(EditAnywhere, Category = "Fade")
 	float RandomPosMinDistance = 1;
-	
+	UPROPERTY(EditAnywhere, Category = "Fade")
+	float LoopInterval = 5.0f;
 	UPROPERTY(EditAnywhere, Category = "Fade")
 	TArray<TSubclassOf<UUserWidget>> FadeWidgetClass;
 	UPROPERTY(EditAnywhere, Category = "Fade")
@@ -68,6 +69,5 @@ private:
 	int EventNum;
 private:
 	void SetPlaceWidget();
-	void WidgetArrayBounds();
 };
  

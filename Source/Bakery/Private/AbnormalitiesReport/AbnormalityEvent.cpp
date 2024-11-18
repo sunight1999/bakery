@@ -8,6 +8,7 @@
 AAbnormalityEvent::AAbnormalityEvent()
 {
     PrimaryActorTick.bCanEverTick = false;
+    FirstBlurEffect = false;
     EventPlay = false;
     EventNum = 0;
     
@@ -30,19 +31,21 @@ void AAbnormalityEvent::PlayEvent(int num)
 }
 void AAbnormalityEvent::ChoiceEvent() {
     BakeryGameMode = Cast<ABakeryGameMode>(GetWorld()->GetAuthGameMode()); // 게임모드 가져오기 
-    EventPlay = true;
     switch (EventNum) {
     case 1:
         //1. 얼룩진 화면
         //TriggerBlurEffect();
-        if (FirstBlurEffect==true) {
+        if (!FirstBlurEffect) {
+            UE_LOG(LogTemp, Display, TEXT("위젯 생성 진행중 ..."));
             TriggerBlurEffectInitialize();
-            FirstBlurEffect = false;
+            FirstBlurEffect = true;
         }
         else {
             FadeLoop();
         }
-        if (EventPlay) {
+        if (!EventPlay && FirstBlurEffect) {
+            UE_LOG(LogTemp, Display, TEXT("위젯 이벤트 접근"));
+            EventPlay = true;
             GetWorld()->GetTimerManager().SetTimer(
                 RoundTimerHandle,                // 타이머 핸들
                 this,                       // 호출할 객체
@@ -60,7 +63,6 @@ void AAbnormalityEvent::ChoiceEvent() {
 }
 void AAbnormalityEvent::TestPlayEvent()
 {
-    UE_LOG(LogTemp, Display, TEXT("TestPlayEvent진입!!!!!!!!!!!"));
     //TriggerBlurEffectInitialize();
 }
 
@@ -97,66 +99,68 @@ void AAbnormalityEvent::TriggerBlurEffectInitialize()
 void AAbnormalityEvent::TriggerBlurEffectStop()
 {
     FadeLoopStop();
-    for (UFadeImageWidget* WidgetInstance : FadeWidgetInstanceArray) {
-        WidgetInstance->OffImage();
-    }
-    FadeLoop();
     EventPlay = false;
 }
 void AAbnormalityEvent::FadeLoop()
 {
+    UE_LOG(LogTemp, Display, TEXT("fadeLoop진입"));
     GetWorld()->GetTimerManager().SetTimer(
         FadeLoopTimer,
         this,
         &AAbnormalityEvent::SetPlaceWidget,
-        FadeWidgetInstance->LoopInterval,
+        LoopInterval,
         true
     );
+   
 }
 void AAbnormalityEvent::FadeLoopStop() {
     for (UFadeImageWidget* WidgetInstance : FadeWidgetInstanceArray) {
+        GetWorld()->GetTimerManager().ClearTimer(WidgetInstance->GetLoopTimer());
+        GetWorld()->GetTimerManager().ClearTimer(RoundTimerHandle);
+        WidgetInstance->StopAllAnimations();
         WidgetInstance->OffImage();
     }
-    GetWorld()->GetTimerManager().ClearTimer(FadeLoopTimer);
+
 }
 void AAbnormalityEvent::SetPlaceWidget()
 {
-    FadeWidgetInstanceArray[0]->SetRandomImagePosition();
-    for (int32 i = 1; i < FadeWidgetInstanceArray.Num(); i++) {
-        for (int32 j = 0; j < i; j++) {
-            if (i == j) continue;
-            FadeWidgetInstanceArray[i]->SetRandomImagePosition();
-            if (FadeWidgetInstanceArray[i]->Bound.Intersect(FadeWidgetInstanceArray[j]->Bound)) {
-                j = 0;
+    FBox2D Test;
+    int num = 0;
+    
+    for (int32 i = 0; i < FadeWidgetInstanceArray.Num(); i++) {
+        UFadeImageWidget* CurrentWidget = FadeWidgetInstanceArray[i];
+        CurrentWidget->LoopFadeImage();
+        CurrentWidget->SetRandomImagePosition();
+        //CurrentWidget->SetImagePos(FVector2D(-200,100));
+        CurrentWidget->SetRandomImageScale();
+        CurrentWidget->SetWidgetBounds();
+        UE_LOG(LogTemp, Display, TEXT("%d번 박스 사이즈 %f %f %f %f"),i+1, CurrentWidget->Bound.Min.X, CurrentWidget->Bound.Min.Y, CurrentWidget->Bound.Max.X, CurrentWidget->Bound.Max.Y);
+        UE_LOG(LogTemp, Display, TEXT("%d번 위치x : %f 위치y : %f 사이즈x : %f 사이즈y : %f"),i+1,CurrentWidget->BlurImage->GetRenderTransform().Translation.X,
+        CurrentWidget->BlurImage->GetRenderTransform().Translation.Y, CurrentWidget->BlurImage->GetRenderTransform().Scale.X, CurrentWidget->BlurImage->GetRenderTransform().Scale.Y);
+        bool flag = true;
+        while (flag) {
+            flag = false;
+            for (int32 j = 0; j < i; j++) {
+                UE_LOG(LogTemp, Display, TEXT("검증중"));
+                if (CurrentWidget->GetWidgetBounds().Intersect(FadeWidgetInstanceArray[j]->GetWidgetBounds())) {
+                    CurrentWidget->SetRandomImagePosition();
+                    CurrentWidget->SetWidgetBounds();
+                    flag = true;
+                    UE_LOG(LogTemp, Display, TEXT("겹침 발생 재시도!! %d"),j);
+                    break;
+                }
             }
-            else {
-                continue;
-            }
-        }
-    }
-    /*
-    int i = 0;
-    for (UFadeImageWidget* WidgetInstance : FadeWidgetInstanceArray) {
-        WidgetBoxArray[i] = WidgetInstance->GetWidgetBounds(WidgetInstance);
-        i++;
-    }
-    for (int32 i = 1; i < WidgetBoxArray.Num(); i++)
-    {
-        for (int32 j = 0; j < i; j++)
-        {
-            // 자기 자신과 비교를 피하기 위해 i와 j가 같을 경우 건너뜁니다.
-            if (i == j) continue;
             
-            if(WidgetBoxArray[i].Intersect(WidgetBoxArray[j])){
-                FadeWidgetInstanceArray[j]->SetRandomImagePosition();
-                WidgetBoxArray[j] = FadeWidgetInstanceArray[j]->GetWidgetBounds(FadeWidgetInstanceArray[j]);
-                i = 0;
-            }
         }
+        
+    }
+ /*   UFadeImageWidget* testWidget = FadeWidgetInstanceArray[2];
+    for (UFadeImageWidget* WidgetInstance : FadeWidgetInstanceArray) {
+        if (testWidget->GetWidgetBounds().Intersect(WidgetInstance->GetWidgetBounds()) == true) {
+            UE_LOG(LogTemp, Display, TEXT("3번과 %d 겹침"), num + 1);
+        }
+        num++;
     }*/
-}
-void AAbnormalityEvent::WidgetArrayBounds() {
-
 }
 /*
 1. 이벤트 초기화 함수 만들어 둘 것 ( 끝나고 초기화 )
