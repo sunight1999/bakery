@@ -11,6 +11,13 @@ class UInputComponent;
 class UInputMappingContext;
 class UInputAction;
 class UInteractorComponent;
+class UWidgetComponent;
+
+enum class EPlayerState : uint8
+{
+	Normal,
+	SpeedDown
+};
 
 UCLASS()
 class BAKERY_API APlayerPawn : public ABaseCharacter
@@ -21,6 +28,11 @@ public:
 	APlayerPawn();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+
+	EPlayerState GetPlayerState() const { return State; }
+	void SetPlayerState(EPlayerState InState);
+	
+	bool IsGrabbing();
 
 	void HandsUp() { if (GrabbingMontage) PlayAnimMontage(GrabbingMontage, 2.f); }
 	void HandsDown() { if (GrabbingMontage) StopAnimMontage(GrabbingMontage); }
@@ -67,4 +79,15 @@ private:
 	 */
 	UPROPERTY(EditAnywhere, Category = "Player|Animation")
 	UAnimMontage* GrabbingMontage;
+
+	/*
+	 * 상태 UI 관련
+	 */
+	UPROPERTY(VisibleAnywhere, Category = "Player|Animation")
+	UWidgetComponent* StateWidget;
+
+	UPROPERTY(EditAnywhere, Category = "Player|Animation")
+	TSubclassOf<UUserWidget> SpeedDownStateWidgetClass;
+
+	EPlayerState State = EPlayerState::Normal;
 };

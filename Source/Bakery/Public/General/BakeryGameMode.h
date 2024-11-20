@@ -45,15 +45,15 @@ private:
 	UPROPERTY(EditAnywhere, Category = "GameSetting")
 	float GameTimeMultiplier = 2;
 
-	// 게임 시작 시 설정 시간 (분)
+	// 게임 시작 시 설정 게임 시간 (분)
 	UPROPERTY(EditAnywhere, Category = "GameSetting")
 	int GameStartTime = 7 * 60;
 
-	// 영업 시작 시간 (분)
+	// 영업 시작 게임 시간 (분)
 	UPROPERTY(EditAnywhere, Category = "GameSetting")
 	int BakeryOpenTime = 9 * 60;
 
-	// 영업 종료 시간 (분)
+	// 영업 종료 게임 시간 (분)
 	UPROPERTY(EditAnywhere, Category = "GameSetting")
 	int BakeryCloseTime = 18 * 60;
 

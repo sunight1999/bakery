@@ -12,6 +12,7 @@
 #include "Characters/Customer.h"
 #include "Widgets/HUD/BakeryHUDWidget.h"
 #include "General/Tools/CustomerSpawner.h"
+#include "Abnormality/AbnormalityManager.h"
 
 ABakeryGameMode::ABakeryGameMode()
 {
@@ -36,9 +37,14 @@ void ABakeryGameMode::BeginPlay()
 		CustomerSpawners.Add(*It);
 	}
 
+	// 게임 시간 설정
 	float TimeTickRate = 1.f / GameTimeMultiplier;
 	BakeryGameState->SetTime(GameStartTime);
 	GetWorldTimerManager().SetTimer(GameTimeHandle, BakeryGameState, &ABakeryGameState::AddTime, TimeTickRate, true, TimeTickRate);
+
+	UAbnormalityManager* AbnormalityManager = UAbnormalityManager::GetInstance(GetWorld());
+	AbnormalityManager->RegisterRandomAbnormality();
+	OnBakeryClosed.AddUObject(AbnormalityManager, &UAbnormalityManager::RegisterRandomAbnormality);
 }
 
 void ABakeryGameMode::Tick(float DeltaSeconds)
@@ -50,6 +56,7 @@ void ABakeryGameMode::Tick(float DeltaSeconds)
 		if (BakeryGameState->GetElapsedTime() >= BakeryCloseTime)
 		{
 			CloseBakery();
+			return;
 		}
 	}
 	else if (BakeryGameState->GetBakeryState() == EBakeryState::Closed)
@@ -66,6 +73,7 @@ void ABakeryGameMode::OpenBakery()
 	BakeryHUDWidget->SetHUDState(true);
 
 	BakeryGameState->SetTime(BakeryOpenTime);
+	UAbnormalityManager::GetInstance(GetWorld())->CauseAllAbnormality();
 
 	OnBakeryPreOpened.Broadcast();
 	OnBakeryOpened.Broadcast();
@@ -76,6 +84,7 @@ void ABakeryGameMode::CloseBakery()
 	BakeryHUDWidget->SetHUDState(false);
 
 	BakeryGameState->SetTime(BakeryCloseTime);
+	UAbnormalityManager::GetInstance(GetWorld())->ClearRegisteredAbnormality();
 
 	for (TActorIterator<ACustomer>It(GetWorld()); It; ++It)
 	{

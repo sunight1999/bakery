@@ -8,6 +8,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/WidgetComponent.h"
 
 #include "Interactions/InteractorComponent.h"
 #include "Interactions/GrabberComponent.h"
@@ -18,6 +19,10 @@ APlayerPawn::APlayerPawn()
 {
 	Interactor = CreateDefaultSubobject<UInteractorComponent>(TEXT("Interactor"));
 	Interactor->SetupAttachment(RootComponent);
+
+	StateWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("StateWidget"));
+	StateWidget->SetupAttachment(RootComponent);
+	StateWidget->SetVisibility(false);
 }
 
 void APlayerPawn::BeginPlay()
@@ -59,6 +64,32 @@ void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 		EnhancedInput->BindAction(GrabAction, ETriggerEvent::Completed, Interactor, &UInteractorComponent::EndGrab);
 		EnhancedInput->BindAction(StartBakeryAction, ETriggerEvent::Started, this, &APlayerPawn::StartBakery);
 	}
+}
+
+void APlayerPawn::SetPlayerState(EPlayerState InState)
+{
+	StateWidget->SetVisibility(true);
+
+	// TODO: state 비트 플래그로 변경
+	// 하나의 Widget에서 onoff로 state 표현할 수 있게 변경
+	switch (InState)
+	{
+	case EPlayerState::Normal:
+		StateWidget->SetVisibility(false);
+		break;
+
+	case EPlayerState::SpeedDown:
+		StateWidget->SetWidgetClass(SpeedDownStateWidgetClass);
+		break;
+
+	default:
+		break;
+	}
+}
+
+bool APlayerPawn::IsGrabbing()
+{
+	return Interactor->GetGrabber()->IsGrabbing();
 }
 
 void APlayerPawn::Move(const FInputActionValue& Value)

@@ -7,7 +7,7 @@
 
 UUISubsystem::UUISubsystem()
 {
-	ConstructorHelpers::FObjectFinder<UDataTable> UIDataTableFinder(TEXT("/Game/Data/UI/DT_ManagedUI"));
+	ConstructorHelpers::FObjectFinder<UDataTable> UIDataTableFinder(TEXT("/Game/Data/DT_ManagedUI"));
 	if (UIDataTableFinder.Succeeded())
 	{
 		UIDataTable = UIDataTableFinder.Object;
