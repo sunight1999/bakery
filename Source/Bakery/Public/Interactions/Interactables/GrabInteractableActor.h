@@ -19,13 +19,13 @@ public:
 	AGrabInteractableActor();
 
 	UFUNCTION(BlueprintCallable)
-	virtual void OnEnterGrab(const FInteractionInfo& InteractionInfo) override;
+	virtual void OnEnterGrab(const FInteractionInfo& InteractionInfo) override { unimplemented(); }
 
 	UFUNCTION(BlueprintCallable)
-	virtual void OnGrab() override;
+	virtual void OnGrab() override { unimplemented(); }
 
 	UFUNCTION(BlueprintCallable)
-	virtual void OnExitGrab() override;
+	virtual void OnExitGrab() override { unimplemented(); }
 
 protected:
 	virtual void BeginPlay() override;

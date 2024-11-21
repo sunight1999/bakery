@@ -55,6 +55,9 @@ private:
 	bool bIsInteracting = false;
 	// 현재 잡기 중 여부
 	bool bIsGrabbing = false;
+
+	// 상호작용 가능 액터 존재 여부 확인 결과
+	AActor* PrevDetectedActor;
 	// 현재 상호작용 중인 액터의 InteractableComponent
 	UInteractableComponent* CurrentInteractable;
 };

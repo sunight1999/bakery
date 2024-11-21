@@ -26,18 +26,12 @@ void AInteractableActor::BeginPlay()
 	Super::BeginPlay();
 }
 
-
-void AInteractableActor::OnEnterInteract(const FInteractionInfo& InteractionInfo)
+void AInteractableActor::OnEnterHighlight()
 {
-	unimplemented();
+
 }
 
-void AInteractableActor::OnInteract()
+void AInteractableActor::OnExitHighlight()
 {
-	unimplemented();
-}
 
-void AInteractableActor::OnExitInteract()
-{
-	unimplemented();
 }

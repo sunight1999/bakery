@@ -5,6 +5,7 @@
 #include "Interactions/GrabberComponent.h"
 #include "Interactions/Interactables/InteractableComponent.h"
 #include "Interactions/InteractionDefines.h"
+#include "Interactions/Interactables/Highlight.h"
 
 UInteractorComponent::UInteractorComponent()
 {
@@ -33,6 +34,39 @@ void UInteractorComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 	{
 		CurrentInteractable->OnGrabDelegate.Broadcast();
 	}
+
+	// 상호작용 가능한 액터 하이라이팅 처리
+	FHitResult HitResult;
+	if (DetectInteractable(InteractTraceChannel, HitResult))
+	{
+		AActor* DetectedActor = HitResult.GetActor();
+		if (PrevDetectedActor != DetectedActor)
+		{
+			if (PrevDetectedActor)
+			{
+				if (auto Highlightable = Cast<IHighlight>(PrevDetectedActor))
+				{
+					Highlightable->OnExitHighlight();
+				}
+			}
+
+			if (auto Highlightable = Cast<IHighlight>(DetectedActor))
+			{
+				Highlightable->OnEnterHighlight();
+			}
+
+			PrevDetectedActor = DetectedActor;
+		}
+	}
+	else
+	{
+		if (auto Highlightable = Cast<IHighlight>(PrevDetectedActor))
+		{
+			Highlightable->OnExitHighlight();
+		}
+
+		PrevDetectedActor = nullptr;
+	}
 }
 
 void UInteractorComponent::BeginInteraction()
@@ -45,8 +79,6 @@ void UInteractorComponent::BeginInteraction()
 	FHitResult HitResult;
 	if (DetectInteractable(InteractTraceChannel, HitResult))
 	{
-		UE_LOG(LogTemp, Display, TEXT("%s"), *HitResult.GetActor()->GetActorNameOrLabel());
-
 		auto Interactable = HitResult.GetActor()->GetComponentByClass<UInteractableComponent>();
 		if (!Interactable)
 		{

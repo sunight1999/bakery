@@ -20,18 +20,3 @@ void AGrabInteractableActor::BeginPlay()
 {
 	Super::BeginPlay();
 }
-
-void AGrabInteractableActor::OnEnterGrab(const FInteractionInfo& InteractionInfo)
-{
-	unimplemented();
-}
-
-void AGrabInteractableActor::OnGrab()
-{
-	unimplemented();
-}
-
-void AGrabInteractableActor::OnExitGrab()
-{
-	unimplemented();
-}
