@@ -45,8 +45,8 @@ public:
 	AAbnormalityEvent();
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void Cause() override {}
-	virtual void Finish() override {}
+	virtual void Cause() override;
+	virtual void Finish() override;
 
 	const FAbnormalityEventData* GetAbnormalityEventData() const { return AbnormalityEventData; }
 	void SetAbnormalityEventData(FAbnormalityEventData* InAbnormalityEventData) { AbnormalityEventData = InAbnormalityEventData; }
@@ -55,6 +55,9 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+	UPROPERTY(EditAnywhere, Category="AbnormalityEvent")
+	bool bIsFearingEvent = true;
+
 	const FAbnormalityEventData* AbnormalityEventData;
 };
  

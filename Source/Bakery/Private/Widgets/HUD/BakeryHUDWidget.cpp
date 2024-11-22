@@ -7,7 +7,6 @@
 #include "Components/ProgressBar.h"
 
 #include "General/BakeryGameState.h"
-#include "Widgets/Hall/WaitingTimeBarWidget.h"
 
 void UBakeryHUDWidget::NativeConstruct()
 {

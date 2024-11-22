@@ -5,5 +5,12 @@
 
 void ASpawnAbnormalityEvent::Cause()
 {
+	Super::Cause();
+
 	UE_LOG(LogTemp, Display, TEXT("Hello"));
+}
+
+void ASpawnAbnormalityEvent::Finish()
+{
+	Super::Finish();
 }

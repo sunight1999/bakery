@@ -10,7 +10,6 @@ class ACustomer;
 class AChair;
 class ADish;
 class UWidgetComponent;
-class UWaitingTimeBarWidget;
 class ABakeryGameMode;
 
 /**

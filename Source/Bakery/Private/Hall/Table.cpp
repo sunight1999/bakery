@@ -14,7 +14,6 @@
 #include "Kitchen/Ingredient.h"
 #include "Kitchen/Dish.h"
 #include "Characters/Customer.h"
-#include "Widgets/Hall/WaitingTimeBarWidget.h"
 
 ATable::ATable()
 {

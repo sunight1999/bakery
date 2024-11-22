@@ -44,6 +44,8 @@ void AStatusAbnormalityEvent::Tick(float DeltaTime)
 
 void AStatusAbnormalityEvent::Cause()
 {
+	Super::Cause();
+
 	bIsCaused = true;
 
 	Player->SetPlayerState(EPlayerState::Normal);
@@ -56,6 +58,8 @@ void AStatusAbnormalityEvent::Cause()
 
 void AStatusAbnormalityEvent::Finish()
 {
+	Super::Finish();
+
 	bIsCaused = false;
 
 	Player->SetPlayerState(EPlayerState::Normal);

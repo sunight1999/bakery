@@ -17,6 +17,8 @@ void AInkAbnormalityEvent::BeginPlay()
 
 void AInkAbnormalityEvent::Cause()
 {
+	Super::Cause();
+
 	if (!InkAbnormalityDrawing)
 	{
 		UUISubsystem* UISubsystem = GetGameInstance()->GetSubsystem<UUISubsystem>();
@@ -35,5 +37,7 @@ void AInkAbnormalityEvent::Cause()
 
 void AInkAbnormalityEvent::Finish()
 {
+	Super::Finish();
+
 	GetWorld()->GetTimerManager().ClearTimer(InkShakeTimer);
 }

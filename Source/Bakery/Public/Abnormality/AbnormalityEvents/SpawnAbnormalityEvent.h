@@ -16,4 +16,5 @@ class BAKERY_API ASpawnAbnormalityEvent : public AAbnormalityEvent
 	
 public:
 	virtual void Cause() override;
+	virtual void Finish() override;
 };

@@ -1,5 +1,8 @@
 
 #include "Abnormality/AbnormalityEvents/AbnormalityEvent.h"
+#include "EngineUtils.h"
+
+#include "Characters/Customer.h"
 
 AAbnormalityEvent::AAbnormalityEvent()
 {
@@ -15,4 +18,33 @@ void AAbnormalityEvent::BeginPlay()
 void AAbnormalityEvent::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+
+    if (!bIsFearingEvent)
+    {
+        return;
+    }
+
+    for (TActorIterator<ACustomer>It(GetWorld()); It; ++It)
+    {
+        if (!(*It)->IsFeared())
+        {
+            (*It)->SetFeared(true);
+        }
+    }
+}
+
+void AAbnormalityEvent::Cause()
+{
+    
+}
+
+void AAbnormalityEvent::Finish()
+{
+    if (bIsFearingEvent)
+    {
+        for (TActorIterator<ACustomer>It(GetWorld()); It; ++It)
+        {
+            (*It)->SetFeared(false);
+        }
+    }
 }

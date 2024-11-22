@@ -16,7 +16,7 @@
 #include "Hall/Table.h"
 #include "Hall/Chair.h"
 #include "Characters/PlayerPawn.h"
-#include "Widgets/Customer/CustomerWaitingTimeBarWidget.h"
+#include "Widgets/Customer/CustomerStateWidget.h"
 
 /*
  * 손님 행동 순서
@@ -41,9 +41,9 @@ ACustomer::ACustomer()
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
-	CustomerWaitingTimeBarWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("CustomerWaitingTimeBarWidget"));
-	CustomerWaitingTimeBarWidget->SetVisibility(false);
-	CustomerWaitingTimeBarWidget->SetupAttachment(RootComponent);
+	CustomerStateWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("CustomerStateWidget"));
+	CustomerStateWidget->SetVisibility(true);
+	CustomerStateWidget->SetupAttachment(RootComponent);
 }
 
 void ACustomer::BeginPlay()
@@ -73,12 +73,23 @@ void ACustomer::Tick(float DeltaTime)
 	{
 		float CurrentTime = GetRemainingWaitingTime();
 		float WaitingTime = GetWaitingTime();
-		CustomerWaitingTimeBar->SetPercentage(CurrentTime / WaitingTime);
+		CustomerStateUI->SetWaitingTimeBarPercentage(CurrentTime / WaitingTime);
 	}
 	else if (CustomerState == ECustomerState::Standing)
 	{
 		FVector NewLocation = FMath::VInterpConstantTo(GetActorLocation(), MoveTargetPosition, DeltaTime, SitMovementSpeed);
 		SetActorLocation(NewLocation);
+	}
+
+	if (bIsFeared)
+	{
+		CurrentFearedTime += DeltaTime;
+		CustomerStateUI->SetFearBarPercentage(CurrentFearedTime / MaxFearedTime);
+
+		if (CurrentFearedTime >= MaxFearedTime)
+		{
+			Disappoint();
+		}
 	}
 }
 
@@ -96,10 +107,16 @@ void ACustomer::SetOrder(const URecipeData* RecipeData)
 {
 	Order = RecipeData;
 
-	if (!CustomerWaitingTimeBar)
+	if (!CustomerStateUI)
 	{
-		CustomerWaitingTimeBar = Cast<UCustomerWaitingTimeBarWidget>(CustomerWaitingTimeBarWidget->GetUserWidgetObject());
+		CustomerStateUI = Cast<UCustomerStateWidget>(CustomerStateWidget->GetUserWidgetObject());
 	}
+}
+
+void ACustomer::SetFeared(bool bFeared)
+{
+	bIsFeared = bFeared;
+	CustomerStateUI->SetFearBarVisibility(bIsFeared);
 }
 
 /*
@@ -144,6 +161,7 @@ bool ACustomer::ServeDish(ADish* Dish)
 void ACustomer::Disappoint()
 {
 	ClearWaitingTimer();
+	ClearFearWidget();
 
 	Leave();
 
@@ -249,14 +267,14 @@ FORCEINLINE void ACustomer::SetWaitingTimer(FString WaitingIconPath, float Waiti
 {
 	ClearWaitingTimer();
 
-	CustomerWaitingTimeBarWidget->SetVisibility(true);
-	CustomerWaitingTimeBar->SetWaitingIconImage(WaitingIconPath);
+	CustomerStateUI->SetWaitingTimeBarVisibility(true);
+	CustomerStateUI->SetWaitingIconImage(WaitingIconPath);
 	TimerManager->SetTimer(WaitingTimer, this, &ACustomer::Disappoint, WaitingTime, false, WaitingTime);
 }
 
 FORCEINLINE void ACustomer::ClearWaitingTimer()
 {
-	CustomerWaitingTimeBarWidget->SetVisibility(false);
+	CustomerStateUI->SetWaitingTimeBarVisibility(false);
 	TimerManager->ClearTimer(WaitingTimer);
 }
 
@@ -293,4 +311,11 @@ bool ACustomer::IsInTargetPosition(const float ToleranceRadius) const
 {
 	float DistanceSquared = FVector::DistSquared2D(GetActorLocation(), MoveTargetPosition);
 	return DistanceSquared <= ToleranceRadius * ToleranceRadius;
+}
+
+void ACustomer::ClearFearWidget()
+{
+	bIsFeared = false;
+	CurrentFearedTime = 0.f;
+	CustomerStateUI->SetFearBarVisibility(false);
 }

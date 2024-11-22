@@ -15,7 +15,7 @@ class AChair;
 class AIngredient;
 class ADish;
 class URecipeData;
-class UCustomerWaitingTimeBarWidget;
+class UCustomerStateWidget;
 
 UCLASS()
 class BAKERY_API ACustomer : public ABaseCharacter
@@ -42,6 +42,9 @@ public:
 	float GetWaitingTime() const { return TimerManager->GetTimerRate(WaitingTimer); }
 
 	void SetDespawnPosition(const FVector& Position) { DespawnPosition = Position; }
+	
+	bool IsFeared() const { return bIsFeared; }
+	void SetFeared(bool bFeared);
 
 	/*
 	 * 상태별 처리 함수 (외부 액터에 의해 호출 또는 상태 변경)
@@ -80,6 +83,11 @@ public:
 	void SitTo(AChair* Seat);
 	bool IsInTargetPosition(const float ToleranceRadius = 10.f) const;
 
+	/*
+	 * 이상현상 관련 함수
+	 */
+	void ClearFearWidget();
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -88,7 +96,7 @@ private:
 	 * 주문 대기 및 식사 시간 관련
 	 */
 	UPROPERTY(VisibleAnywhere, Category = "Customer");
-	UWidgetComponent* CustomerWaitingTimeBarWidget;
+	UWidgetComponent* CustomerStateWidget;
 
 	UPROPERTY(EditAnywhere, Category = "Customer");
 	float OrderWaitingTime = 30.f;
@@ -98,6 +106,15 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Customer");
 	float EatingTime = 10.f;
+
+	const URecipeData* Order = nullptr;
+	ADish* ServedDish = nullptr;
+
+	FTimerManager* TimerManager;
+	FTimerHandle WaitingTimer;
+	FTimerHandle EatingTimer;
+
+	UCustomerStateWidget* CustomerStateUI;
 
 	/*
 	 * AI 및 이동 관련
@@ -123,14 +140,10 @@ private:
 	FVector DespawnPosition;
 
 	/*
-	 * 주문 및 식사 관련
+	 * 이상현상 관련
 	 */
-	const URecipeData* Order = nullptr;
-	ADish* ServedDish = nullptr;
-
-	FTimerManager* TimerManager;
-	FTimerHandle WaitingTimer;
-	FTimerHandle EatingTimer;
-
-	UCustomerWaitingTimeBarWidget* CustomerWaitingTimeBar;
+	UPROPERTY(EditAnywhere, Category = "Customer")
+	float MaxFearedTime = 15.f;
+	float CurrentFearedTime = 0.f;
+	bool bIsFeared = false;
 };
