@@ -19,6 +19,8 @@ AInteractableActor::AInteractableActor()
 	InteractionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("InteractionBox"));
 	InteractionBox->SetCollisionProfileName(TEXT("Interactable"));
 	RootComponent = InteractionBox;
+
+	HighlightOverlayMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/ETC/Overlays/MI_InteractableOverlay"));
 }
 
 void AInteractableActor::BeginPlay()
@@ -28,10 +30,29 @@ void AInteractableActor::BeginPlay()
 
 void AInteractableActor::OnEnterHighlight()
 {
+	if (!HighlightOverlayMaterial)
+	{
+		return;
+	}
 
+	//UMaterialInstanceDynamic* DynamicHighlightMaterial = UMaterialInstanceDynamic::Create(HighlightOverlayMaterial,)
+
+	TArray<UStaticMeshComponent*> MeshComponents;
+	GetComponents(MeshComponents);
+
+	for (auto MeshComponent : MeshComponents)
+	{
+		MeshComponent->SetOverlayMaterial(HighlightOverlayMaterial);
+	}
 }
 
 void AInteractableActor::OnExitHighlight()
 {
+	TArray<UStaticMeshComponent*> MeshComponents;
+	GetComponents(MeshComponents);
 
+	for (auto MeshComponent : MeshComponents)
+	{
+		MeshComponent->SetOverlayMaterial(nullptr);
+	}
 }

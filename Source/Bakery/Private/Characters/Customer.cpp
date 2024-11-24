@@ -17,6 +17,7 @@
 #include "Hall/Chair.h"
 #include "Characters/PlayerPawn.h"
 #include "Widgets/Customer/CustomerStateWidget.h"
+#include "Abnormality/Components/FlyAwayComponent.h"
 
 /*
  * 손님 행동 순서
@@ -59,6 +60,19 @@ void ACustomer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (bIsFeared)
+	{
+		CurrentFearedTime += DeltaTime;
+		CustomerStateUI->SetFearBarPercentage(CurrentFearedTime / MaxFearedTime);
+
+		if (CurrentFearedTime >= MaxFearedTime)
+		{
+			Disappoint();
+		}
+
+		return;
+	}
+
 	if (CustomerState == ECustomerState::Idle)
 	{
 		HandleIdle();
@@ -79,17 +93,6 @@ void ACustomer::Tick(float DeltaTime)
 	{
 		FVector NewLocation = FMath::VInterpConstantTo(GetActorLocation(), MoveTargetPosition, DeltaTime, SitMovementSpeed);
 		SetActorLocation(NewLocation);
-	}
-
-	if (bIsFeared)
-	{
-		CurrentFearedTime += DeltaTime;
-		CustomerStateUI->SetFearBarPercentage(CurrentFearedTime / MaxFearedTime);
-
-		if (CurrentFearedTime >= MaxFearedTime)
-		{
-			Disappoint();
-		}
 	}
 }
 
@@ -116,6 +119,13 @@ void ACustomer::SetOrder(const URecipeData* RecipeData)
 void ACustomer::SetFeared(bool bFeared)
 {
 	bIsFeared = bFeared;
+
+	// 공포 수치가 조금이라도 있으면 계속 화면에 표시
+	if (CurrentFearedTime > 0)
+	{
+		return;
+	}
+
 	CustomerStateUI->SetFearBarVisibility(bIsFeared);
 }
 
@@ -199,6 +209,25 @@ void ACustomer::Leave()
 	}
 
 	MoveToDespawn();
+}
+
+void ACustomer::LoseDish(float InMoveSpeed, float InFlySpeed, float InAmplitude, float InMoveInterval)
+{
+	SetFeared(true);
+	TimerManager->PauseTimer(EatingTimer);
+
+	UActorComponent* ActorComponent = ServedDish->AddComponentByClass(UFlyAwayComponent::StaticClass(), false, FTransform::Identity, false);
+	UFlyAwayComponent* FlyAwayComponent = Cast<UFlyAwayComponent>(ActorComponent);
+	FlyAwayComponent->SetFlyOptions(InMoveSpeed, InFlySpeed, InAmplitude, InMoveInterval);
+}
+
+void ACustomer::RegainDish()
+{
+	SetFeared(false);
+	TimerManager->UnPauseTimer(EatingTimer);
+
+	UFlyAwayComponent* FlyAwayComponent = ServedDish->GetComponentByClass<UFlyAwayComponent>();
+	FlyAwayComponent->DestroyComponent();
 }
 
 /*

@@ -3,14 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
 #include "Dish.generated.h"
 
 class UBoxComponent;
 class AIngredient;
 
 UCLASS()
-class BAKERY_API ADish : public AActor
+class BAKERY_API ADish : public APawn
 {
 	GENERATED_BODY()
 	

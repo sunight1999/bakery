@@ -51,13 +51,14 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable)
 	void RequestTakeOrder();
-
 	void TakeOrder();
 	bool ServeDish(ADish* Dish);
 	void Disappoint();
-
 	UFUNCTION(BlueprintCallable)
 	void Leave();
+
+	void LoseDish(float InMoveSpeed, float InFlySpeed, float InAmplitude, float InMoveInterval);
+	void RegainDish();
 
 private:
 	/*

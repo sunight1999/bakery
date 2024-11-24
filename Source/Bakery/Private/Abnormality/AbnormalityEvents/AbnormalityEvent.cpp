@@ -19,7 +19,7 @@ void AAbnormalityEvent::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-    if (!bIsFearingEvent)
+    if (!bIsFearingAllEvent)
     {
         return;
     }
@@ -40,7 +40,7 @@ void AAbnormalityEvent::Cause()
 
 void AAbnormalityEvent::Finish()
 {
-    if (bIsFearingEvent)
+    if (bIsFearingAllEvent)
     {
         for (TActorIterator<ACustomer>It(GetWorld()); It; ++It)
         {

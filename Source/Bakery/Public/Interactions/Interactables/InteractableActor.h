@@ -42,4 +42,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Interaction")
 	UBoxComponent* InteractionBox;
+
+	UPROPERTY(EditAnywhere, Category = "Interaction")
+	UMaterialInterface* HighlightOverlayMaterial;
 };

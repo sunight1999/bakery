@@ -28,10 +28,10 @@ void UCustomerStateWidget::SetWaitingIconImage(FString ImagePath)
 
 void UCustomerStateWidget::SetWaitingTimeBarColor(const FSlateColor& NewColor)
 {
-	FProgressBarStyle ProgressBarStyle = WaitingTimeBar->WidgetStyle;
+	FProgressBarStyle ProgressBarStyle = WaitingTimeBar->GetWidgetStyle();
 	ProgressBarStyle.FillImage.TintColor = NewColor;
 
-	WaitingTimeBar->WidgetStyle = ProgressBarStyle;
+	WaitingTimeBar->SetWidgetStyle(ProgressBarStyle);
 }
 
 void UCustomerStateWidget::SetWaitingTimeBarVisibility(bool bVisible)
@@ -43,9 +43,9 @@ void UCustomerStateWidget::SetWaitingTimeBarVisibility(bool bVisible)
 	else
 	{
 		QueuePlayAnimationReverse(WaitingTimeBarAppearAnim);
-		ResetWaitingTimeBar();
 	}
 
+	ResetWaitingTimeBar();
 	bIsWaitingTimeBarVisible = bVisible;
 }
 

@@ -23,6 +23,8 @@ ADish::ADish()
 	// Physics 설정
 	DishMesh->SetSimulatePhysics(true);
 	DishMesh->SetEnableGravity(false);
+
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
 void ADish::BeginPlay()
