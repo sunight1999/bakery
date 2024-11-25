@@ -9,6 +9,7 @@
 class UTextBlock;
 class UCanvasPanel;
 class UProgressBar;
+class UImage;
 
 /**
  *
@@ -36,13 +37,17 @@ public:
 	/*
 	 * 중간 HUD 값 Setter
 	 */
-	void SetSatisfactionProgress(float Progress);
+	UE::Slate::FDeprecateVector2DResult GetInternalDayClockSize() const;
+	void SetOperatingTimeMarker();
+	void SetOperatingTimeMarker(float OpenTime, float CloseTime);
+	void SetTimeMarker(float CurrentTime);
+	void SetMarkerPosition(UWidget* Widget, float X);
 
 	/*
 	 * 오른쪽 HUD 값 Setter
 	 */
 	void SetDay(int Day);
-	void SetTime(int Minute);
+	void SetTime(float Minute);
 
 private:
 	/*
@@ -64,13 +69,27 @@ private:
 	 * 중간 HUD 변수
 	 */
 	UPROPERTY(meta = (BindWidget))
-	UCanvasPanel* SatisfactionBarCanvas;
+	UCanvasPanel* DayClockCanvas;
 
 	UPROPERTY(meta = (BindWidget))
-	UProgressBar* SatisfactionBar;
+	UCanvasPanel* InternalDayClockCanvas;
+
+	UPROPERTY(meta = (BindWidget))
+	UImage* DayClockImage;
+
+	UPROPERTY(meta = (BindWidget))
+	UImage* CurrentTimeMarkerImage;
+
+	UPROPERTY(meta = (BindWidget))
+	UImage* BakeryOpenTimeMarkerImage;
+
+	UPROPERTY(meta = (BindWidget))
+	UImage* BakeryCloseTimeMarkerImage;
 
 	UPROPERTY(meta = (BindWidget))
 	UCanvasPanel* PrepareDisplay;
+
+	FVector2D DayClockSize;
 
 	/*
 	 * 오른쪽 HUD 변수

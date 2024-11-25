@@ -5,8 +5,11 @@
 #include "Components/TextBlock.h"
 #include "Components/CanvasPanel.h"
 #include "Components/ProgressBar.h"
+#include "Components/Image.h"
+#include "Components/CanvasPanelSlot.h"
 
 #include "General/BakeryGameState.h"
+#include "General/BakeryGameMode.h"
 
 void UBakeryHUDWidget::NativeConstruct()
 {
@@ -14,6 +17,11 @@ void UBakeryHUDWidget::NativeConstruct()
 	BakeryGameState->OnMoneyChanged.AddUObject(this, &UBakeryHUDWidget::SetMoney);
 	BakeryGameState->OnDayChanged.AddUObject(this, &UBakeryHUDWidget::SetDay);
 	BakeryGameState->OnTimeChanged.AddUObject(this, &UBakeryHUDWidget::SetTime);
+	BakeryGameState->OnTimeChanged.AddUObject(this, &UBakeryHUDWidget::SetTimeMarker);
+
+	// 이 시점에선 GetCachedGeometry가 유효하지 않으므로 잠깐 기다렸다가 운영 시간 마커 위치 설정
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UBakeryHUDWidget::SetOperatingTimeMarker, 0.001f, false);
 }
 
 void UBakeryHUDWidget::SetHUDState(bool bIsOpened)
@@ -40,7 +48,6 @@ void UBakeryHUDWidget::SetHUDState(bool bIsOpened)
 
 	// CustomerPredictCanvas의 경우 아직 미구현 기능이므로 Collapsed 처리
 	CustomerPredictCanvas->SetVisibility(ESlateVisibility::Collapsed);
-	SatisfactionBarCanvas->SetVisibility(OppositeHUDVisibility);
 	PrepareDisplay->SetVisibility(HUDVisibility);
 }
 
@@ -61,9 +68,47 @@ void UBakeryHUDWidget::SetCustomerPredict(uint8 CustomerGroupNum, uint8 Customer
 /*
  * 중간 HUD 값 Setter
  */
-void UBakeryHUDWidget::SetSatisfactionProgress(float Progress)
+UE::Slate::FDeprecateVector2DResult UBakeryHUDWidget::GetInternalDayClockSize() const
 {
-	SatisfactionBar->SetPercent(Progress);
+	return InternalDayClockCanvas->GetCachedGeometry().GetLocalSize();
+}
+
+void UBakeryHUDWidget::SetOperatingTimeMarker()
+{
+	ABakeryGameMode* BakeryGameMode = Cast<ABakeryGameMode>(GetWorld()->GetAuthGameMode());
+	SetOperatingTimeMarker(BakeryGameMode->GetBakeryOpenTime(), BakeryGameMode->GetBakeryCloseTime());
+}
+
+void UBakeryHUDWidget::SetOperatingTimeMarker(float OpenTime, float CloseTime)
+{
+	auto CachedDayClockSize = GetInternalDayClockSize();
+
+	float DayClockWidth = CachedDayClockSize.X;
+	float OpenTimeMarkerX = DayClockWidth * OpenTime / 1439;
+	float CloseTimeMarkerX = DayClockWidth * CloseTime / 1439;
+	
+	SetMarkerPosition(BakeryOpenTimeMarkerImage, OpenTimeMarkerX);
+	SetMarkerPosition(BakeryCloseTimeMarkerImage, CloseTimeMarkerX);
+}
+
+void UBakeryHUDWidget::SetTimeMarker(float CurrentTime)
+{
+	auto CachedDayClockSize = GetInternalDayClockSize();
+	
+	float DayClockWidth = CachedDayClockSize.X;
+	float CurrentTimeMarkerX = DayClockWidth * CurrentTime / 1439;
+
+	SetMarkerPosition(CurrentTimeMarkerImage, CurrentTimeMarkerX);
+}
+
+void UBakeryHUDWidget::SetMarkerPosition(UWidget* Widget, float X)
+{
+	if (UCanvasPanelSlot* CanvasPanelSlot = Cast<UCanvasPanelSlot>(Widget->Slot))
+	{
+		FVector2D MarkerPosition = CanvasPanelSlot->GetPosition();
+		MarkerPosition.X = X;
+		CanvasPanelSlot->SetPosition(MarkerPosition);
+	}
 }
 
 /*
@@ -78,10 +123,10 @@ void UBakeryHUDWidget::SetDay(int Day)
 /// 경과한 분에 맞게 시간 표시
 /// </summary>
 /// <param name="Minute">현재 하루 중 경과한 분. 0 ~ 1439 (00:00 ~ 23:59)</param>
-void UBakeryHUDWidget::SetTime(int Minute)
+void UBakeryHUDWidget::SetTime(float Minute)
 {
 	int CurrentHour = Minute / 60;
-	int CurrentMinute = Minute % 60;
+	int CurrentMinute = Minute - CurrentHour * 60;
 	if (CurrentHour > 12)
 	{
 		CurrentHour -= 12;

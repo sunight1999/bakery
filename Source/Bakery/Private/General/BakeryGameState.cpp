@@ -62,7 +62,7 @@ void ABakeryGameState::AddDay()
 	AddDay(1);
 }
 
-void ABakeryGameState::SetTime(int Minute)
+void ABakeryGameState::SetTime(float Minute)
 {
 	ElapsedTime = Minute;
 
