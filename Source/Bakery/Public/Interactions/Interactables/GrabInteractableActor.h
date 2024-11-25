@@ -22,7 +22,7 @@ public:
 	virtual void OnEnterGrab(const FInteractionInfo& InteractionInfo) override { unimplemented(); }
 
 	UFUNCTION(BlueprintCallable)
-	virtual void OnGrab() override { unimplemented(); }
+	virtual void OnGrab(float DeltaTime) override { unimplemented(); }
 
 	UFUNCTION(BlueprintCallable)
 	virtual void OnExitGrab() override { unimplemented(); }

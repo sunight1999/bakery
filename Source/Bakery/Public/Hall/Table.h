@@ -29,11 +29,11 @@ public:
 	void LeaveSeat(AChair* Seat);
 
 	void OnEnterInteract(const FInteractionInfo& InteractionInfo) override;
-	void OnInteract() override {}
+	void OnInteract(float DeltaTime) override {}
 	void OnExitInteract() override {}
 
 	void OnEnterGrab(const FInteractionInfo& InteractionInfo) override;
-	void OnGrab() override {}
+	void OnGrab(float DeltaTime) override {}
 	void OnExitGrab() override {}
 
 	void PutDish(ADish* Dish, AChair* Chair);

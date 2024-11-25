@@ -24,6 +24,6 @@ class BAKERY_API IGrab
 
 public:
 	virtual void OnEnterGrab(const FInteractionInfo& InteractionInfo) = 0;
-	virtual void OnGrab() = 0;
+	virtual void OnGrab(float DeltaTime) = 0;
 	virtual void OnExitGrab() = 0;
 };

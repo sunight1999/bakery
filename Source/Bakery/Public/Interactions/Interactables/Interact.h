@@ -24,6 +24,6 @@ class BAKERY_API IInteract
 
 public:
 	virtual void OnEnterInteract(const FInteractionInfo& InteractionInfo) = 0;
-	virtual void OnInteract() = 0;
+	virtual void OnInteract(float DeltaTime) = 0;
 	virtual void OnExitInteract() = 0;
 };

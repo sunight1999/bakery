@@ -28,11 +28,11 @@ void UInteractorComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 	// TODO: OnInteraction, OnGrab 이벤트의 경우 매 틱마다 호출해야하므로 기획 상 불필요하다고 판단되면 제거
 	if (bIsInteracting)
 	{
-		CurrentInteractable->OnInteractDelegate.Broadcast();
+		CurrentInteractable->OnInteractDelegate.Broadcast(DeltaTime);
 	}
 	else if (bIsGrabbing)
 	{
-		CurrentInteractable->OnGrabDelegate.Broadcast();
+		CurrentInteractable->OnGrabDelegate.Broadcast(DeltaTime);
 	}
 
 	// 상호작용 가능한 액터 하이라이팅 처리

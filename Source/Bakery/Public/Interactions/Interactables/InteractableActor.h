@@ -23,10 +23,11 @@ public:
 	virtual void OnEnterInteract(const FInteractionInfo& InteractionInfo) override { unimplemented(); }
 
 	UFUNCTION(BlueprintCallable)
-	virtual void OnInteract() override { unimplemented(); }
+	virtual void OnInteract(float DeltaTime) override { unimplemented(); }
 
 	UFUNCTION(BlueprintCallable)
 	virtual void OnExitInteract() override { unimplemented(); }
+
 
 	UFUNCTION(BlueprintCallable)
 	virtual void OnEnterHighlight() override;

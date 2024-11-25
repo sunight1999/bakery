@@ -30,11 +30,11 @@ public:
 	void ResetCooking();
 
 	virtual void OnEnterInteract(const FInteractionInfo& InteractionInfo) override;
-	virtual void OnInteract() override {}
+	virtual void OnInteract(float DeltaTime) override {}
 	virtual void OnExitInteract() override {}
 
 	virtual void OnEnterGrab(const FInteractionInfo& InteractionInfo) override;
-	virtual void OnGrab() override {}
+	virtual void OnGrab(float DeltaTime) override {}
 	virtual void OnExitGrab() override {}
 
 	/*
