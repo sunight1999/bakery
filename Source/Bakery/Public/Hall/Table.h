@@ -22,7 +22,6 @@ class BAKERY_API ATable : public AGrabInteractableActor
 
 public:
 	ATable();
-	//void Tick(float DeltaTime) override;
 
 	int GetEmptySeatNum() const { return EmptySeats.Num(); }
 
@@ -32,9 +31,12 @@ public:
 	void OnEnterInteract(const FInteractionInfo& InteractionInfo) override;
 	void OnInteract() override {}
 	void OnExitInteract() override {}
+
 	void OnEnterGrab(const FInteractionInfo& InteractionInfo) override;
 	void OnGrab() override {}
 	void OnExitGrab() override {}
+
+	void PutDish(ADish* Dish, AChair* Chair);
 
 private:
 	void BeginPlay() override;

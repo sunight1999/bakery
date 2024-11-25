@@ -4,16 +4,24 @@
 #include "Kitchen/Dish.h"
 #include "EngineUtils.h"
 #include "Components/BoxComponent.h"
+#include "NiagaraComponent.h"
 
 #include "Kitchen/Ingredient.h"
 #include "Kitchen/IngredientContainer.h"
+#include "Interactions/GrabberComponent.h"
+#include "Interactions/InteractionDefines.h"
+#include "Interactions/InteractorComponent.h"
+#include "Abnormality/Components/FlyAwayComponent.h"
 
 ADish::ADish()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	DishMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ContainerMesh"));
-	RootComponent = DishMesh;
+	InteractionBox->SetSimulatePhysics(true);
+	InteractionBox->SetEnableGravity(false);
+
+	DishMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DishMesh"));
+	DishMesh->SetupAttachment(RootComponent);
 
 	// Collision 설정
 	DishMesh->SetMobility(EComponentMobility::Movable);
@@ -21,16 +29,71 @@ ADish::ADish()
 	DishMesh->SetCollisionProfileName(FName("Ingredient"));
 
 	// Physics 설정
-	DishMesh->SetSimulatePhysics(true);
+	DishMesh->SetSimulatePhysics(false);
 	DishMesh->SetEnableGravity(false);
 
-	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+	FlyAwayEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("FlyAwayEffect"));
+	FlyAwayEffect->SetAutoActivate(false);
+	FlyAwayEffect->SetupAttachment(RootComponent);
 }
 
 void ADish::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	InteractionBox->SetBoxExtent(FVector::ZeroVector, false);
+}
+
+void ADish::OnEnterGrab(const FInteractionInfo& InteractionInfo)
+{
+	UGrabberComponent* Grabber = InteractionInfo.Interactor->GetGrabber();
+	UPrimitiveComponent* Grabbed = Grabber->GetGrabbed();
+
+	if (Grabbed || !bIsFlying)
+	{
+		return;
+	}
+
+	Caught();
+
+	UPrimitiveComponent* Primitive = GetComponentByClass<UPrimitiveComponent>();
+	Grabber->Grab(Primitive, GetActorLocation());
+}
+
+void ADish::OnEnterHighlight()
+{
+	Super::OnEnterHighlight();
+
+	if (!HighlightOverlayMaterial || !Dessert)
+	{
+		return;
+	}
+
+	TArray<UStaticMeshComponent*> MeshComponents;
+	Dessert->GetComponents(MeshComponents);
+
+	for (auto MeshComponent : MeshComponents)
+	{
+		MeshComponent->SetOverlayMaterial(HighlightOverlayMaterial);
+	}
+}
+
+void ADish::OnExitHighlight()
+{
+	Super::OnExitHighlight();
+
+	if (!HighlightOverlayMaterial || !Dessert)
+	{
+		return;
+	}
+
+	TArray<UStaticMeshComponent*> MeshComponents;
+	Dessert->GetComponents(MeshComponents);
+
+	for (auto MeshComponent : MeshComponents)
+	{
+		MeshComponent->SetOverlayMaterial(nullptr);
+	}
 }
 
 bool ADish::IsSettable(AIngredient* Ingredient)
@@ -101,3 +164,26 @@ void ADish::Wash()
 	}
 }
 
+void ADish::FlyAway(float InMoveSpeed, float InFlySpeed, float InAmplitude, float InMoveInterval)
+{
+	bIsFlying = true;
+	bIsLostDish = true;
+
+	UActorComponent* ActorComponent = AddComponentByClass(UFlyAwayComponent::StaticClass(), false, FTransform::Identity, false);
+	UFlyAwayComponent* FlyAwayComponent = Cast<UFlyAwayComponent>(ActorComponent);
+	FlyAwayComponent->SetFlyOptions(InMoveSpeed, InFlySpeed, InAmplitude, InMoveInterval);
+
+	InteractionBox->SetBoxExtent(OriginInteractionBoxExtent, false);
+	FlyAwayEffect->Activate();
+}
+
+void ADish::Caught()
+{
+	bIsFlying = false;
+
+	UFlyAwayComponent* FlyAwayComponent = GetComponentByClass<UFlyAwayComponent>();
+	FlyAwayComponent->DestroyComponent();
+
+	InteractionBox->SetBoxExtent(FVector::ZeroVector, false);
+	FlyAwayEffect->Deactivate();
+}

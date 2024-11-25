@@ -4,6 +4,7 @@
 #include "Hall/Table.h"
 #include "Components/BoxComponent.h"
 #include "Components/WidgetComponent.h"
+#include "EngineUtils.h"
 
 #include "Hall/Chair.h"
 #include "General/BakeryDefines.h"
@@ -143,6 +144,27 @@ void ATable::OnEnterGrab(const FInteractionInfo& InteractionInfo)
 		return;
 	}
 
+	if (Dish->IsLostDish())
+	{
+		for (AChair* Seat : UsingSeats)
+		{
+			ACustomer* Customer = Seat->GetAssignedCustomer();
+			if (!Customer->IsFeared() || !Customer->IsDishBelongs(Dish))
+			{
+				continue;
+			}
+
+			Grabber->Release();
+			PutDish(Dish, Seat);
+
+			Customer->SetFeared(false);
+
+			break;
+		}
+
+		return;
+	}
+
 	// 해당 요리를 주문한 손님이 있는지 확인 후 제공
 	for (AChair* Seat : UsingSeats)
 	{
@@ -155,17 +177,23 @@ void ATable::OnEnterGrab(const FInteractionInfo& InteractionInfo)
 		if (Customer->ServeDish(Dish))
 		{
 			Grabber->Release();
+			PutDish(Dish, Seat);
 
-			FVector TableCenterLocation = DishServingCenterPoint->GetComponentLocation();
-			FVector DishLocation = TableCenterLocation + Seat->GetChairDirection() * DishesDistance;
-			Dish->SetActorLocation(DishLocation);
-
-			UPrimitiveComponent* Primitive = Dish->GetComponentByClass<UPrimitiveComponent>();
-			Primitive->SetPhysicsLinearVelocity(FVector::ZeroVector);
-			Primitive->SetPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
-
-			ServedDishes.Emplace(Dish);
 			return;
 		}
 	}
+}
+
+void ATable::PutDish(ADish* Dish, AChair* Chair)
+{
+	FVector TableCenterLocation = DishServingCenterPoint->GetComponentLocation();
+	FVector DishLocation = TableCenterLocation + Chair->GetChairDirection() * DishesDistance;
+	Dish->SetActorLocation(DishLocation);
+
+	UPrimitiveComponent* Primitive = Dish->GetComponentByClass<UPrimitiveComponent>();
+	Primitive->SetPhysicsLinearVelocity(FVector::ZeroVector);
+	Primitive->SetPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
+
+	ServedDishes.Emplace(Dish);
+	return;
 }

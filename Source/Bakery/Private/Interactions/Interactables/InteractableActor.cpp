@@ -35,8 +35,6 @@ void AInteractableActor::OnEnterHighlight()
 		return;
 	}
 
-	//UMaterialInstanceDynamic* DynamicHighlightMaterial = UMaterialInstanceDynamic::Create(HighlightOverlayMaterial,)
-
 	TArray<UStaticMeshComponent*> MeshComponents;
 	GetComponents(MeshComponents);
 

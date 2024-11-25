@@ -6,6 +6,7 @@
 #include "Components/WidgetComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "AIController.h"
+#include "Animation/AnimMontage.h"
 
 #include "General/BakeryGameMode.h"
 #include "General/BakeryGameState.h"
@@ -17,7 +18,6 @@
 #include "Hall/Chair.h"
 #include "Characters/PlayerPawn.h"
 #include "Widgets/Customer/CustomerStateWidget.h"
-#include "Abnormality/Components/FlyAwayComponent.h"
 
 /*
  * 손님 행동 순서
@@ -120,13 +120,21 @@ void ACustomer::SetFeared(bool bFeared)
 {
 	bIsFeared = bFeared;
 
-	// 공포 수치가 조금이라도 있으면 계속 화면에 표시
-	if (CurrentFearedTime > 0)
+	if (bIsFeared)
 	{
-		return;
+		PlayAnimMontage(CustomerMontage, 1.f, FName("Scared"));
+		CustomerController->PauseMove(FAIRequestID::CurrentRequest);
+		PauseTimers();
+	}
+	else
+	{
+		StopAnimMontage(CustomerMontage);
+		CustomerController->ResumeMove(FAIRequestID::CurrentRequest);
+		ResumeTimers();
 	}
 
-	CustomerStateUI->SetFearBarVisibility(bIsFeared);
+	// 공포 수치가 조금이라도 있으면 계속 화면에 표시
+	CustomerStateUI->SetFearBarVisibility(bIsFeared || CurrentFearedTime > 0);
 }
 
 /*
@@ -216,18 +224,13 @@ void ACustomer::LoseDish(float InMoveSpeed, float InFlySpeed, float InAmplitude,
 	SetFeared(true);
 	TimerManager->PauseTimer(EatingTimer);
 
-	UActorComponent* ActorComponent = ServedDish->AddComponentByClass(UFlyAwayComponent::StaticClass(), false, FTransform::Identity, false);
-	UFlyAwayComponent* FlyAwayComponent = Cast<UFlyAwayComponent>(ActorComponent);
-	FlyAwayComponent->SetFlyOptions(InMoveSpeed, InFlySpeed, InAmplitude, InMoveInterval);
+	ServedDish->FlyAway(InMoveSpeed, InFlySpeed, InAmplitude, InMoveInterval);
 }
 
 void ACustomer::RegainDish()
 {
 	SetFeared(false);
 	TimerManager->UnPauseTimer(EatingTimer);
-
-	UFlyAwayComponent* FlyAwayComponent = ServedDish->GetComponentByClass<UFlyAwayComponent>();
-	FlyAwayComponent->DestroyComponent();
 }
 
 /*
@@ -287,6 +290,32 @@ void ACustomer::FinishEating()
 	BakeryGameState->AddMoney(Order->GetPrice());
 
 	// Standing 애니메이션 종료 후 애니메이션 블루프린트에서 Leave() 호출
+}
+
+void ACustomer::PauseTimers()
+{
+	if (TimerManager->IsTimerActive(WaitingTimer))
+	{
+		TimerManager->PauseTimer(WaitingTimer);
+	}
+
+	if (TimerManager->IsTimerActive(EatingTimer))
+	{
+		TimerManager->PauseTimer(EatingTimer);
+	}
+}
+
+void ACustomer::ResumeTimers()
+{
+	if (TimerManager->IsTimerPaused(WaitingTimer))
+	{
+		TimerManager->UnPauseTimer(WaitingTimer);
+	}
+
+	if (TimerManager->IsTimerPaused(EatingTimer))
+	{
+		TimerManager->UnPauseTimer(EatingTimer);
+	}
 }
 
 /*

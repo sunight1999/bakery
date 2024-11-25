@@ -25,14 +25,17 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	float MoveSpeed = 100.f;
-	float FlySpeed = 100.f;
+	float MoveSpeed = 10.f;
+	float FlySpeed = 10.f;
 	float Amplitude = 30.f;
 	float MoveInterval = 5.f;
 
 	AActor* Owner = nullptr;
-	AAIController* DishController = nullptr;
 	UNavigationSystemV1* NavigationSystem = nullptr;
+
+	bool bIsMoving = false;
+	TArray<FVector> TargetPath;
+	int CurrentPathPoint = 0;
 
 	FVector CurrentLocation;
 	float ElapsedTime = 0.f;

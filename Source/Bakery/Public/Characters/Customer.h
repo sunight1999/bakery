@@ -42,9 +42,6 @@ public:
 	float GetWaitingTime() const { return TimerManager->GetTimerRate(WaitingTimer); }
 
 	void SetDespawnPosition(const FVector& Position) { DespawnPosition = Position; }
-	
-	bool IsFeared() const { return bIsFeared; }
-	void SetFeared(bool bFeared);
 
 	/*
 	 * 상태별 처리 함수 (외부 액터에 의해 호출 또는 상태 변경)
@@ -73,6 +70,8 @@ public:
 	/*
 	 * 주문 대기 UI 관련 함수
 	 */
+	void PauseTimers();
+	void ResumeTimers();
 	FORCEINLINE void SetWaitingTimer(FString WaitingIconPath, float WaitingTime);
 	FORCEINLINE void ClearWaitingTimer();
 
@@ -87,6 +86,11 @@ public:
 	/*
 	 * 이상현상 관련 함수
 	 */
+	bool IsFeared() const { return bIsFeared; }
+	void SetFeared(bool bFeared);
+
+	bool IsDishBelongs(ADish* Dish) { return Dish == ServedDish; }
+
 	void ClearFearWidget();
 
 protected:
@@ -143,6 +147,9 @@ private:
 	/*
 	 * 이상현상 관련
 	 */
+	UPROPERTY(EditAnywhere, Category = "Customer")
+	UAnimMontage* CustomerMontage;
+
 	UPROPERTY(EditAnywhere, Category = "Customer")
 	float MaxFearedTime = 15.f;
 	float CurrentFearedTime = 0.f;

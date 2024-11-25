@@ -21,6 +21,8 @@ public:
 	void Cause() override;
 	void Finish() override;
 
+	void Steal();
+
 	bool bIsCaused = false;
 
 private:
@@ -35,4 +37,6 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "AbnormalityEvent")
 	float MoveInterval = 5.f;
+
+	FTimerHandle ThiefHandle;
 };
