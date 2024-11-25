@@ -11,6 +11,8 @@ class AIngredient;
 class UIngredientData;
 class URecipeSubsystem;
 class UNiagaraComponent;
+class UWidgetComponent;
+class UProgressWidget;
 
 /**
  * 재료를 올려두거나 요리할 수 있는 조리대
@@ -77,6 +79,9 @@ private:
 	/*
 	 * 요리 관련
 	 */
+	UPROPERTY(VisibleAnywhere, Category = "Countertop|Cooking")
+	UWidgetComponent* CookingProgressWidget;
+
 	UPROPERTY(EditAnywhere, Category = "Countertop|Cooking")
 	UNiagaraComponent* PrimaryCookingEffect;
 
@@ -102,6 +107,8 @@ private:
 	// 요리를 완성하기 위해 필요한 상호작용 횟수
 	UPROPERTY(EditAnywhere, Category = "Countertop|Cooking")
 	int HandCookingTime = 10;
+
+	UProgressWidget* CookingProgress;
 
 	/*
 	 * 현재 보관 중인 재료 또는 요리 관련

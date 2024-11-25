@@ -3,6 +3,8 @@
 
 #include "Kitchen/Countertop.h"
 #include "Components/BoxComponent.h"
+#include "Components/AudioComponent.h"
+#include "Components/WidgetComponent.h"
 #include "NiagaraComponent.h"
 #include "EngineUtils.h"
 
@@ -10,6 +12,7 @@
 #include "Interactions/InteractorComponent.h"
 #include "Interactions/GrabberComponent.h"
 #include "Interactions/Interactables/InteractableComponent.h"
+#include "Widgets/Progress/ProgressWidget.h"
 
 #include "Kitchen/KitchenDefines.h"
 #include "Kitchen/Ingredient.h"
@@ -19,7 +22,6 @@
 #include "Subsystems/RecipeSubsystem.h"
 #include "Characters/PlayerPawn.h"
 #include "Subsystems/SoundManager.h"
-#include "Components/AudioComponent.h"
 
 ACountertop::ACountertop()
 {
@@ -36,6 +38,10 @@ ACountertop::ACountertop()
 
 	KeepPoint = CreateDefaultSubobject<USceneComponent>(TEXT("KeepPoint"));
 	KeepPoint->SetupAttachment(TopPlateMesh);
+
+	CookingProgressWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("CookingProgressWidget"));
+	CookingProgressWidget->SetupAttachment(InteractionBox);
+	CookingProgressWidget->SetVisibility(false);
 
 	PrimaryCookingEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("PrimaryCookingEffect"));
 	PrimaryCookingEffect->SetAutoActivate(false);
@@ -54,6 +60,8 @@ void ACountertop::BeginPlay()
 	RecipeSubsystem = GameInstance->GetSubsystem<URecipeSubsystem>();
 
 	verify(RecipeSubsystem);
+
+	CookingProgress = Cast<UProgressWidget>(CookingProgressWidget->GetUserWidgetObject());
 }
 
 void ACountertop::Tick(float DeltaTime)
@@ -61,7 +69,7 @@ void ACountertop::Tick(float DeltaTime)
 	if (bIsCooking && bIsAutomatic)
 	{
 		CurrentAutoCookingTime += DeltaTime;
-		UE_LOG(LogTemp, Display, TEXT("( %f / %f )"), CurrentAutoCookingTime, AutoCookingTime);
+		CookingProgress->SetPercentage(CurrentAutoCookingTime / AutoCookingTime);
 
 		if (IsCookingDone())
 		{
@@ -85,6 +93,9 @@ void ACountertop::ResetCooking()
 	CurrentHandCookingTime = 0;
 	CurrentCookingTool = ECookingTool::None;
 	CurrentCookingTarget = nullptr;
+
+	CookingProgressWidget->SetVisibility(false);
+	CookingProgress->SetPercentage(0.f);
 
 	if (PrimaryCookingEffect)
 	{
@@ -113,7 +124,7 @@ void ACountertop::BeginCook(ECookingTool CookingTool, const UIngredientData* Coo
 	CurrentCookingTool = CookingTool;
 	CurrentCookingTarget = CookingTarget;
 
-	// TODO: 요리 진행바 UI 띄우기
+	CookingProgressWidget->SetVisibility(true);
 
 	// 요리 이펙트 재생
 	if (PrimaryCookingEffect)
@@ -158,7 +169,7 @@ void ACountertop::Cook()
 	else
 	{
 		++CurrentHandCookingTime;
-		UE_LOG(LogTemp, Display, TEXT("( %d / %d )"), CurrentHandCookingTime, HandCookingTime);
+		CookingProgress->SetPercentage((float)CurrentHandCookingTime / (float)HandCookingTime);
 	}
 
 	if (IsCookingDone())
