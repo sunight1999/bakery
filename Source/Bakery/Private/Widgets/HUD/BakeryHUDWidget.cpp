@@ -18,6 +18,15 @@ void UBakeryHUDWidget::NativeConstruct()
 	BakeryGameState->OnDayChanged.AddUObject(this, &UBakeryHUDWidget::SetDay);
 	BakeryGameState->OnTimeChanged.AddUObject(this, &UBakeryHUDWidget::SetTime);
 	BakeryGameState->OnTimeChanged.AddUObject(this, &UBakeryHUDWidget::SetTimeMarker);
+	BakeryGameState->OnRatingChanged.AddUObject(this, &UBakeryHUDWidget::SetRating);
+
+	// 평점 ProgressBar 레퍼런스 탐색
+	for (int32 i = 0; i < 5; i++)
+	{
+		FString ProgressBarName = FString::Printf(TEXT("StarProgressBar_%d"), i);
+		UProgressBar* ProgressBar = Cast<UProgressBar>(GetWidgetFromName(FName(ProgressBarName)));
+		RatingProgressBars.Emplace(ProgressBar);
+	}
 
 	// 이 시점에선 GetCachedGeometry가 유효하지 않으므로 잠깐 기다렸다가 운영 시간 마커 위치 설정
 	FTimerHandle TimerHandle;
@@ -63,6 +72,21 @@ void UBakeryHUDWidget::SetCustomerPredict(uint8 CustomerGroupNum, uint8 Customer
 {
 	PredictGroupNumText->SetText(IntToFText(CustomerGroupNum));
 	PredictGroupConsistNumText->SetText(IntToFText(CustomerGroupConsistNum));
+}
+
+void UBakeryHUDWidget::SetRating(float Rating)
+{
+	int FullStars = (int)Rating;
+	
+	for (int i = 0; i < FullStars; i++)
+	{
+		RatingProgressBars[i]->SetPercent(1.f);
+	}
+
+	if (FullStars < 5)
+	{
+		RatingProgressBars[FullStars]->SetPercent(Rating - FullStars);
+	}
 }
 
 /*

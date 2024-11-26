@@ -12,6 +12,8 @@ UUISubsystem::UUISubsystem()
 	{
 		UIDataTable = UIDataTableFinder.Object;
 	}
+
+	verify(UIDataTable);
 }
 
 void UUISubsystem::Initialize(FSubsystemCollectionBase& Collection)
@@ -25,6 +27,12 @@ void UUISubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 void UUISubsystem::LoadAllUI()
 {
+	if (!IsWorldValid())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("World가 유효하지 않습니다."));
+		return;
+	}
+
 	// DT_ManagedUI에 정의된 데이터에 따라 Widget 초기화
 	FString ContextString = "ManagedUI";
 	TArray<FName> ManagedUINames = UIDataTable->GetRowNames();

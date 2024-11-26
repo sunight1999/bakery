@@ -33,6 +33,7 @@ public:
 	 */
 	void SetMoney(int32 Money);
 	void SetCustomerPredict(uint8 CustomerGroupNum, uint8 CustomerGroupConsistNum);
+	void SetRating(float Rating);
 
 	/*
 	 * 중간 HUD 값 Setter
@@ -55,6 +56,8 @@ private:
 	 */
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* MoneyText;
+
+	TArray<UProgressBar*> RatingProgressBars;
 
 	UPROPERTY(meta = (BindWidget))
 	UCanvasPanel* CustomerPredictCanvas;

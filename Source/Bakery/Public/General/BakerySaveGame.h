@@ -20,4 +20,7 @@ public:
 
 	UPROPERTY()
 	int32 Day;
+
+	UPROPERTY()
+	float Rating;
 };

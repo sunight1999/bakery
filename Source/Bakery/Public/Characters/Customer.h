@@ -7,6 +7,7 @@
 #include "../General/BakeryDefines.h"
 #include "Customer.generated.h"
 
+enum class EWaitingState : uint8;
 class AHallManager;
 class UWidgetComponent;
 class UAnimMontage;
@@ -46,6 +47,9 @@ public:
 	/*
 	 * 상태별 처리 함수 (외부 액터에 의해 호출 또는 상태 변경)
 	 */
+	UFUNCTION()
+	void StateChanged(EWaitingState NewState);
+
 	UFUNCTION(BlueprintCallable)
 	void RequestTakeOrder();
 	void TakeOrder();
@@ -120,6 +124,9 @@ private:
 	FTimerHandle EatingTimer;
 
 	UCustomerStateWidget* CustomerStateUI;
+
+	// 평점. 평점은 대기시간이 Bad 상태까지 넘어가거나, 공포도가 Bad 상태까지 넘어가면 -1. 둘 중 하나라도 초과할 경우 최소치인 1 부여.
+	int Rating = 5;
 
 	/*
 	 * AI 및 이동 관련

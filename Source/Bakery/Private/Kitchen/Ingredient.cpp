@@ -72,7 +72,7 @@ const UIngredientData* AIngredient::MergeIngredient(const AIngredient* OtherIngr
 
 	// 두 재료를 사용하는 레시피가 있을 경우 해당 레시피의 결과물(UIngredientData)을 반환
 	const TSet<URecipeData*>& NextRecipes = AvailableRecipe->GetNextRecipes();
-	for (const URecipeData* NextRecipe : NextRecipes)
+	for (URecipeData* NextRecipe : NextRecipes)
 	{
 		bool bIsThisIncluded = NextRecipe->Includes(IngredientData);
 		bool bIsOtherIncluded = NextRecipe->Includes(OtherIngredient->GetIngredientData());

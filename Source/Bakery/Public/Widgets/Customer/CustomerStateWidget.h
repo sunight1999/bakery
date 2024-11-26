@@ -9,17 +9,19 @@
 #define WAITING_ORDER_ICON_BASE_PATH FString("/Game/Textures/Icon/Order/")
 #define WAITING_ORDER_ICON_ORDERING_PATH WAITING_ORDER_ICON_BASE_PATH + FString("Bell")
 
-class UCanvasPanel;
-class UImage;
-class UProgressBar;
-
+UENUM(BlueprintType)
 enum class EWaitingState : uint8
 {
-	None,
 	Nice,
 	NotBad,
 	Bad
 };
+
+class UCanvasPanel;
+class UImage;
+class UProgressBar;
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FWaitingStateChanged, EWaitingState);
 
 /**
  * 
@@ -30,6 +32,8 @@ class BAKERY_API UCustomerStateWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	void SetProgressBarColor(UProgressBar* ProgressBar, const FSlateColor& NewColor);
+
 	/*
 	 * 대기시간 관련 함수
 	 */
@@ -38,9 +42,10 @@ public:
 
 	void ResetWaitingTimeBar();
 	void SetWaitingIconImage(FString ImagePath);
-	void SetWaitingTimeBarColor(const FSlateColor& NewColor);
 	void SetWaitingTimeBarVisibility(bool bVisible);
 	void SetWaitingTimeBarPercentage(float InPercentage);
+
+	FWaitingStateChanged OnWaitingStateChanged;
 
 	/*
 	 * 공포 수치 관련 함수
@@ -48,8 +53,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetFearBarPercentage() const { return FearBarPercentage; }
 
+	void ResetFearBar();
 	void SetFearBarVisibility(bool bVisible);
 	void SetFearBarPercentage(float InPercentage);
+
+	FWaitingStateChanged OnFearStateChanged;
 
 private:
 	/*
@@ -85,7 +93,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Customer");
 	FColor WaitingBadStateColor;
 
-	EWaitingState WaitingState = EWaitingState::None;
+	EWaitingState WaitingState = EWaitingState::Nice;
 	bool bIsWaitingTimeBarVisible = false;
 	float WaitingTimeBarPercentage = 1.f;
 
@@ -104,6 +112,22 @@ private:
 	UPROPERTY(Transient, meta = (BindWidgetAnim))
 	UWidgetAnimation* FearBarShakeAnim;
 
+	UPROPERTY(EditAnywhere, Category = "Customer");
+	float FearNotBadStateThreshold = .3f;
+
+	UPROPERTY(EditAnywhere, Category = "Customer");
+	float FearBadStateThreshold = .6f;
+
+	UPROPERTY(EditAnywhere, Category = "Customer");
+	FColor FearNiceStateColor;
+
+	UPROPERTY(EditAnywhere, Category = "Customer");
+	FColor FearNotBadStateColor;
+
+	UPROPERTY(EditAnywhere, Category = "Customer");
+	FColor FearBadStateColor;
+
+	EWaitingState FearState = EWaitingState::Nice;
 	bool bIsFearBarVisible = false;
 	float FearBarPercentage = 0.f;
 };

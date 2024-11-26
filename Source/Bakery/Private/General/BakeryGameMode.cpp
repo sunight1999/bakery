@@ -51,17 +51,16 @@ void ABakeryGameMode::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (BakeryGameState->GetBakeryState() == EBakeryState::Opened)
+	if (BakeryGameState->GetElapsedTime() >= BakeryCloseTime)
 	{
-		if (BakeryGameState->GetElapsedTime() >= BakeryCloseTime)
+		if (BakeryGameState->GetBakeryState() == EBakeryState::Opened)
 		{
 			CloseBakery();
-			return;
 		}
 	}
-	else if (BakeryGameState->GetBakeryState() == EBakeryState::Closed)
+	else if (BakeryGameState->GetElapsedTime() >= BakeryOpenTime)
 	{
-		if (BakeryGameState->GetElapsedTime() >= BakeryOpenTime)
+		if (BakeryGameState->GetBakeryState() == EBakeryState::Closed)
 		{
 			OpenBakery();
 		}

@@ -9,6 +9,7 @@
 class ACustomer;
 class ATable;
 class AChair;
+class ABakeryGameState;
 
 UCLASS()
 class BAKERY_API AHallManager : public AActor
@@ -28,11 +29,21 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	/*
+	 * 좌석 배치 관련 함수
+	 */
 	void RefreshHall();
 	int GetEmptySeatNum();
 
 	AChair* RequestSeat();
 	FVector RequestWaiting(ACustomer* Customer);
+
+	/*
+	 * 영업 정산 관련 함수
+	 */
+	void SettleSales();
+	void AddPendingMoney(int InMoney) { PendingMoney += InMoney; }
+	void AddPendingRating(int InRating) { PendingRating = PendingRating == 0 ? InRating : (PendingRating + InRating) / 2.f; }
 
 protected:
 	virtual void BeginPlay() override;
@@ -45,9 +56,8 @@ private:
 	FVector CalulateWaitingPosition(int WaitingIndex = -1);
 
 	/*
-	 * 대기열 관련
+	 * 좌석 배치 관련
 	 */
-
 	// 대기열 시작 위치
 	UPROPERTY(EditDefaultsOnly, Category="Hall")
 	USceneComponent* WaitingPoint;
@@ -62,10 +72,14 @@ private:
 
 	TArray<ACustomer*> WaitingQueue;
 
-	/*
-	 * 홀 관련
-	 */
 	TArray<ATable*> Tables;
-
 	int TopPriorityTableIndex = 0;
+
+	/*
+	 * 영업 정산 관련
+	 */
+	ABakeryGameState* BakeryGameState = nullptr;
+
+	int PendingMoney = 0;
+	float PendingRating = 0.f;
 };

@@ -26,9 +26,11 @@ void ABakeryGameState::LoadGame()
 		SaveGame = UGameplayStatics::CreateSaveGameObject(UBakerySaveGame::StaticClass());
 	}
 
+	// 델리게이트 브로드캐스팅을 위해 Add- 함수로 값 설정
 	UBakerySaveGame* BakerySaveGame = Cast<UBakerySaveGame>(SaveGame);
 	AddMoney(BakerySaveGame->Money);
 	AddDay(BakerySaveGame->Day);
+	AddRating(BakerySaveGame->Rating * 2);
 }
 
 void ABakeryGameState::SaveGame()
@@ -37,6 +39,7 @@ void ABakeryGameState::SaveGame()
 	UBakerySaveGame* BakerySaveGame = Cast<UBakerySaveGame>(SaveGame);
 	BakerySaveGame->Money = Money;
 	BakerySaveGame->Day = Day;
+	BakerySaveGame->Rating = Rating;
 
 	UE_LOG(LogTemp, Display, TEXT("GAME SAVED"));
 
@@ -65,7 +68,7 @@ void ABakeryGameState::AddDay()
 void ABakeryGameState::SetTime(float Minute)
 {
 	ElapsedTime = Minute;
-
+	 
 	OnTimeChanged.Broadcast(ElapsedTime);
 }
 
@@ -77,4 +80,18 @@ void ABakeryGameState::AddTime()
 	}
 
 	OnTimeChanged.Broadcast(ElapsedTime);
+}
+
+void ABakeryGameState::AddRating(float InRating)
+{
+	if (Rating == 0)
+	{
+		Rating = InRating;
+	}
+	else
+	{
+		Rating = (Rating + InRating) / 2.f;
+	}
+
+	OnRatingChanged.Broadcast(Rating);
 }

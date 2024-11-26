@@ -10,6 +10,7 @@
 
 #include "General/BakeryGameMode.h"
 #include "General/BakeryGameState.h"
+#include "Bakery/HallManager.h"
 #include "Subsystems/SoundManager.h"
 #include "Kitchen/Ingredient.h"
 #include "Kitchen/Dish.h"
@@ -140,6 +141,14 @@ void ACustomer::SetFeared(bool bFeared)
 /*
  * 상태별 처리 함수 (외부 액터에 의해 호출 또는 상태 변경)
  */
+void ACustomer::StateChanged(EWaitingState NewState)
+{
+	if (NewState == EWaitingState::Bad)
+	{
+		--Rating;
+	}
+}
+
 void ACustomer::RequestTakeOrder()
 {
 	CustomerState = ECustomerState::Ordering;
@@ -181,6 +190,8 @@ void ACustomer::Disappoint()
 	ClearWaitingTimer();
 	ClearFearWidget();
 
+	Rating = 1;
+
 	Leave();
 
 	ABakeryGameMode* BakeryGameMode = Cast<ABakeryGameMode>(GetWorld()->GetAuthGameMode());
@@ -199,6 +210,7 @@ void ACustomer::Leave()
 
 	// 타이머 및 UI 정리 (식사 완료 전 영업이 종료되는 경우를 위해)
 	ClearWaitingTimer();
+	ClearFearWidget();
 	TimerManager->ClearTimer(EatingTimer);
 
 	// 테이블 정리
@@ -286,8 +298,8 @@ void ACustomer::FinishEating()
 	ServedDish = nullptr;
 
 	// 먹은 음식 계산
-	ABakeryGameState* BakeryGameState = Cast<ABakeryGameState>(GetWorld()->GetGameState());
-	BakeryGameState->AddMoney(Order->GetPrice());
+	AHallManager::GetInstance(GetWorld())->AddPendingMoney(Order->GetPrice());
+	AHallManager::GetInstance(GetWorld())->AddPendingRating(Rating);
 
 	// Standing 애니메이션 종료 후 애니메이션 블루프린트에서 Leave() 호출
 }

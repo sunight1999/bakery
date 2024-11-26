@@ -17,31 +17,39 @@ void URecipeData::PreSave(FObjectPreSaveContext SaveContext)
 {
 	Super::PreSave(SaveContext);
 
-	UAssetManager& AssetManager = UAssetManager::Get();
-
 	// 재료 이름을 에셋의 파일명으로 지정
 	Name = GetFName();
+}
 
-	// 레시피 Output IngredientData를 에셋명으로 찾아 등록
-	FPrimaryAssetId AssetId(KITCHEN_ASSETTYPE_INGREDIENT, Name);
-	FSoftObjectPtr IngredientObjectPtr(AssetManager.GetPrimaryAssetPath(AssetId));
-
-	if (IngredientObjectPtr.IsPending())
+const UIngredientData* URecipeData::GetResult()
+{
+	if (!ItselfResult)
 	{
-		IngredientObjectPtr.LoadSynchronous();
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("%s 이름으로 된 Ingredient 에셋이 존재하지 않습니다."), *Name.ToString());
-		return;
+		UAssetManager& AssetManager = UAssetManager::Get();
+
+		// 레시피 Output IngredientData를 에셋명으로 찾아 등록
+		FPrimaryAssetId AssetId(KITCHEN_ASSETTYPE_INGREDIENT, Name);
+		FSoftObjectPtr IngredientObjectPtr(AssetManager.GetPrimaryAssetPath(AssetId));
+
+		if (IngredientObjectPtr.IsPending())
+		{
+			IngredientObjectPtr.LoadSynchronous();
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("%s 이름으로 된 Ingredient 에셋이 존재하지 않습니다."), *Name.ToString());
+			return nullptr;
+		}
+
+		UIngredientData* IngredientData = CastChecked<UIngredientData>(IngredientObjectPtr.Get());
+		if (!IngredientData)
+		{
+			UE_LOG(LogTemp, Error, TEXT("%s 이름으로 된 Ingredient 에셋이 존재하지 않습니다."), *Name.ToString());
+			return nullptr;
+		}
+
+		ItselfResult = IngredientData;
 	}
 
-	UIngredientData* IngredientData = CastChecked<UIngredientData>(IngredientObjectPtr.Get());
-	if (!IngredientData)
-	{
-		UE_LOG(LogTemp, Error, TEXT("%s 이름으로 된 Ingredient 에셋이 존재하지 않습니다."), *Name.ToString());
-		return;
-	}
-
-	ItselfResult = IngredientData;
+	return ItselfResult;
 }

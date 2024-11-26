@@ -5,6 +5,7 @@
 #include "EngineUtils.h"
 
 #include "General/BakeryGameMode.h"
+#include "General/BakeryGameState.h"
 #include "Characters/Customer.h"
 #include "Hall/Table.h"
 #include "Hall/Chair.h"
@@ -87,6 +88,7 @@ void AHallManager::BeginPlay()
 	// TODO: RefreshHall 호출 시점을 인테리어 수정을 완료 했을 때로 변경하고 OnBakeryPreOpened는 제거
 	ABakeryGameMode* BakeryGameMode = Cast<ABakeryGameMode>(GetWorld()->GetAuthGameMode());
 	BakeryGameMode->OnBakeryPreOpened.AddUObject(this, &AHallManager::RefreshHall);
+	BakeryGameMode->OnBakeryClosed.AddUObject(this, &AHallManager::SettleSales);
 }
 
 void AHallManager::Tick(float DeltaTime)
@@ -198,4 +200,21 @@ FVector AHallManager::RequestWaiting(ACustomer* Customer)
 	WaitingQueue.Emplace(Customer);
 
 	return CalulateWaitingPosition();
+}
+
+/*
+ * 영업 정산 관련 함수
+ */
+void AHallManager::SettleSales()
+{
+	if (!BakeryGameState)
+	{
+		BakeryGameState = Cast<ABakeryGameState>(GetWorld()->GetGameState());
+	}
+
+	BakeryGameState->AddMoney(PendingMoney);
+	BakeryGameState->AddRating(PendingRating);
+
+	PendingMoney = 0;
+	PendingRating = 0.f;
 }
