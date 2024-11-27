@@ -7,6 +7,8 @@
 #include "General/Tools/Pool.h"
 #include "SoundManager.generated.h"
 
+#define BACKGROUND_MUSIC_SOUND_TAG TEXT("BGM")
+
 class UAudioComponent;
 
 USTRUCT(BlueprintType)
@@ -41,8 +43,12 @@ public:
 	void InitializeAudio(UObject* AudioObject);
 	void ResetAudio(UAudioComponent* Audio);
 
-	UAudioComponent* PlaySoundAtLocationByTag(const FName& SoundTag, const FVector& Location, float Volume = 1.f, float Pitch = 1.f);
+	void PlayBackgroundMusic();
+	void StopBackgroundMusic();
+	void SetBackgroundMusicPitch(float PitchMultiplier);
+	void OnBackgroundMusicEnded(UAudioComponent* Audio);
 
+	UAudioComponent* PlaySoundAtLocationByTag(const FName& SoundTag, const FVector& Location, float Volume = 1.f, float Pitch = 1.f);
 private:
 	UAudioComponent* PlaySoundAtLocation(USoundBase* Sound, const FVector& Location, float Volume = 1.f, float Pitch = 1.f, bool bIsLoop = false);
 
@@ -50,4 +56,6 @@ private:
 
 	UDataTable* SoundDataTable = nullptr;
 	TPool AudioPool;
+	
+	UAudioComponent* BackgroundMusicAudio = nullptr;
 };

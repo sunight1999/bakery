@@ -13,6 +13,7 @@
 #include "Widgets/HUD/BakeryHUDWidget.h"
 #include "General/Tools/CustomerSpawner.h"
 #include "Abnormality/AbnormalityManager.h"
+#include "Subsystems/SoundManager.h"
 
 ABakeryGameMode::ABakeryGameMode()
 {
@@ -45,6 +46,8 @@ void ABakeryGameMode::BeginPlay()
 	UAbnormalityManager* AbnormalityManager = UAbnormalityManager::GetInstance(GetWorld());
 	AbnormalityManager->RegisterRandomAbnormality();
 	OnBakeryClosed.AddUObject(AbnormalityManager, &UAbnormalityManager::RegisterRandomAbnormality);
+
+	USoundManager::GetInstance(GetWorld())->PlayBackgroundMusic();
 }
 
 void ABakeryGameMode::Tick(float DeltaSeconds)

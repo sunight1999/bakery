@@ -50,6 +50,46 @@ void USoundManager::ResetAudio(UAudioComponent* Audio)
 	}
 }
 
+void USoundManager::PlayBackgroundMusic()
+{
+	BackgroundMusicAudio = PlaySoundAtLocationByTag(BACKGROUND_MUSIC_SOUND_TAG, FVector::ZeroVector);
+	if (!BackgroundMusicAudio)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("배경 음악 소스(%s)를 찾을 수 없습니다."), BACKGROUND_MUSIC_SOUND_TAG);
+		return;
+	}
+
+	BackgroundMusicAudio->OnAudioFinishedNative.Clear();
+	BackgroundMusicAudio->OnAudioFinishedNative.AddUObject(this, &USoundManager::OnBackgroundMusicEnded);
+}
+
+void USoundManager::StopBackgroundMusic()
+{
+	if (!BackgroundMusicAudio)
+	{
+		return;
+	}
+
+	BackgroundMusicAudio->Stop();
+	BackgroundMusicAudio = nullptr;
+}
+
+void USoundManager::SetBackgroundMusicPitch(float PitchMultiplier)
+{
+	if (!BackgroundMusicAudio)
+	{
+		return;
+	}
+
+	BackgroundMusicAudio->PitchMultiplier = PitchMultiplier;
+}
+
+void USoundManager::OnBackgroundMusicEnded(UAudioComponent* Audio)
+{
+	ResetAudio(Audio);
+	PlayBackgroundMusic();
+}
+
 /// <summary>
 /// 'Content/Data/DT_Sound'에 정의된 효과음을 재생한다.
 /// </summary>
