@@ -12,6 +12,7 @@ class URecipeSubsystem;
 class UIngredientData;
 class UIngredientMeshData;
 class URecipeData;
+class UNiagaraComponent;
 
 UCLASS()
 class BAKERY_API AIngredient : public AActor
@@ -22,7 +23,7 @@ public:
 	AIngredient();
 	void InitializeMeshComponent(UMeshComponent* MeshComponent);
 
-	void PlayBeingCookedAnimation();
+	void PlayBeingCookedAnimation(ECookingTool CookingTool);
 	void StopBeingCookedAnimation();
 
 	void ChangeIngredient(const UIngredientData* NewIngredientData, bool bIsRaw = false);
@@ -58,6 +59,7 @@ private:
 	 * 컴포넌트
 	 */
 	UBoxComponent* RootBoxComponent;
+	UNiagaraComponent* CookingEffect;
 
 	UStaticMeshComponent* IngredientBottomStaticMesh;
 	UStaticMeshComponent* IngredientBodyStaticMesh;

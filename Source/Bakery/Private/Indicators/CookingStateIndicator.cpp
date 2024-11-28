@@ -13,12 +13,15 @@ ACookingStateIndicator::ACookingStateIndicator()
 	RootComponent = RootSceneComponent;
 
 	CookingDoneIconMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CookingDoneIconMesh"));
+	CookingDoneIconMesh->SetCastShadow(false);
 	CookingDoneIconMesh->SetupAttachment(RootComponent);
 
 	CookingFailedIconMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CookingFailedIconMesh"));
+	CookingFailedIconMesh->SetCastShadow(false);
 	CookingFailedIconMesh->SetupAttachment(RootComponent);
 
 	CookingNextTargetIconMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CookingNextTargetIconMesh"));
+	CookingNextTargetIconMesh->SetCastShadow(false);
 	CookingNextTargetIconMesh->SetupAttachment(RootComponent);
 
 	FloatingComponent = CreateDefaultSubobject<UFloatingComponent>(TEXT("FloatingComponent"));

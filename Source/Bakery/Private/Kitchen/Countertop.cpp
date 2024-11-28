@@ -202,7 +202,10 @@ void ACountertop::PlayCookingAnimation()
 		PrimaryCookingEffect->Activate();
 	}
 
-	CurrentKeptIngredient->PlayBeingCookedAnimation();
+	if (CurrentKeptIngredient)
+	{
+		CurrentKeptIngredient->PlayBeingCookedAnimation(CurrentCookingTool);
+	}
 
 	OnCookingAnimStarted.Broadcast();
 }
@@ -214,7 +217,10 @@ void ACountertop::StopCookingAnimation()
 		PrimaryCookingEffect->Deactivate();
 	}
 
-	CurrentKeptIngredient->StopBeingCookedAnimation();
+	if (CurrentKeptIngredient)
+	{
+		CurrentKeptIngredient->StopBeingCookedAnimation();
+	}
 
 	OnCookingAnimStopped.Broadcast();
 }
@@ -323,6 +329,14 @@ void ACountertop::OnEnterGrab(const FInteractionInfo& InteractionInfo)
 				{
 					bIsCookable = true;
 					break;
+				}
+			}
+
+			if (!bIsCookable)
+			{
+				if (bIsPendingCookingCompletable)
+				{
+					bIsCookable = GrabbedIngredient->GetIngredientData()->CheckCookable(ECookingTool::Put) != nullptr;
 				}
 			}
 

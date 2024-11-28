@@ -25,6 +25,10 @@ public:
 	USkeletalMesh* GetBodySkeletalMesh() const { return BodySkeletalMesh; }
 	USkeletalMesh* GetLidSkeletalMesh() const { return LidSkeletalMesh; }
 
+	UAnimSequence* GetBottomSkeletalAnimation() const { return BottomSkeletalAnimation; }
+	UAnimSequence* GetBodySkeletalAnimation() const { return BodySkeletalAnimation; }
+	UAnimSequence* GetLidSkeletalAnimation() const { return LidSkeletalAnimation; }
+
 private:
 	// true일 경우, Static Mesh Component를 사용
 	// false일 경우, Skeletal Mesh Component를 사용
@@ -50,8 +54,18 @@ private:
 	USkeletalMesh* BottomSkeletalMesh;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ingredient|SkeletalMesh", meta = (AllowPrivateAccess = "true"))
+	UAnimSequence* BottomSkeletalAnimation;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ingredient|SkeletalMesh", meta = (AllowPrivateAccess = "true"))
 	USkeletalMesh* BodySkeletalMesh;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ingredient|SkeletalMesh", meta = (AllowPrivateAccess = "true"))
+	UAnimSequence* BodySkeletalAnimation;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ingredient|SkeletalMesh", meta = (AllowPrivateAccess = "true"))
 	USkeletalMesh* LidSkeletalMesh;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ingredient|SkeletalMesh", meta = (AllowPrivateAccess = "true"))
+	UAnimSequence* LidSkeletalAnimation;
+	
 };

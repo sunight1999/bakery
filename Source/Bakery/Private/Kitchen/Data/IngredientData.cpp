@@ -3,6 +3,7 @@
 
 #include "Kitchen/Data/IngredientData.h"
 #include "UObject/ObjectSaveContext.h"
+#include "NiagaraSystem.h"
 
 #include "Kitchen/KitchenDefines.h"
 #include "Kitchen/Data/RecipeData.h"

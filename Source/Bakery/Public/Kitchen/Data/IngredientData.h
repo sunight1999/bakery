@@ -9,6 +9,7 @@
 enum class ECookingTool : uint8;
 class URecipeData;
 class UIngredientMeshData;
+class UNiagaraSystem;
 
 /**
  * 
@@ -25,6 +26,20 @@ public:
 
 	const FName& GetName() const { return Name; }
 	const FName* GetCookingSoundTag(ECookingTool CookingTool) const { return CookingSoundTagMap.Find(CookingTool); }
+	UNiagaraSystem* GetCookingEffect(ECookingTool CookingTool) const
+	{
+		if (UNiagaraSystem* const* Effect = CookingEffectMap.Find(CookingTool))
+			return *Effect;
+
+		return nullptr;
+	}
+	const FVector& GetCookingEffectOffset(ECookingTool CookingTool) const
+	{
+		if (FVector const* Offset = CookingEffectOffsetMap.Find(CookingTool))
+			return *Offset;
+
+		return FVector::ZeroVector;
+	}
 	const UIngredientMeshData* GetIngredientMeshData() const { return IngredientMeshData; }
 
 	const UIngredientData* CheckCookable(ECookingTool CookingTool) const
@@ -58,6 +73,14 @@ private:
 	// 조리 방법별 효과음
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ingredient", meta = (AllowPrivateAccess = "true"))
 	TMap<ECookingTool, FName> CookingSoundTagMap;
+	
+	// 조리 방법별 이펙트
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ingredient", meta = (AllowPrivateAccess = "true"))
+	TMap<ECookingTool, UNiagaraSystem*> CookingEffectMap;
+
+	// 이펙트 별 위치 오프셋
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ingredient", meta = (AllowPrivateAccess = "true"))
+	TMap<ECookingTool, FVector> CookingEffectOffsetMap;
 
 	// 해당 재료를 조리(썰기, 찌기 등)해 만들 수 있는 재료
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ingredient", meta = (AllowPrivateAccess = "true"))

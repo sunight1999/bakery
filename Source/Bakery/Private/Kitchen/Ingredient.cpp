@@ -4,6 +4,7 @@
 #include "Kitchen/Ingredient.h"
 #include "UObject/ObjectSaveContext.h"
 #include "Components/BoxComponent.h"
+#include "NiagaraComponent.h"
 
 #include "Subsystems/RecipeSubsystem.h"
 #include "Kitchen/KitchenDefines.h"
@@ -26,6 +27,10 @@ AIngredient::AIngredient()
 	// Physics 설정
 	RootBoxComponent->SetSimulatePhysics(true);
 	RootBoxComponent->SetEnableGravity(false);
+
+	CookingEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("CookingEffect"));
+	CookingEffect->SetAutoActivate(false);
+	CookingEffect->SetupAttachment(RootComponent);
 
 	/*
 	 * StaticMeshComponent 설정
@@ -69,16 +74,40 @@ void AIngredient::BeginPlay()
 	verify(RecipeSubsystem);
 }
 
-void AIngredient::PlayBeingCookedAnimation()
+void AIngredient::PlayBeingCookedAnimation(ECookingTool CookingTool)
 {
-	// TODO: 애니메이션 재생
-	// TODO: 이펙트 재생
+	const UIngredientMeshData* IngredientMeshData = IngredientData->GetIngredientMeshData();
+	if (!IngredientMeshData->IsUsingStaticMesh())
+	{
+		IngredientBottomSkeletalMesh->PlayAnimation(IngredientMeshData->GetBottomSkeletalAnimation(), true);
+		IngredientBodySkeletalMesh->PlayAnimation(IngredientMeshData->GetBodySkeletalAnimation(), true);
+		IngredientLidSkeletalMesh->PlayAnimation(IngredientMeshData->GetLidSkeletalAnimation(), true);
+	}
+
+	if (UNiagaraSystem* Effect = IngredientData->GetCookingEffect(CookingTool))
+	{
+		const FVector& Offset = IngredientData->GetCookingEffectOffset(CookingTool);
+		CookingEffect->SetRelativeLocation(Offset);
+		CookingEffect->SetAsset(Effect);
+		CookingEffect->Activate();
+	}
 }
 
 void AIngredient::StopBeingCookedAnimation()
 {
-	// TODO: 애니메이션 정지
-	// TODO: 이펙트 정지
+	const UIngredientMeshData* IngredientMeshData = IngredientData->GetIngredientMeshData();
+	if (!IngredientMeshData->IsUsingStaticMesh())
+	{
+		IngredientBottomSkeletalMesh->Stop();
+		IngredientBodySkeletalMesh->Stop();
+		IngredientLidSkeletalMesh->Stop();
+	}
+	
+	if (CookingEffect->IsActive())
+	{
+		CookingEffect->Deactivate();
+		CookingEffect->SetAsset(nullptr);
+	}
 }
 
 /// <summary>
@@ -133,9 +162,14 @@ void AIngredient::Clear()
 	IngredientBottomStaticMesh->SetStaticMesh(nullptr);
 	IngredientBodyStaticMesh->SetStaticMesh(nullptr);
 	IngredientLidStaticMesh->SetStaticMesh(nullptr);
+
 	IngredientBottomSkeletalMesh->SetSkeletalMesh(nullptr);
 	IngredientBodySkeletalMesh->SetSkeletalMesh(nullptr);
 	IngredientLidSkeletalMesh->SetSkeletalMesh(nullptr);
+
+	IngredientBottomSkeletalMesh->SetAnimation(nullptr);
+	IngredientBodySkeletalMesh->SetAnimation(nullptr);
+	IngredientLidSkeletalMesh->SetAnimation(nullptr);
 
 	bIsCooked = false;
 	IngredientData = nullptr;
