@@ -38,7 +38,7 @@ void AIngredientContainer::InitializeIngredient(UObject* IngredientObj)
 
 	Ingredient->SetActorLocationAndRotation(GetActorLocation(), FRotator::ZeroRotator);
 	Ingredient->SetActorScale3D(FVector(IngredientMeshSizeMultiplier));
-	Ingredient->ChangeIngredient(ContainedIngredient);
+	Ingredient->ChangeIngredient(ContainedIngredient, true);
 
 	UPrimitiveComponent* Primitive = Ingredient->GetComponentByClass<UPrimitiveComponent>();
 	if (!Primitive)
@@ -79,7 +79,7 @@ void AIngredientContainer::OnEnterGrab(const FInteractionInfo& InteractionInfo)
 
 	// Ingredient 액터를 플레이어가 쥐도록 설정
 	AIngredient* Ingredient = Cast<AIngredient>(IngredientPool.Get());
-	Ingredient->ChangeIngredient(ContainedIngredient);
+	Ingredient->ChangeIngredient(ContainedIngredient, true);
 
 	UPrimitiveComponent* Primitive = Ingredient->GetComponentByClass<UPrimitiveComponent>();
 	Grabber->Grab(Primitive, Ingredient->GetActorLocation());

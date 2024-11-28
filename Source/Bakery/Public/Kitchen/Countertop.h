@@ -40,7 +40,7 @@ public:
 	/*
 	 * 요리 관련 함수
 	 */
-	void BeginCook(ECookingTool CookingTool, const UIngredientData* TargetIngredient);
+	void BeginCook(ECookingTool CookingTool);
 	void Cook();
 	void EndCook();
 
@@ -86,10 +86,11 @@ private:
 	UNiagaraComponent* PrimaryCookingEffect;
 
 	UPROPERTY(EditAnywhere, Category = "Countertop|Cooking")
-	UNiagaraComponent* SecondaryCookingEffect;
-
-	UPROPERTY(EditAnywhere, Category = "Countertop|Cooking")
 	TSet<ECookingTool> AvailableCookingTools;
+
+	// true인 경우 조리가 완료됐지만 bIsPendingCooking = true인 재료에 대해 완료 처리를 진행할 수 있음
+	UPROPERTY(EditAnywhere, Category = "Countertop|Cooking")
+	bool bIsPendingCookingCompletable = false;
 
 	// true인 경우 조리대에서 요리 가능한 재료라면 자동으로 요리 진행, 일정 시간 후 완료
 	// false인 경우 플레이어가 상호작용 키를 여러 번 눌러 요리를 진행해야 함
@@ -118,7 +119,6 @@ private:
 	UAudioComponent* CurrentAudio;
 
 	ECookingTool CurrentCookingTool;
-	const UIngredientData* CurrentCookingTarget;
 	float CurrentAutoCookingTime = 0.f;
 	int CurrentHandCookingTime = 0;
 

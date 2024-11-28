@@ -175,7 +175,7 @@ bool ACustomer::ServeDish(ADish* Dish)
 		return false;
 	}
 
-	if (Dish->PeekDessert()->GetAvailableRecipe() != Order)
+	if (Dish->PeekDessert()->GetSourceRecipe() != Order)
 	{
 		return false;
 	}

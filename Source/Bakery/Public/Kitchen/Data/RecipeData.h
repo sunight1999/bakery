@@ -19,12 +19,10 @@ class BAKERY_API URecipeData : public UPrimaryDataAsset
 
 public:
 	URecipeData();
-	void PreSave(FObjectPreSaveContext SaveContext) override;
 
 	FPrimaryAssetId GetPrimaryAssetId() const override { return FPrimaryAssetId(AssetType, GetFName()); }
 	const FName GetName() const { return Name; }
 	const TSet<URecipeData*>& GetNextRecipes() const { return NextRecipes; }
-	const UIngredientData* GetResult();
 	int GetPrice() const { return Price; }
 
 	bool Includes(const UIngredientData* Ingredient) const { return Ingredients.Contains(Ingredient); }
@@ -51,9 +49,4 @@ private:
 	// 이 레시피 다음으로 해금할 수 있는 상위 레시피
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kitchen|Recipe", meta = (AllowPrivateAccess = "true"))
 	TSet<URecipeData*> NextRecipes;
-
-	// 해당 레시피로 만들어지는 요리(IngredientData)로, 재료를 합칠 때 새로 설정할 IngredientData를 구하고자 사용됨
-	// 예) 백설기 레시피인 경우 백설기 IngredientData를 저장
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kitchen|Recipe", meta = (AllowPrivateAccess = "true"))
-	const UIngredientData* ItselfResult;
 };

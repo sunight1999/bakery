@@ -47,8 +47,6 @@ void URecipeSubsystem::Load(const FPrimaryAssetType& AssetType)
 			UE_LOG(LogTemp, Warning, TEXT("Recipe DataAsset '%s' is null"), *Id.PrimaryAssetName.ToString());
 		}
 	}
-
-	RecipeRoot = *RecipeMap.Find("Root");
 }
 
 const URecipeData* URecipeSubsystem::GetRecipe(FName Name) const
@@ -62,9 +60,4 @@ const URecipeData* URecipeSubsystem::GetRecipe(FName Name) const
 	{
 		return nullptr;
 	}
-}
-
-const URecipeData* URecipeSubsystem::GetRecipeRoot() const
-{
-	return RecipeRoot;
 }

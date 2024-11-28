@@ -22,7 +22,6 @@ public:
 	void Load(const FPrimaryAssetType& AssetType);
 
 	const URecipeData* GetRecipe(FName Name) const;
-	const URecipeData* GetRecipeRoot() const;
 
 private:
 	TMap<FName, const URecipeData*> RecipeMap;

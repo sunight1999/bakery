@@ -46,10 +46,6 @@ ACountertop::ACountertop()
 	PrimaryCookingEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("PrimaryCookingEffect"));
 	PrimaryCookingEffect->SetAutoActivate(false);
 	PrimaryCookingEffect->SetupAttachment(InteractionBox);
-
-	SecondaryCookingEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("SecondaryCookingEffect"));
-	SecondaryCookingEffect->SetAutoActivate(false);
-	SecondaryCookingEffect->SetupAttachment(InteractionBox);
 }
 
 void ACountertop::BeginPlay()
@@ -92,7 +88,6 @@ void ACountertop::ResetCooking()
 	CurrentAutoCookingTime = 0.f;
 	CurrentHandCookingTime = 0;
 	CurrentCookingTool = ECookingTool::None;
-	CurrentCookingTarget = nullptr;
 
 	CookingProgressWidget->SetVisibility(false);
 	CookingProgress->SetPercentage(0.f);
@@ -100,11 +95,6 @@ void ACountertop::ResetCooking()
 	if (PrimaryCookingEffect)
 	{
 		PrimaryCookingEffect->Deactivate();
-	}
-
-	if (SecondaryCookingEffect)
-	{
-		SecondaryCookingEffect->Deactivate();
 	}
 
 	if (CurrentAudio)
@@ -117,12 +107,9 @@ void ACountertop::ResetCooking()
 /*
  * 요리 관련 함수
  */
-void ACountertop::BeginCook(ECookingTool CookingTool, const UIngredientData* CookingTarget)
+void ACountertop::BeginCook(ECookingTool CookingTool)
 {
-	verify(CookingTarget);
-
 	CurrentCookingTool = CookingTool;
-	CurrentCookingTarget = CookingTarget;
 
 	CookingProgressWidget->SetVisibility(true);
 
@@ -130,11 +117,6 @@ void ACountertop::BeginCook(ECookingTool CookingTool, const UIngredientData* Coo
 	if (PrimaryCookingEffect)
 	{
 		PrimaryCookingEffect->Activate();
-	}
-
-	if (SecondaryCookingEffect)
-	{
-		SecondaryCookingEffect->Activate();
 	}
 
 	bIsCooking = true;
@@ -182,7 +164,16 @@ void ACountertop::EndCook()
 {
 	USoundManager::GetInstance(GetWorld())->PlaySoundAtLocationByTag(FName("CookingDone"), GetActorLocation());
 
-	CurrentKeptIngredient->ChangeIngredient(CurrentCookingTarget);
+	const UIngredientData* CurrentKeptIngredientData = CurrentKeptIngredient->GetIngredientData();
+	if (!CurrentKeptIngredientData->IsPendingCooking())
+	{
+		const UIngredientData* TargetIngredientData = CurrentKeptIngredientData->CheckCookable(CurrentCookingTool);
+		CurrentKeptIngredient->ChangeIngredient(TargetIngredientData);
+	}
+	else
+	{
+		CurrentKeptIngredient->SetIsCooked(true);
+	}
 
 	ResetCooking();
 
@@ -217,7 +208,7 @@ void ACountertop::OnEnterInteract(const FInteractionInfo& InteractionInfo)
 	// 플레이어가 잡고 있는 액터가 재료일 경우 재료 합치기 시도
 	if (GrabbedIngredient && CurrentKeptIngredient)
 	{
-		const UIngredientData* MergedIngredientData = CurrentKeptIngredient->MergeIngredient(GrabbedIngredient);
+		const UIngredientData* MergedIngredientData = CurrentKeptIngredient->TryMergeIngredient(GrabbedIngredient);
 		if (MergedIngredientData)
 		{
 			Grabber->Release();
@@ -245,7 +236,7 @@ void ACountertop::OnEnterInteract(const FInteractionInfo& InteractionInfo)
 		return;
 	}
 
-	if (!CurrentKeptIngredient)
+	if (!CurrentKeptIngredient || CurrentKeptIngredient->IsCooked())
 	{
 		return;
 	}
@@ -256,7 +247,7 @@ void ACountertop::OnEnterInteract(const FInteractionInfo& InteractionInfo)
 	{
 		if (const UIngredientData* CookingTarget = IngredientData->CheckCookable(CookingTool))
 		{
-			BeginCook(CookingTool, CookingTarget);
+			BeginCook(CookingTool);
 			return;
 		}
 	}
@@ -282,6 +273,7 @@ void ACountertop::OnEnterGrab(const FInteractionInfo& InteractionInfo)
 		CurrentKeptObject = Grabbed->GetOwner();
 		CurrentKeptIngredient = Cast<AIngredient>(CurrentKeptObject);
 
+		// 오브젝트 위치 설정
 		FVector NewLocation = KeepPoint->GetComponentLocation();
 		FRotator NewRotation = CurrentKeptObject->GetActorRotation();
 		NewRotation.Pitch = 0.f;
@@ -292,8 +284,20 @@ void ACountertop::OnEnterGrab(const FInteractionInfo& InteractionInfo)
 		Grabbed->SetSimulatePhysics(false);
 		CurrentKeptObject->SetActorLocationAndRotation(NewLocation, NewRotation);
 
+		if (!CurrentKeptIngredient)
+		{
+			return;
+		}
+
+		// 조리 완료가 지연 처리되는 재료의 경우 도마 등에 올려놨을 때 조리를 완료해 다음 재료로 데이터 변경
+		// ex) 쌀가루 찜기의 경우 가스레인지에서 조리가 끝나면 들어서 도마나 접시 등에 올려놔야 쌀반죽, 백설기 등으로 변경됨
+		if (bIsPendingCookingCompletable)
+		{
+			CurrentKeptIngredient->CompletePendingCooking(ECookingTool::Put);
+		}
+
 		// Automatic일 경우 요리를 바로 시작하기 위해 OnEnterInteract를 호출
-		if (CurrentKeptIngredient && bIsAutomatic)
+		if (bIsAutomatic)
 		{
 			OnEnterInteract(FInteractionInfo::NoneInteraction);
 		}

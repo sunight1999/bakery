@@ -6,8 +6,10 @@
 #include "Components/BoxComponent.h"
 #include "NiagaraComponent.h"
 
+#include "Kitchen/KitchenDefines.h"
 #include "Kitchen/Ingredient.h"
 #include "Kitchen/IngredientContainer.h"
+#include "Kitchen/Data/IngredientData.h"
 #include "Interactions/GrabberComponent.h"
 #include "Interactions/InteractionDefines.h"
 #include "Interactions/InteractorComponent.h"
@@ -98,11 +100,13 @@ void ADish::OnExitHighlight()
 
 bool ADish::IsSettable(AIngredient* Ingredient)
 {
-	return Ingredient->GetAvailableRecipe() && !Dessert;
+	return Ingredient->GetSourceRecipe() && !Dessert;
 }
 
 bool ADish::SetDessert(AIngredient* Ingredient)
 {
+	Ingredient->CompletePendingCooking(ECookingTool::Dish);
+
 	if (!IsSettable(Ingredient))
 	{
 		return false;
