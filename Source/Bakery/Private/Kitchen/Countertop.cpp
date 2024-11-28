@@ -22,6 +22,7 @@
 #include "Subsystems/RecipeSubsystem.h"
 #include "Characters/PlayerPawn.h"
 #include "Subsystems/SoundManager.h"
+#include "Indicators/CookingStateIndicator.h"
 
 ACountertop::ACountertop()
 {
@@ -38,6 +39,10 @@ ACountertop::ACountertop()
 
 	KeepPoint = CreateDefaultSubobject<USceneComponent>(TEXT("KeepPoint"));
 	KeepPoint->SetupAttachment(TopPlateMesh);
+
+	CookingStateIndicatorPoint = CreateDefaultSubobject<USceneComponent>(TEXT("CookingStateIndicatorPoint"));
+	CookingStateIndicatorPoint->SetupAttachment(RootComponent);
+	CookingStateIndicatorPoint->SetRelativeLocation(FVector(0.f, 0.f, 250.f));
 
 	CookingProgressWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("CookingProgressWidget"));
 	CookingProgressWidget->SetupAttachment(InteractionBox);
@@ -58,6 +63,16 @@ void ACountertop::BeginPlay()
 	verify(RecipeSubsystem);
 
 	CookingProgress = Cast<UProgressWidget>(CookingProgressWidget->GetUserWidgetObject());
+
+	// 요리 상태 Indicator 스폰
+	verify(CookingStateIndicatorClass);
+
+	FVector Location = CookingStateIndicatorPoint->GetComponentLocation();
+	FVector Scale = CookingStateIndicatorPoint->GetComponentScale();
+	CookingStateIndicator = Cast<ACookingStateIndicator>(GetWorld()->SpawnActor(CookingStateIndicatorClass));
+	CookingStateIndicator->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	CookingStateIndicator->Initailize(Location, Scale);
+	CookingStateIndicator->SetActorRotation(CookingStateFixedRotation);
 }
 
 void ACountertop::Tick(float DeltaTime)
@@ -92,10 +107,7 @@ void ACountertop::ResetCooking()
 	CookingProgressWidget->SetVisibility(false);
 	CookingProgress->SetPercentage(0.f);
 
-	if (PrimaryCookingEffect)
-	{
-		PrimaryCookingEffect->Deactivate();
-	}
+	StopCookingAnimation();
 
 	if (CurrentAudio)
 	{
@@ -112,12 +124,10 @@ void ACountertop::BeginCook(ECookingTool CookingTool)
 	CurrentCookingTool = CookingTool;
 
 	CookingProgressWidget->SetVisibility(true);
+	CookingStateIndicator->Hide();
 
-	// 요리 이펙트 재생
-	if (PrimaryCookingEffect)
-	{
-		PrimaryCookingEffect->Activate();
-	}
+	// 요리 이펙트 및 애니메이션 재생
+	PlayCookingAnimation();
 
 	bIsCooking = true;
 	Cook();
@@ -175,6 +185,7 @@ void ACountertop::EndCook()
 		CurrentKeptIngredient->SetIsCooked(true);
 	}
 
+	CookingStateIndicator->Show(ECookingIndicator::Done);
 	ResetCooking();
 
 	// 더 이상 요리가 불가능 할 때까지 자동으로 요리 진행
@@ -182,6 +193,30 @@ void ACountertop::EndCook()
 	{
 		OnEnterInteract(FInteractionInfo::NoneInteraction);
 	}
+}
+
+void ACountertop::PlayCookingAnimation()
+{
+	if (PrimaryCookingEffect)
+	{
+		PrimaryCookingEffect->Activate();
+	}
+
+	CurrentKeptIngredient->PlayBeingCookedAnimation();
+
+	OnCookingAnimStarted.Broadcast();
+}
+
+void ACountertop::StopCookingAnimation()
+{
+	if (PrimaryCookingEffect)
+	{
+		PrimaryCookingEffect->Deactivate();
+	}
+
+	CurrentKeptIngredient->StopBeingCookedAnimation();
+
+	OnCookingAnimStopped.Broadcast();
 }
 
 /*
@@ -270,6 +305,33 @@ void ACountertop::OnEnterGrab(const FInteractionInfo& InteractionInfo)
 			return;
 		}
 
+		AActor* GrabbedActor = Grabbed->GetOwner();
+		AIngredient* GrabbedIngredient = Cast<AIngredient>(GrabbedActor);
+
+		// 조리대 위에 올려진 조리 도구가 있을 경우 조리 외에는 물체를 올려놓지 못하도록 처리
+		if (OptionalToolMesh->GetStaticMesh())
+		{
+			if (!GrabbedIngredient)
+			{
+				return;
+			}
+
+			bool bIsCookable = false;
+			for (ECookingTool CookingTool : AvailableCookingTools)
+			{
+				if (const UIngredientData* CookingTarget = GrabbedIngredient->GetIngredientData()->CheckCookable(CookingTool))
+				{
+					bIsCookable = true;
+					break;
+				}
+			}
+
+			if (!bIsCookable)
+			{
+				return;
+			}
+		}
+
 		CurrentKeptObject = Grabbed->GetOwner();
 		CurrentKeptIngredient = Cast<AIngredient>(CurrentKeptObject);
 
@@ -353,6 +415,7 @@ void ACountertop::OnEnterGrab(const FInteractionInfo& InteractionInfo)
 		Primitive->SetSimulatePhysics(true);
 		Grabber->Grab(Primitive, GrabPoint);
 
+		CookingStateIndicator->Hide();
 		Reset();
 	}
 }

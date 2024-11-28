@@ -22,8 +22,8 @@ public:
 	AIngredient();
 	void InitializeMeshComponent(UMeshComponent* MeshComponent);
 
-	void PlayCookingAnimation();
-	void StopCookingAnimation();
+	void PlayBeingCookedAnimation();
+	void StopBeingCookedAnimation();
 
 	void ChangeIngredient(const UIngredientData* NewIngredientData, bool bIsRaw = false);
 	const UIngredientData* TryMergeIngredient(const AIngredient* OtherIngredient);

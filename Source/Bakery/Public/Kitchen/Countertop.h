@@ -6,6 +6,9 @@
 #include "Interactions/Interactables/GrabInteractableActor.h"
 #include "Countertop.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCookingAnimStartedDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCookingAnimStoppedDelegate);
+
 enum class ECookingTool : uint8;
 class AIngredient;
 class UIngredientData;
@@ -13,6 +16,7 @@ class URecipeSubsystem;
 class UNiagaraComponent;
 class UWidgetComponent;
 class UProgressWidget;
+class ACookingStateIndicator;
 
 /**
  * 재료를 올려두거나 요리할 수 있는 조리대
@@ -44,6 +48,9 @@ public:
 	void Cook();
 	void EndCook();
 
+	void PlayCookingAnimation();
+	void StopCookingAnimation();
+
 	FORCEINLINE float CalculateAutoShorten() const { return AutoCookingTime / HandCookingTime * AutoCookingReduceMultiplier; }
 	FORCEINLINE bool IsCookingDone() const
 	{
@@ -56,6 +63,12 @@ public:
 			return CurrentHandCookingTime >= HandCookingTime;
 		}
 	}
+
+	UPROPERTY(BlueprintAssignable)
+	FCookingAnimStartedDelegate OnCookingAnimStarted;
+
+	UPROPERTY(BlueprintAssignable)
+	FCookingAnimStoppedDelegate OnCookingAnimStopped;
 
 protected:
 	virtual void BeginPlay() override;
@@ -75,6 +88,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category="Countertop")
 	USceneComponent* KeepPoint;
+
+	UPROPERTY(VisibleAnywhere, Category = "Countertop")
+	USceneComponent* CookingStateIndicatorPoint;
 
 	/*
 	 * 요리 관련
@@ -109,7 +125,14 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Countertop|Cooking")
 	int HandCookingTime = 10;
 
+	UPROPERTY(EditAnywhere, Category = "Countertop|Cooking")
+	TSubclassOf<ACookingStateIndicator> CookingStateIndicatorClass;
+
+	UPROPERTY(EditAnywhere, Category = "Countertop|Cooking")
+	FRotator CookingStateFixedRotation = FRotator(0.f, 180.f, 0.f);
+
 	UProgressWidget* CookingProgress;
+	ACookingStateIndicator* CookingStateIndicator;
 
 	/*
 	 * 현재 보관 중인 재료 또는 요리 관련

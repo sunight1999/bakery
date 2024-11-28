@@ -69,13 +69,13 @@ void AIngredient::BeginPlay()
 	verify(RecipeSubsystem);
 }
 
-void AIngredient::PlayCookingAnimation()
+void AIngredient::PlayBeingCookedAnimation()
 {
 	// TODO: 애니메이션 재생
 	// TODO: 이펙트 재생
 }
 
-void AIngredient::StopCookingAnimation()
+void AIngredient::StopBeingCookedAnimation()
 {
 	// TODO: 애니메이션 정지
 	// TODO: 이펙트 정지
