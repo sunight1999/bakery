@@ -50,6 +50,8 @@ protected:
 	virtual void BeginPlay() override;
 
 	void Move(const FInputActionValue& Value);
+
+	void OpenAbnormalForecastMenu();
 	void StartBakery();
 
 private:
@@ -70,6 +72,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Player|Interaction")
 	UInputAction* StartBakeryAction;
+
+	UPROPERTY(EditAnywhere, Category = "Player|Interaction")
+	UInputAction* TabAction;
 
 	/*
 	 * 상호작용 및 이동 관련

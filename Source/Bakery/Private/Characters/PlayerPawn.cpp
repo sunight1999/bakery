@@ -9,6 +9,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/WidgetComponent.h"
+#include "Subsystems/UISubsystem.h"
 
 #include "Interactions/InteractorComponent.h"
 #include "Interactions/GrabberComponent.h"
@@ -70,6 +71,7 @@ void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 		EnhancedInput->BindAction(GrabAction, ETriggerEvent::Started, Interactor, &UInteractorComponent::BeginGrab);
 		EnhancedInput->BindAction(GrabAction, ETriggerEvent::Completed, Interactor, &UInteractorComponent::EndGrab);
 		EnhancedInput->BindAction(StartBakeryAction, ETriggerEvent::Started, this, &APlayerPawn::StartBakery);
+		EnhancedInput->BindAction(TabAction, ETriggerEvent::Started, this, &APlayerPawn::OpenAbnormalForecastMenu);
 	}
 }
 
@@ -173,6 +175,13 @@ void APlayerPawn::Move(const FInputActionValue& Value)
 
 	AddMovementInput(FVector::ForwardVector, MovementValue.Y);
 	AddMovementInput(FVector::RightVector, MovementValue.X);
+}
+
+void APlayerPawn::OpenAbnormalForecastMenu()
+{
+	SetUIOpened(true);
+	UUISubsystem* UISubsystem = GetGameInstance()->GetSubsystem<UUISubsystem>();
+	UISubsystem->SetUIVisibility(FName("AbnormalForecast"), ESlateVisibility::SelfHitTestInvisible);
 }
 
 void APlayerPawn::StartBakery()
