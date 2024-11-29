@@ -25,6 +25,8 @@
 #include "Subsystems/SoundManager.h"
 #include "Indicators/CookingStateIndicator.h"
 
+#include "Subsystems/UISubsystem.h"
+
 ACountertop::ACountertop()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -194,6 +196,17 @@ void ACountertop::EndCook()
 	else
 	{
 		CurrentKeptIngredient->SetIsCooked(true);
+	}
+
+	if (bIsFirstCooked && CurrentKeptIngredient->GetSourceRecipe())
+	{
+		bIsFirstCooked = false;
+
+		UUISubsystem* UISubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UUISubsystem>();
+		UUserWidget* UserWidget = UISubsystem->SetUIVisibility(FName("DessertExplain"), ESlateVisibility::SelfHitTestInvisible);
+
+		APlayerPawn* PlayerPawn = Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+		PlayerPawn->SetUIOpened(true);
 	}
 
 	CookingStateIndicator->Show(ECookingIndicator::Done);

@@ -97,8 +97,8 @@ void UAbnormalityManager::RegisterAbnormality(FName Name, int OccurrenceTime)
 void UAbnormalityManager::RegisterFixedAbnormality()
 {
 	RegisterAbnormality(FName("DishThief"), 600);
-	RegisterAbnormality(FName("Ink"), 700);
-	RegisterAbnormality(FName("SpeedDown"), 740);
+	RegisterAbnormality(FName("Ink"), 680);
+	RegisterAbnormality(FName("SpeedDown"), 690);
 }
 
 /*

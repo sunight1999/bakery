@@ -179,4 +179,10 @@ private:
 	 * 서브시스템 캐싱
 	 */ 
 	const URecipeSubsystem* RecipeSubsystem;
+
+
+	/*
+	 * Temporal
+	 */
+	bool bIsFirstCooked = true;
 };
