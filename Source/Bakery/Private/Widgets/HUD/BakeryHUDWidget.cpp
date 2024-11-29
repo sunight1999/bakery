@@ -13,6 +13,8 @@
 
 void UBakeryHUDWidget::NativeConstruct()
 {
+	Super::NativeConstruct();
+
 	ABakeryGameState* BakeryGameState = Cast<ABakeryGameState>(GetWorld()->GetGameState());
 	BakeryGameState->OnMoneyChanged.AddUObject(this, &UBakeryHUDWidget::SetMoney);
 	BakeryGameState->OnDayChanged.AddUObject(this, &UBakeryHUDWidget::SetDay);

@@ -14,6 +14,7 @@
 #include "Interactions/GrabberComponent.h"
 #include "General/BakeryGameMode.h"
 #include "General/BakeryGameState.h"
+#include "Widgets/Menu/QuickSelectMenuWidget.h"
 
 APlayerPawn::APlayerPawn()
 {
@@ -23,6 +24,9 @@ APlayerPawn::APlayerPawn()
 	StateWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("StateWidget"));
 	StateWidget->SetupAttachment(RootComponent);
 	StateWidget->SetVisibility(false);
+
+	QuickMenuWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("QuickMenuWidget"));
+	QuickMenuWidget->SetupAttachment(RootComponent);
 }
 
 void APlayerPawn::BeginPlay()
@@ -39,6 +43,9 @@ void APlayerPawn::BeginPlay()
 
 	Interactor->GetGrabber()->OnGrab.AddUObject(this, &APlayerPawn::HandsUp);
 	Interactor->GetGrabber()->OnRelease.AddUObject(this, &APlayerPawn::HandsDown);
+
+	QuickMenu = Cast<UQuickSelectMenuWidget>(QuickMenuWidget->GetWidget());
+	verify(QuickMenu);
 }
 
 void APlayerPawn::Tick(float DeltaTime)
@@ -87,6 +94,25 @@ void APlayerPawn::SetPlayerState(EPlayerState InState)
 	}
 }
 
+UQuickSelectMenuWidget* APlayerPawn::SetQuickMenu(EQuickSelectMenu Menu)
+{
+	QuickMenu->SetMenu(Menu);
+
+	return QuickMenu;
+}
+
+void APlayerPawn::ShowQuickMenu(int InitalizeIndex)
+{
+	bIsQuickMenuOpened = true;
+	QuickMenu->Show(InitalizeIndex);
+}
+
+int APlayerPawn::HideQuickMenu()
+{
+	bIsQuickMenuOpened = false;
+	return QuickMenu->Hide();
+}
+
 bool APlayerPawn::IsGrabbing()
 {
 	return Interactor->GetGrabber()->IsGrabbing();
@@ -96,8 +122,49 @@ void APlayerPawn::Move(const FInputActionValue& Value)
 {
 	const FVector2D MovementValue = Value.Get<FVector2D>();
 
-	AddMovementInput(FVector::ForwardVector, MovementValue.Y);
-	AddMovementInput(FVector::RightVector, MovementValue.X);
+	// TODO: 코드 리팩토링 필요
+	if (bIsQuickMenuOpened)
+	{
+		int Direction = 0;
+
+		if (FMath::IsNearlyEqual(MovementValue.X, 0))
+		{
+			if (FMath::IsNearlyEqual(MovementValue.Y, 1))
+			{
+				Direction = 0;
+			}
+			else if (FMath::IsNearlyEqual(MovementValue.Y, -1))
+			{
+				Direction = 2;
+			}
+			else
+			{
+				return;
+			}
+		}
+		else if (FMath::IsNearlyEqual(MovementValue.Y, 0))
+		{
+			if (FMath::IsNearlyEqual(MovementValue.X, 1))
+			{
+				Direction = 1;
+			}
+			else if (FMath::IsNearlyEqual(MovementValue.X, -1))
+			{
+				Direction = 3;
+			}
+			else
+			{
+				return;
+			}
+		}
+		
+		QuickMenu->SetFocus(Direction);
+	}
+	else
+	{
+		AddMovementInput(FVector::ForwardVector, MovementValue.Y);
+		AddMovementInput(FVector::RightVector, MovementValue.X);
+	}
 }
 
 void APlayerPawn::StartBakery()

@@ -12,7 +12,9 @@ class UInputMappingContext;
 class UInputAction;
 class UInteractorComponent;
 class UWidgetComponent;
+class UQuickSelectMenuWidget;
 
+enum class EQuickSelectMenu : uint8;
 enum class EPlayerState : uint8
 {
 	Normal,
@@ -31,6 +33,10 @@ public:
 
 	EPlayerState GetPlayerState() const { return State; }
 	void SetPlayerState(EPlayerState InState);
+
+	UQuickSelectMenuWidget* SetQuickMenu(EQuickSelectMenu Menu);
+	void ShowQuickMenu(int InitalizeIndex);
+	int HideQuickMenu();
 	
 	bool IsGrabbing();
 
@@ -88,6 +94,14 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Player|Animation")
 	TSubclassOf<UUserWidget> SpeedDownStateWidgetClass;
+
+	/*
+	 * 퀵 메뉴 UI 관련
+	 */
+	UPROPERTY(VisibleAnywhere, Category = "Player|Animation")
+	UWidgetComponent* QuickMenuWidget;
+	UQuickSelectMenuWidget* QuickMenu;
+	bool bIsQuickMenuOpened = false;
 
 	EPlayerState State = EPlayerState::Normal;
 };

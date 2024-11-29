@@ -10,6 +10,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCookingAnimStartedDelegate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCookingAnimStoppedDelegate);
 
 enum class ECookingTool : uint8;
+enum class EQuickSelectMenu : uint8;
+
 class AIngredient;
 class UIngredientData;
 class URecipeSubsystem;
@@ -17,6 +19,7 @@ class UNiagaraComponent;
 class UWidgetComponent;
 class UProgressWidget;
 class ACookingStateIndicator;
+class UGrabberComponent;
 
 /**
  * 재료를 올려두거나 요리할 수 있는 조리대
@@ -33,9 +36,13 @@ public:
 	void Reset();
 	void ResetCooking();
 
+	void HandleCook();
+	void HandleQuickMenu();
+	void HandleQuickMenuClose();
+
 	virtual void OnEnterInteract(const FInteractionInfo& InteractionInfo) override;
-	virtual void OnInteract(float DeltaTime) override {}
-	virtual void OnExitInteract() override {}
+	virtual void OnInteract(float DeltaTime) override;
+	virtual void OnExitInteract() override;
 
 	virtual void OnEnterGrab(const FInteractionInfo& InteractionInfo) override;
 	virtual void OnGrab(float DeltaTime) override {}
@@ -74,6 +81,27 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+	/*
+	 * 퀵 메뉴 관련
+	 */
+	UPROPERTY(EditAnywhere, Category = "Countertop")
+	bool bHasQuickMenu = false;
+
+	UPROPERTY(EditAnywhere, Category = "Countertop")
+	EQuickSelectMenu QuickSelectMenuType;
+
+	UPROPERTY(EditAnywhere, Category = "Countertop")
+	float QuickMenuShowDelay = .5f;
+
+	UPROPERTY(EditAnywhere, Category = "Countertop")
+	TArray<ECookingTool> QuickMenuValues;
+
+	float InteractPressedTime = 0.f;
+	UGrabberComponent* PendingGrabber = nullptr;
+
+	bool bIsQuickMenuOpened = false;
+	int CurrentQuickMenuIndex = 0;
+
 	/*
 	 * 메쉬 관련
 	 */

@@ -9,6 +9,8 @@
 
 void UInkAbnormalityWidget::NativeConstruct()
 {
+	Super::NativeConstruct();
+
 	FWidgetAnimationDynamicEvent FadeOutFinished;
 	FadeOutFinished.BindDynamic(this, &UInkAbnormalityWidget::OnFadeOutFinished);
 	

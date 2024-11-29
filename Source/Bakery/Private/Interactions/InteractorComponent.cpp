@@ -25,7 +25,6 @@ void UInteractorComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// TODO: OnInteraction, OnGrab 이벤트의 경우 매 틱마다 호출해야하므로 기획 상 불필요하다고 판단되면 제거
 	if (bIsInteracting)
 	{
 		CurrentInteractable->OnInteractDelegate.Broadcast(DeltaTime);

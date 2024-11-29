@@ -7,6 +7,7 @@
 #include "Components/WidgetComponent.h"
 #include "NiagaraComponent.h"
 #include "EngineUtils.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "Interactions/InteractionDefines.h"
 #include "Interactions/InteractorComponent.h"
@@ -73,6 +74,12 @@ void ACountertop::BeginPlay()
 	CookingStateIndicator->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	CookingStateIndicator->Initailize(Location, Scale);
 	CookingStateIndicator->SetActorRotation(CookingStateFixedRotation);
+
+	if (bHasQuickMenu)
+	{
+		verify(QuickMenuValues.Num() > 0);
+		CurrentCookingTool = QuickMenuValues[0];
+	}
 }
 
 void ACountertop::Tick(float DeltaTime)
@@ -102,7 +109,11 @@ void ACountertop::ResetCooking()
 	bIsCooking = false;
 	CurrentAutoCookingTime = 0.f;
 	CurrentHandCookingTime = 0;
-	CurrentCookingTool = ECookingTool::None;
+
+	if (!bHasQuickMenu)
+	{
+		CurrentCookingTool = ECookingTool::None;
+	}
 
 	CookingProgressWidget->SetVisibility(false);
 	CookingProgress->SetPercentage(0.f);
@@ -191,7 +202,7 @@ void ACountertop::EndCook()
 	// 더 이상 요리가 불가능 할 때까지 자동으로 요리 진행
 	if (bIsAutomatic)
 	{
-		OnEnterInteract(FInteractionInfo::NoneInteraction);
+		HandleCook();
 	}
 }
 
@@ -225,48 +236,39 @@ void ACountertop::StopCookingAnimation()
 	OnCookingAnimStopped.Broadcast();
 }
 
-/*
- * Interaction Functions
- */
-void ACountertop::OnEnterInteract(const FInteractionInfo& InteractionInfo)
+void ACountertop::HandleCook()
 {
-	UGrabberComponent* Grabber = nullptr;
-	UPrimitiveComponent* Grabbed = nullptr;
-	AIngredient* GrabbedIngredient = nullptr;
-
-	// FInteractionInfo::NoneInteraction를 사용하는 경우가 있어 Interactor 유효성 검사 필요
-	if (InteractionInfo.Interactor)
+	if (PendingGrabber)
 	{
-		Grabber = InteractionInfo.Interactor->GetGrabber();
-		Grabbed = Grabber->GetGrabbed();
-
+		UPrimitiveComponent* Grabbed = PendingGrabber->GetGrabbed();
+		AIngredient* GrabbedIngredient = nullptr;
 		if (Grabbed)
 		{
 			GrabbedIngredient = Cast<AIngredient>(Grabbed->GetOwner());
 		}
-	}
 
-	// 플레이어가 잡고 있는 액터가 재료일 경우 재료 합치기 시도
-	if (GrabbedIngredient && CurrentKeptIngredient)
-	{
-		const UIngredientData* MergedIngredientData = CurrentKeptIngredient->TryMergeIngredient(GrabbedIngredient);
-		if (MergedIngredientData)
+		// 플레이어가 잡고 있는 액터가 재료일 경우 재료 합치기 시도
+		if (GrabbedIngredient && CurrentKeptIngredient)
 		{
-			Grabber->Release();
-			
-			// TODO: 재료 풀링을 각 재료 보관함이 아니라 하나의 오브젝트가 수행하도록 수정
-			for (TActorIterator<AIngredientContainer>It(GetWorld()); It; ++It)
+			const UIngredientData* MergedIngredientData = CurrentKeptIngredient->TryMergeIngredient(GrabbedIngredient);
+			if (MergedIngredientData)
 			{
-				if ((*It)->TryReturnIngredient(GrabbedIngredient))
+				PendingGrabber->Release();
+
+				// TODO: 재료 풀링을 각 재료 보관함이 아니라 하나의 오브젝트가 수행하도록 수정
+				for (TActorIterator<AIngredientContainer>It(GetWorld()); It; ++It)
 				{
-					break;
+					if ((*It)->TryReturnIngredient(GrabbedIngredient))
+					{
+						break;
+					}
 				}
+
+				CurrentKeptIngredient->ChangeIngredient(MergedIngredientData);
+
+				// 합치기에 성공한 경우 요리를 다시 시작해야하므로 reset 수행
+				ResetCooking();
 			}
-
-			CurrentKeptIngredient->ChangeIngredient(MergedIngredientData);
-
-			// 합치기에 성공한 경우 요리를 다시 시작해야하므로 reset 수행
-			ResetCooking();
 		}
 	}
 
@@ -284,14 +286,90 @@ void ACountertop::OnEnterInteract(const FInteractionInfo& InteractionInfo)
 
 	// 현재 Countertop에서 사용 가능한 요리 도구 중 CurrentKeptIngredient와 맞는 게 있으면 요리 시작
 	const UIngredientData* IngredientData = CurrentKeptIngredient->GetIngredientData();
-	for (ECookingTool CookingTool : AvailableCookingTools)
+	if (bHasQuickMenu)
 	{
-		if (const UIngredientData* CookingTarget = IngredientData->CheckCookable(CookingTool))
+		if (const UIngredientData* CookingTarget = IngredientData->CheckCookable(CurrentCookingTool))
 		{
-			BeginCook(CookingTool);
+			BeginCook(CurrentCookingTool);
 			return;
 		}
 	}
+	else
+	{
+		for (ECookingTool CookingTool : AvailableCookingTools)
+		{
+			if (const UIngredientData* CookingTarget = IngredientData->CheckCookable(CookingTool))
+			{
+				BeginCook(CookingTool);
+				return;
+			}
+		}
+	}
+}
+
+void ACountertop::HandleQuickMenu()
+{
+	APlayerPawn* PlayerPawn = Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	PlayerPawn->SetQuickMenu(QuickSelectMenuType);
+	PlayerPawn->ShowQuickMenu(CurrentQuickMenuIndex);
+}
+
+void ACountertop::HandleQuickMenuClose()
+{
+	APlayerPawn* PlayerPawn = Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	int SelectedItemIndex = PlayerPawn->HideQuickMenu();
+	if (SelectedItemIndex >= QuickMenuValues.Num())
+	{
+		SelectedItemIndex = 0;
+	}
+
+	CurrentQuickMenuIndex = SelectedItemIndex;
+	CurrentCookingTool = QuickMenuValues[CurrentQuickMenuIndex];
+	bIsQuickMenuOpened = false;
+
+	ResetCooking();
+}
+
+/*
+ * Interaction Functions
+ */
+void ACountertop::OnEnterInteract(const FInteractionInfo& InteractionInfo)
+{
+	// FInteractionInfo::NoneInteraction를 사용하는 경우가 있어 Interactor 유효성 검사 필요
+	if (InteractionInfo.Interactor)
+	{
+		PendingGrabber = InteractionInfo.Interactor->GetGrabber();
+	}
+
+	InteractPressedTime = 0.f;
+}
+
+void ACountertop::OnInteract(float DeltaTime)
+{
+	if (bHasQuickMenu && !bIsQuickMenuOpened)
+	{
+		InteractPressedTime += DeltaTime;
+
+		if (bHasQuickMenu && InteractPressedTime >= QuickMenuShowDelay)
+		{
+			HandleQuickMenu();
+			bIsQuickMenuOpened = true;
+		}
+	}
+}
+
+void ACountertop::OnExitInteract()
+{
+	if (bIsQuickMenuOpened)
+	{
+		HandleQuickMenuClose();
+	}
+	else
+	{
+		HandleCook();
+	}
+
+	PendingGrabber = nullptr;
 }
 
 /*
@@ -372,10 +450,10 @@ void ACountertop::OnEnterGrab(const FInteractionInfo& InteractionInfo)
 			CurrentKeptIngredient->CompletePendingCooking(ECookingTool::Put);
 		}
 
-		// Automatic일 경우 요리를 바로 시작하기 위해 OnEnterInteract를 호출
+		// Automatic일 경우 요리를 바로 시작하기 위해 HandleCook을 호출
 		if (bIsAutomatic)
 		{
-			OnEnterInteract(FInteractionInfo::NoneInteraction);
+			HandleCook();
 		}
 	}
 	// Countertop이 보관 중인 액터가 있으면, 플레이어가 해당 액터를 잡도록 함
