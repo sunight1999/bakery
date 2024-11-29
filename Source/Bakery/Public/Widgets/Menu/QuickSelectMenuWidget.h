@@ -57,6 +57,7 @@ class BAKERY_API UQuickSelectMenuWidget : public UUserWidget
 public:
 	void Show(int InitalizeIndex);
 	int Hide();
+	bool IsShowing() const { return bIsShowing; }
 
 	void SetMenu(EQuickSelectMenu QuickSelectMenu);
 	void SetFocus(int ItemIndex);
@@ -75,4 +76,6 @@ private:
 	const FQuickSelectMenuData* CurrentQuickMenuData;
 
 	int CurrentFocusingItem = -1;
+
+	bool bIsShowing = false;
 };

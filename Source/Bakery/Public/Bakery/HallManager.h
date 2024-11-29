@@ -43,7 +43,7 @@ public:
 	 */
 	void SettleSales();
 	void AddPendingMoney(int InMoney) { PendingMoney += InMoney; }
-	void AddPendingRating(int InRating) { PendingRating = PendingRating == 0 ? InRating : (PendingRating + InRating) / 2.f; }
+	void AddPendingRating(int InRating);
 
 protected:
 	virtual void BeginPlay() override;
@@ -81,5 +81,5 @@ private:
 	ABakeryGameState* BakeryGameState = nullptr;
 
 	int PendingMoney = 0;
-	float PendingRating = 0.f;
+	TArray<int> PendingRatings {0, 0, 0, 0, 0};
 };

@@ -31,9 +31,11 @@ public:
 	void SaveGame();
 
 	/*
-	 * 게임 데이터 Setter
+	 * 게임 데이터 Getter & Setter
 	 */
+	int32 GetMoney() const { return Money; }
 	void AddMoney(int32 InMoney);
+	int32 GetDay() const { return Day; }
 	void AddDay(int32 InDay);
 	void AddDay();
 

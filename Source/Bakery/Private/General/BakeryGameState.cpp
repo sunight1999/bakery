@@ -84,7 +84,7 @@ void ABakeryGameState::AddTime()
 
 void ABakeryGameState::AddRating(float InRating)
 {
-	if (Rating == 0)
+	if (FMath::IsNearlyZero(Rating))
 	{
 		Rating = InRating;
 	}

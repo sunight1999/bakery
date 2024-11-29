@@ -41,6 +41,8 @@ void UQuickSelectMenuWidget::NativeConstruct()
 
 void UQuickSelectMenuWidget::Show(int InitalizeIndex)
 {
+	bIsShowing = true;
+
 	QueuePlayAnimation(QuickSelectMenuAppearAnim);
 	CurrentFocusingItem = -1;
 	SetFocus(InitalizeIndex);
@@ -48,6 +50,8 @@ void UQuickSelectMenuWidget::Show(int InitalizeIndex)
 
 int UQuickSelectMenuWidget::Hide()
 {
+	bIsShowing = false;
+
 	QueuePlayAnimationReverse(QuickSelectMenuAppearAnim);
 	MenuItemWidgets[CurrentFocusingItem]->SetFocus(false);
 	return CurrentFocusingItem;

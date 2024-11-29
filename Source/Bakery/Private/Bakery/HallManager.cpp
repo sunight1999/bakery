@@ -3,12 +3,16 @@
 
 #include "Bakery/HallManager.h"
 #include "EngineUtils.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "General/BakeryGameMode.h"
 #include "General/BakeryGameState.h"
+#include "Subsystems/UISubsystem.h"
+#include "Characters/PlayerPawn.h"
 #include "Characters/Customer.h"
 #include "Hall/Table.h"
 #include "Hall/Chair.h"
+#include "Widgets/Bakery/SettleSalesWidget.h"
 
 AHallManager* AHallManager::Instance = nullptr;
 
@@ -212,9 +216,39 @@ void AHallManager::SettleSales()
 		BakeryGameState = Cast<ABakeryGameState>(GetWorld()->GetGameState());
 	}
 
-	BakeryGameState->AddMoney(PendingMoney);
-	BakeryGameState->AddRating(PendingRating);
+	UUISubsystem* UISubsystem = GetGameInstance()->GetSubsystem<UUISubsystem>();
+	UUserWidget* UserWidget = UISubsystem->SetUIVisibility(FName("SettleSales"), ESlateVisibility::SelfHitTestInvisible);
+	USettleSalesWidget* SettleSalesWidget = Cast<USettleSalesWidget>(UserWidget);
+	if (SettleSalesWidget)
+	{
+		SettleSalesWidget->SetDay(BakeryGameState->GetDay());
+		SettleSalesWidget->SetEarnedMoney(PendingMoney);
+		SettleSalesWidget->SetRatings(PendingRatings);
 
+		// 플레이어 UI 입력 상태로 전환
+		APlayerPawn* PlayerPawn = Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+		PlayerPawn->SetUIOpened(true);
+	}
+
+	int Count = 0;
+	float Rating = 0.f;
+	for (int32 i = 0; i < PendingRatings.Num(); i++)
+	{
+		Count += PendingRatings[i];
+		Rating += PendingRatings[i] * (i + 1);
+	}
+
+	BakeryGameState->AddMoney(PendingMoney);
+	BakeryGameState->AddRating(Rating / Count);
+	
 	PendingMoney = 0;
-	PendingRating = 0.f;
+	for (int32 i = 0; i < PendingRatings.Num(); i++)
+	{
+		PendingRatings[i] = 0;
+	}
+}
+
+void AHallManager::AddPendingRating(int InRating)
+{
+	++PendingRatings[InRating - 1];
 }

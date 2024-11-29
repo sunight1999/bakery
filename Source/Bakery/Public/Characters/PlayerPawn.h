@@ -34,6 +34,9 @@ public:
 	EPlayerState GetPlayerState() const { return State; }
 	void SetPlayerState(EPlayerState InState);
 
+	bool IsUIOpened() const { return bIsUIOpened; }
+	void SetUIOpened(bool bIsOpened);
+
 	UQuickSelectMenuWidget* SetQuickMenu(EQuickSelectMenu Menu);
 	void ShowQuickMenu(int InitalizeIndex);
 	int HideQuickMenu();
@@ -101,7 +104,7 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Player|Animation")
 	UWidgetComponent* QuickMenuWidget;
 	UQuickSelectMenuWidget* QuickMenu;
-	bool bIsQuickMenuOpened = false;
 
+	bool bIsUIOpened = false;
 	EPlayerState State = EPlayerState::Normal;
 };

@@ -2,10 +2,14 @@
 
 
 #include "Interactions/InteractorComponent.h"
+#include "Kismet/GameplayStatics.h"
+
 #include "Interactions/GrabberComponent.h"
 #include "Interactions/Interactables/InteractableComponent.h"
 #include "Interactions/InteractionDefines.h"
 #include "Interactions/Interactables/Highlight.h"
+#include "Characters/PlayerPawn.h"
+#include "Subsystems/UISubsystem.h"
 
 UInteractorComponent::UInteractorComponent()
 {
@@ -70,6 +74,16 @@ void UInteractorComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 
 void UInteractorComponent::BeginInteraction()
 {
+	APlayerPawn* PlayerPawn = Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	if (PlayerPawn && PlayerPawn->IsUIOpened())
+	{
+		UUISubsystem* UISubsystem = PlayerPawn->GetGameInstance()->GetSubsystem<UUISubsystem>();
+		UISubsystem->RevertUILayer();
+		PlayerPawn->SetUIOpened(false);
+
+		return;
+	}
+
 	if (bIsGrabbing)
 	{
 		return;
