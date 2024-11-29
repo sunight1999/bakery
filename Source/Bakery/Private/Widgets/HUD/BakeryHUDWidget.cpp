@@ -10,6 +10,7 @@
 
 #include "General/BakeryGameState.h"
 #include "General/BakeryGameMode.h"
+#include "Abnormality/AbnormalityEvents/AbnormalityEvent.h"
 
 void UBakeryHUDWidget::NativeConstruct()
 {
@@ -134,6 +135,36 @@ void UBakeryHUDWidget::SetMarkerPosition(UWidget* Widget, float X)
 		FVector2D MarkerPosition = CanvasPanelSlot->GetPosition();
 		MarkerPosition.X = X;
 		CanvasPanelSlot->SetPosition(MarkerPosition);
+	}
+}
+
+void UBakeryHUDWidget::AddAbnormalityMarker(const FAbnormalityEventData* AbnormalityEventData, int OccurrenceTime)
+{
+	auto CachedDayClockSize = GetInternalDayClockSize();
+	float DayClockWidth = CachedDayClockSize.X;
+
+	UImage* Marker = NewObject<UImage>(this);
+	Marker->SetBrushFromTexture(AbnormalityEventData->Icon);
+
+	InternalDayClockCanvas->AddChild(Marker);
+	UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(Marker->Slot);
+	CanvasSlot->SetAnchors(FAnchors(0.f, .5f));
+	CanvasSlot->SetAlignment(FVector2D(.5f, .5f));
+	CanvasSlot->SetPosition(FVector2D(.0f, .0f));
+	CanvasSlot->SetSize(FVector2D(AbnormalityEventData->Icon->GetSizeX(), AbnormalityEventData->Icon->GetSizeY()));
+
+	AbnormalityMarkerMap.Emplace(AbnormalityEventData, Marker);
+	SetMarkerPosition(Marker, DayClockWidth * OccurrenceTime / 1439);
+}
+
+void UBakeryHUDWidget::RemoveAbnormalityMarker(const FAbnormalityEventData* AbnormalityEventData)
+{
+	UImage** Marker = AbnormalityMarkerMap.Find(AbnormalityEventData);
+	if (Marker)
+	{
+		(*Marker)->SetVisibility(ESlateVisibility::Collapsed);
+		(*Marker)->ConditionalBeginDestroy();
+		AbnormalityMarkerMap.Remove(AbnormalityEventData);
 	}
 }
 

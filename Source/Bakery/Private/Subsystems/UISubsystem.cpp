@@ -63,6 +63,25 @@ bool UUISubsystem::IsWorldValid()
 	return IsValid(World);
 }
 
+UUserWidget* UUISubsystem::GetUIObject(FName UIName)
+{
+	if (!IsWorldValid())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("World가 유효하지 않습니다."));
+		return nullptr;
+	}
+
+	FManagedUI* ManagedUI = WidgetMap.Find(UIName);
+	if (!ManagedUI)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UI 이름(%s)이 유효하지 않습니다."), *UIName.ToString());
+		return nullptr;
+	}
+
+	const FUIInformation* UIInformation = ManagedUI->UIManagementInfo;
+	return ManagedUI->Widget;
+}
+
 UUserWidget* UUISubsystem::SetUIVisibility(FName UIName, ESlateVisibility Visibility)
 {
 	if (!IsWorldValid())

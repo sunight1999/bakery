@@ -39,5 +39,6 @@ void AInkAbnormalityEvent::Finish()
 {
 	Super::Finish();
 
+	InkAbnormalityDrawing->FadeOut();
 	GetWorld()->GetTimerManager().ClearTimer(InkShakeTimer);
 }

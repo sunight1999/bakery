@@ -15,7 +15,10 @@ struct FAbnormalityEventData : public FTableRowBase
 public:
 	// 이상현상 이름
 	UPROPERTY(EditAnywhere, Category = "AbnormalityEvent")
-	FString Name;
+	FName Name;
+
+	UPROPERTY(EditAnywhere, Category = "AbnormalityEvent")
+	UTexture2D* Icon;
 
 	// 이상현상 예보 수신인
 	UPROPERTY(EditAnywhere, Category = "AbnormalityEvent")

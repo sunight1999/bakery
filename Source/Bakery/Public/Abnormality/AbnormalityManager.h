@@ -20,9 +20,11 @@ public:
 
 	void SetWorld(UWorld* InWorld) { World = InWorld; }
 
-	void RegisterRandomAbnormality();
-	void CauseOneAbnormality();
-	void CauseAllAbnormality();
+	void HandleRegisteredAbnormality(float ElapsedTime);
+
+	void RegisterAbnormality(FName Name, int OccurrenceTime);
+	void RegisterFixedAbnormality();
+	//void RegisterRandomAbnormality();
 	void ClearRegisteredAbnormality();
 
 private:
@@ -31,8 +33,10 @@ private:
 
 	// 전체 이상 현상 데이터
 	TArray<const FAbnormalityEventData*> AbnormalityEventDatas;
-	TMap<int32, ICause*> AbnormalityEventMap;
+
+	// 액터로 생성된 이상 현상 데이터
+	TMap<FName, AActor*> AbnormalityEventMap;
 
 	// 현재 발생 예정인 이상 현상
-	TSet<ICause*> RegisteredAbnormalityEvents;
+	TMap<const FAbnormalityEventData*, float> OccurrenceTimeMap;
 };

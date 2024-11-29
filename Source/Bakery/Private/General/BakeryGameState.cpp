@@ -6,6 +6,7 @@
 
 #include "General/BakerySaveGame.h"
 #include "General/BakeryGameMode.h"
+#include "Abnormality/AbnormalityManager.h"
 
 void ABakeryGameState::BeginPlay()
 {
@@ -16,6 +17,8 @@ void ABakeryGameState::BeginPlay()
 	BakeryGameMode->OnBakeryOpened.AddUObject(this, &ABakeryGameState::AddDay);
 	BakeryGameMode->OnBakeryClosed.AddUObject(this, &ABakeryGameState::SetBakeryStateClosed);
 	BakeryGameMode->OnBakeryClosed.AddUObject(this, &ABakeryGameState::SaveGame);
+
+	OnTimeChanged.AddUObject(UAbnormalityManager::GetInstance(GetWorld()), &UAbnormalityManager::HandleRegisteredAbnormality);
 }
 
 void ABakeryGameState::LoadGame()

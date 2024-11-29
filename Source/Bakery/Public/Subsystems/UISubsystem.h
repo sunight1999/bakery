@@ -97,6 +97,7 @@ public:
 	void LoadAllUI();
 	bool IsWorldValid();
 
+	UUserWidget* GetUIObject(FName UIName);
 	UUserWidget* SetUIVisibility(FName UIName, ESlateVisibility Visibility);
 	void RevertUILayer();
 
