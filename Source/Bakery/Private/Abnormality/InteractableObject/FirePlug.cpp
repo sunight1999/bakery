@@ -10,11 +10,15 @@ void AFirePlug::BeginPlay()
 	}
 }
 
-void AFirePlug::OnInteract(float deltatime) 
+void AFirePlug::OnEnterInteract(const FInteractionInfo& InteractionInfo)
+{
+}
+void AFirePlug::OnInteract(float deltatime)
 {
 	if (CurrentGauge < MaxGauge && !EventFlag) {
 		CurrentGauge += GuageSpeed * deltatime;
-		ProgressWidget->SetPercentage(CurrentGauge);
+		//ProgressWidget->SetPercentage(CurrentGauge);
+		UE_LOG(LogTemp, Display, TEXT("Test : %f"),CurrentGauge);
 	}
 	if (CurrentGauge == MaxGauge) {
 		EventFlag = true;
@@ -25,10 +29,9 @@ void AFirePlug::OnExitInteract()
 {
 	if (CurrentGauge < MaxGauge) {
 		CurrentGauge = 0;
-		ProgressWidget->SetPercentage(0);
+		//ProgressWidget->SetPercentage(0);
 	}
 }
-
 void AFirePlug::SetEventFlag(bool Flag)
 {
 	EventFlag = Flag;

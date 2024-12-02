@@ -1,4 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -18,6 +17,7 @@ class BAKERY_API AFirePlug : public AInteractableActor
 protected:
 	virtual void BeginPlay() override;
 private:
+	void OnEnterInteract(const FInteractionInfo& InteractionInfo) override;
 	void OnInteract(float deltatime) override;
 	void OnExitInteract()override;
 public:
