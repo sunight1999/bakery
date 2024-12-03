@@ -142,6 +142,7 @@ void ACountertop::BeginCook(ECookingTool CookingTool)
 	// 요리 이펙트 및 애니메이션 재생
 	PlayCookingAnimation();
 
+
 	bIsCooking = true;
 	Cook();
 }
@@ -175,6 +176,9 @@ void ACountertop::Cook()
 	{
 		++CurrentHandCookingTime;
 		CookingProgress->SetPercentage((float)CurrentHandCookingTime / (float)HandCookingTime);
+
+		APlayerPawn* PlayerPawn = Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+		PlayerPawn->HandsCook();
 	}
 
 	if (IsCookingDone())
@@ -196,17 +200,6 @@ void ACountertop::EndCook()
 	else
 	{
 		CurrentKeptIngredient->SetIsCooked(true);
-	}
-
-	if (bIsFirstCooked && CurrentKeptIngredient->GetSourceRecipe())
-	{
-		bIsFirstCooked = false;
-
-		UUISubsystem* UISubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UUISubsystem>();
-		UUserWidget* UserWidget = UISubsystem->SetUIVisibility(FName("DessertExplain"), ESlateVisibility::SelfHitTestInvisible);
-
-		APlayerPawn* PlayerPawn = Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
-		PlayerPawn->SetUIOpened(true);
 	}
 
 	CookingStateIndicator->Show(ECookingIndicator::Done);
@@ -511,6 +504,7 @@ void ACountertop::OnEnterGrab(const FInteractionInfo& InteractionInfo)
 				Reset();
 			}
 
+			CookingStateIndicator->Hide();
 			return;
 		}
 

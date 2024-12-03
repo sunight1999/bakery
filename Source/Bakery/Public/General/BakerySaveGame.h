@@ -23,4 +23,7 @@ public:
 
 	UPROPERTY()
 	float Rating;
+
+	UPROPERTY()
+	TSet<FName> CookedReipces;
 };

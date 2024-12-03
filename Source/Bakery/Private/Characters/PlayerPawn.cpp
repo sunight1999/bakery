@@ -125,6 +125,38 @@ bool APlayerPawn::IsGrabbing()
 	return Interactor->GetGrabber()->IsGrabbing();
 }
 
+void APlayerPawn::EnsureHandsDownTimerDone()
+{
+	FTimerManager& TimerManager = GetWorld()->GetTimerManager();
+	if (TimerManager.IsTimerActive(HandsDownTimer))
+	{
+		TimerManager.ClearTimer(HandsDownTimer);
+		HandsDown();
+	}
+}
+
+void APlayerPawn::HandsUp()
+{
+	EnsureHandsDownTimerDone();
+
+	if (PlayerMontage)
+	{
+		PlayAnimMontage(PlayerMontage, 2.f, FName("Grab"));
+	}
+}
+
+void APlayerPawn::HandsCook()
+{
+	EnsureHandsDownTimerDone();
+
+	if (PlayerMontage)
+	{
+		PlayAnimMontage(PlayerMontage, 2.f, FName("Cook"));
+	}
+	
+	GetWorld()->GetTimerManager().SetTimer(HandsDownTimer, this, &APlayerPawn::HandsDown, 1.2f);
+}
+
 void APlayerPawn::Move(const FInputActionValue& Value)
 {
 	const FVector2D MovementValue = Value.Get<FVector2D>();
@@ -175,6 +207,8 @@ void APlayerPawn::Move(const FInputActionValue& Value)
 
 	AddMovementInput(FVector::ForwardVector, MovementValue.Y);
 	AddMovementInput(FVector::RightVector, MovementValue.X);
+
+	EnsureHandsDownTimerDone();
 }
 
 void APlayerPawn::OpenAbnormalForecastMenu()

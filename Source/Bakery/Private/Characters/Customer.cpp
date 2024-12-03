@@ -191,6 +191,7 @@ void ACustomer::Disappoint()
 	ClearFearWidget();
 
 	Rating = 1;
+	AHallManager::GetInstance(GetWorld())->AddPendingRating(Rating);
 
 	Leave();
 

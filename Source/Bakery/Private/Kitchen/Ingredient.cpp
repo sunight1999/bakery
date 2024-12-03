@@ -5,12 +5,19 @@
 #include "UObject/ObjectSaveContext.h"
 #include "Components/BoxComponent.h"
 #include "NiagaraComponent.h"
+#include "EngineUtils.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "Subsystems/RecipeSubsystem.h"
 #include "Kitchen/KitchenDefines.h"
 #include "Kitchen/Data/IngredientData.h"
 #include "Kitchen/Data/IngredientMeshData.h"
 #include "Kitchen/Data/RecipeData.h"
+#include "General/BakeryGameState.h"
+#include "General/Tools/DessertSceneCapturer.h"
+#include "Subsystems/UISubsystem.h"
+#include "Characters/PlayerPawn.h"
+#include "Widgets/Bakery/DessertExplainWidget.h"
 
 AIngredient::AIngredient()
 {
@@ -128,6 +135,8 @@ void AIngredient::ChangeIngredient(const UIngredientData* NewIngredientData, boo
 	SourceRecipe = RecipeSubsystem->GetRecipe(NewIngredientData->GetName());
 
 	SetIngredientMesh();
+
+	CheckFirstCook();
 }
 
 /// <summary>
@@ -155,6 +164,37 @@ void AIngredient::CompletePendingCooking(ECookingTool CookingTool)
 
 	const UIngredientData* CookedIngredientData = IngredientData->CheckCookable(CookingTool);
 	ChangeIngredient(CookedIngredientData);
+}
+
+void AIngredient::CheckFirstCook()
+{
+	ABakeryGameState* BakeryGameState = Cast<ABakeryGameState>(GetWorld()->GetGameState());
+	const FName& RecipeName = IngredientData->GetName();
+
+	if (SourceRecipe && !BakeryGameState->IsCookedRecipe(RecipeName))
+	{
+		// 디저트 2D 씬 캡쳐 메시 설정
+		if (!DessertSceneCapturer)
+		{
+			for (TActorIterator<ADessertSceneCapturer>It(GetWorld()); It; ++It)
+			{
+				DessertSceneCapturer = *It;
+				break;
+			}
+		}
+		DessertSceneCapturer->SetDessertMesh(IngredientData->GetIngredientMeshData()->GetBodyStaticMesh());
+
+		// 디저트 설명 UI 가시화
+		UUISubsystem* UISubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UUISubsystem>();
+		UUserWidget* UserWidget = UISubsystem->SetUIVisibility(FName("DessertExplain"), ESlateVisibility::SelfHitTestInvisible);
+		UDessertExplainWidget* DessertExplainWidget = Cast<UDessertExplainWidget>(UserWidget);
+		DessertExplainWidget->SetDessert(SourceRecipe);
+
+		APlayerPawn* PlayerPawn = Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+		PlayerPawn->SetUIOpened(true);
+
+		BakeryGameState->SetCookedRecipe(RecipeName);
+	}
 }
 
 void AIngredient::Clear()

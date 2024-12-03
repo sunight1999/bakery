@@ -42,9 +42,11 @@ public:
 	int HideQuickMenu();
 	
 	bool IsGrabbing();
+	void EnsureHandsDownTimerDone();
 
-	void HandsUp() { if (GrabbingMontage) PlayAnimMontage(GrabbingMontage, 2.f); }
-	void HandsDown() { if (GrabbingMontage) StopAnimMontage(GrabbingMontage); }
+	void HandsUp();
+	void HandsCook();
+	void HandsDown() { if (PlayerMontage) StopAnimMontage(PlayerMontage); }
 
 protected:
 	virtual void BeginPlay() override;
@@ -92,7 +94,9 @@ private:
 	 * 애니메이션 관련
 	 */
 	UPROPERTY(EditAnywhere, Category = "Player|Animation")
-	UAnimMontage* GrabbingMontage;
+	UAnimMontage* PlayerMontage;
+
+	FTimerHandle HandsDownTimer;
 
 	/*
 	 * 상태 UI 관련

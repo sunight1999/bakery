@@ -20,6 +20,7 @@ class UWidgetComponent;
 class UProgressWidget;
 class ACookingStateIndicator;
 class UGrabberComponent;
+class ADessertSceneCapturer;
 
 /**
  * 재료를 올려두거나 요리할 수 있는 조리대
@@ -176,13 +177,7 @@ private:
 	bool bIsCooking = false;
 
 	/*
-	 * 서브시스템 캐싱
+	 * 캐싱
 	 */ 
 	const URecipeSubsystem* RecipeSubsystem;
-
-
-	/*
-	 * Temporal
-	 */
-	bool bIsFirstCooked = true;
 };

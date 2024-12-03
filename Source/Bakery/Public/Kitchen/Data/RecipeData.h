@@ -22,6 +22,9 @@ public:
 
 	FPrimaryAssetId GetPrimaryAssetId() const override { return FPrimaryAssetId(AssetType, GetFName()); }
 	const FName GetName() const { return Name; }
+	const FText& GetExplainName() const { return ExplainName; }
+	const FText& GetExplainTitle() const { return ExplainTitle; }
+	const FText& GetExplain() const { return Explain; }
 	const TSet<URecipeData*>& GetNextRecipes() const { return NextRecipes; }
 	int GetPrice() const { return Price; }
 
@@ -33,6 +36,15 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kitchen|Recipe", meta = (AllowPrivateAccess = "true"))
 	FName Name;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kitchen|Recipe", meta = (AllowPrivateAccess = "true"))
+	FText ExplainName;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kitchen|Recipe", meta = (AllowPrivateAccess = "true"))
+	FText ExplainTitle;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kitchen|Recipe", meta = (AllowPrivateAccess = "true"))
+	FText Explain;
 
 	// 이 레시피의 요리를 제작하기 위해 필요한 재료
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kitchen|Recipe", meta = (AllowPrivateAccess = "true"))

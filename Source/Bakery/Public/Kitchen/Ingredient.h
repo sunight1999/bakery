@@ -13,6 +13,7 @@ class UIngredientData;
 class UIngredientMeshData;
 class URecipeData;
 class UNiagaraComponent;
+class ADessertSceneCapturer;
 
 UCLASS()
 class BAKERY_API AIngredient : public AActor
@@ -35,6 +36,8 @@ public:
 	bool IsCooked() const { return bIsCooked; }
 	void SetIsCooked(bool bCooked) { bIsCooked = bCooked; }
 	void CompletePendingCooking(ECookingTool CookingTool);
+
+	void CheckFirstCook();
 
 protected:
 	virtual void BeginPlay() override;
@@ -68,4 +71,9 @@ private:
 	USkeletalMeshComponent* IngredientBottomSkeletalMesh;
 	USkeletalMeshComponent* IngredientBodySkeletalMesh;
 	USkeletalMeshComponent* IngredientLidSkeletalMesh;
+
+	/*
+	 * 캐싱
+	 */
+	ADessertSceneCapturer* DessertSceneCapturer;
 };

@@ -34,6 +34,7 @@ void ABakeryGameState::LoadGame()
 	AddMoney(BakerySaveGame->Money);
 	AddDay(BakerySaveGame->Day);
 	AddRating(BakerySaveGame->Rating);
+	CookedRecipes = BakerySaveGame->CookedReipces;
 }
 
 void ABakeryGameState::SaveGame()
@@ -43,6 +44,7 @@ void ABakeryGameState::SaveGame()
 	BakerySaveGame->Money = Money;
 	BakerySaveGame->Day = Day;
 	BakerySaveGame->Rating = Rating;
+	BakerySaveGame->CookedReipces = CookedRecipes;
 
 	UGameplayStatics::SaveGameToSlot(BakerySaveGame, BAKERY_SAVEGAME_SLOT_NAME, 0);
 }

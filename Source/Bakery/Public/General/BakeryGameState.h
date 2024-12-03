@@ -33,16 +33,25 @@ public:
 	/*
 	 * 게임 데이터 Getter & Setter
 	 */
+	// 자금 관련
 	int32 GetMoney() const { return Money; }
 	void AddMoney(int32 InMoney);
+	
+	// 일자 관련
 	int32 GetDay() const { return Day; }
 	void AddDay(int32 InDay);
 	void AddDay();
 
+	// 시간 관련
 	void SetTime(float Minute);
 	void AddTime();
 
+	// 평점 관련
 	void AddRating(float InRating);
+
+	// 요리 완성 경험 관련
+	void SetCookedRecipe(FName RecipeName) { CookedRecipes.Emplace(RecipeName); }
+	bool IsCookedRecipe(FName RecipeName) { return CookedRecipes.Contains(RecipeName); }
 
 	float GetElapsedTime() const { return ElapsedTime; }
 
@@ -55,7 +64,7 @@ protected:
 	void BeginPlay() override;
 
 private:
-	// 보유 자본
+	// 보유 자금
 	int32 Money;
 	// 영업일
 	int32 Day;
@@ -63,6 +72,8 @@ private:
 	float ElapsedTime;
 	// 고객 평점
 	float Rating = 0.f;
+	// 요리 완성 경험 여부
+	TSet<FName> CookedRecipes;
 
 	EBakeryState BakeryState = EBakeryState::Closed;
 };
