@@ -74,13 +74,6 @@ void ATable::BeginPlay()
 	}
 }
 
-/*
-void ATable::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
-*/
-
 AChair* ATable::RequestSeat()
 {
 	if (EmptySeats.Num() <= 0)
@@ -189,10 +182,11 @@ void ATable::PutDish(ADish* Dish, AChair* Chair)
 	FVector TableCenterLocation = DishServingCenterPoint->GetComponentLocation();
 	FVector DishLocation = TableCenterLocation + Chair->GetChairDirection() * DishesDistance;
 	Dish->SetActorLocation(DishLocation);
-
+	
 	UPrimitiveComponent* Primitive = Dish->GetComponentByClass<UPrimitiveComponent>();
 	Primitive->SetPhysicsLinearVelocity(FVector::ZeroVector);
 	Primitive->SetPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
+	Primitive->SetSimulatePhysics(false);
 
 	ServedDishes.Emplace(Dish);
 	return;

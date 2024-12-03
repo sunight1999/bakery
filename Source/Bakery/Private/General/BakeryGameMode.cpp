@@ -94,6 +94,7 @@ void ABakeryGameMode::CloseBakery()
 		(*It)->Leave();
 	}
 
+	OnBakeryPreClosed.Broadcast();
 	OnBakeryClosed.Broadcast();
 }
 

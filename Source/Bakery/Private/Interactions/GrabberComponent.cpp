@@ -51,6 +51,7 @@ void UGrabberComponent::Grab(UPrimitiveComponent* Primitive, const FVector& Impa
 
 	// 잡고 있는 오브젝트가 Interactor의 트레이스에 걸리지 않도록 Collision 설정 변경
 	Primitive->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	Primitive->SetSimulatePhysics(true);
 
 	PhysicsHandle->GrabComponentAtLocationWithRotation(
 		Primitive,

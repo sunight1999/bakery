@@ -35,6 +35,7 @@ public:
 
 	FBakeryOpendDelegate OnBakeryPreOpened;
 	FBakeryOpendDelegate OnBakeryOpened;
+	FBakeryClosedDelegate OnBakeryPreClosed;
 	FBakeryClosedDelegate OnBakeryClosed;
 
 protected:
