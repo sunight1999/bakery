@@ -9,6 +9,7 @@
 class UBoxComponent;
 class AHallManager;
 class URecipeSubsystem;
+class UAnimInstance;
 
 /**
  * 
@@ -35,6 +36,12 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category="CustomerSpawner")
 	UBoxComponent* DespawnBox;
+
+	UPROPERTY(EditAnywhere, Category = "CustomerSpawner")
+	TArray<USkeletalMesh*> CustomerMeshes;
+
+	UPROPERTY(EditAnywhere, Category = "CustomerSpawner")
+	TArray<TSubclassOf<UAnimInstance>> CustomerAnimClasses;
 
 	AHallManager* HallManager;
 	URecipeSubsystem* RecipeSubsystem;

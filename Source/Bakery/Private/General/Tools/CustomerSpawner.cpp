@@ -4,6 +4,7 @@
 #include "General/Tools/CustomerSpawner.h"
 #include "Components/BoxComponent.h"
 #include "EngineUtils.h"
+#include "Animation/AnimInstance.h"
 
 #include "General/BakeryGameMode.h"
 #include "Bakery/HallManager.h"
@@ -47,12 +48,22 @@ void ACustomerSpawner::PostSpawn(AActor* Actor)
 		return;
 	}
 
+	// 랜덤으로 손님 메시 설정
+	if (CustomerMeshes.Num() > 0)
+	{
+		int Index = FMath::RandRange(0, CustomerMeshes.Num() - 1);
+		USkeletalMeshComponent* SkeletalMesh = Customer->GetMesh();
+		SkeletalMesh->SetSkeletalMesh(CustomerMeshes[Index]);
+		SkeletalMesh->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+		SkeletalMesh->SetAnimClass(CustomerAnimClasses[Index]);
+	}
+
 	Customer->SetDespawnPosition(DespawnBox->GetComponentLocation());
 
 	// TODO: 랜덤으로 레시피 중 하나 지정
-	//TArray<FName> RecipeNames{ FName("Bread"), FName("Injeolmi"), FName("InjeolmiToast"), FName("Baekseolgi"), FName("Jeolpyeon")};
-	//Customer->SetOrder(RecipeSubsystem->GetRecipe(RecipeNames[FMath::RandRange(0, RecipeNames.Num() - 1)]));
-	Customer->SetOrder(RecipeSubsystem->GetRecipe(FName("Bread")));
+	TArray<FName> RecipeNames{ FName("Bread"), FName("Injeolmi"), FName("InjeolmiToast"), FName("Baekseolgi"), FName("Jeolpyeon")};
+	Customer->SetOrder(RecipeSubsystem->GetRecipe(RecipeNames[FMath::RandRange(0, RecipeNames.Num() - 1)]));
+	//Customer->SetOrder(RecipeSubsystem->GetRecipe(FName("Bread")));
 
 	// 홀에 자리가 있을 경우 지정된 좌석으로 Customer 이동
 	AChair* Seat = HallManager->RequestSeat();
