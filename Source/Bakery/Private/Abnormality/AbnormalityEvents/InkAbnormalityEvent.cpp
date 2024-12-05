@@ -32,13 +32,13 @@ void AInkAbnormalityEvent::Cause()
 	}
 
 	InkAbnormalityDrawing->Initailize(InkImage, InkImageNum, InkMinDistance);
-	GetWorld()->GetTimerManager().SetTimer(InkShakeTimer, InkAbnormalityDrawing, &UInkAbnormalityWidget::FadeOut, InkShakeInterval, true, InkShakeInterval);
+	//GetWorld()->GetTimerManager().SetTimer(InkShakeTimer, InkAbnormalityDrawing, &UInkAbnormalityWidget::FadeOut, InkShakeInterval, true, InkShakeInterval);
 }
 
 void AInkAbnormalityEvent::Finish()
 {
 	Super::Finish();
 
-	InkAbnormalityDrawing->FadeOut();
-	GetWorld()->GetTimerManager().ClearTimer(InkShakeTimer);
+	//GetWorld()->GetTimerManager().ClearTimer(InkShakeTimer);
+	InkAbnormalityDrawing->Stop();
 }

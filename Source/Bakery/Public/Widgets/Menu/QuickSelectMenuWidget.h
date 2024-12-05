@@ -69,7 +69,8 @@ private:
 	UPROPERTY(Transient, meta = (BindWidgetAnim))
 	UWidgetAnimation* QuickSelectMenuAppearAnim;
 
-	TMap<EQuickSelectMenu, const FQuickSelectMenuData*> MenuDataMap;
+	UPROPERTY()
+	TMap<EQuickSelectMenu, FQuickSelectMenuData> MenuDataMap;
 	TArray<UQuickSelectMenuItemWidget*> MenuItemWidgets;
 
 	EQuickSelectMenu CurrentQuickSelectMenuType;

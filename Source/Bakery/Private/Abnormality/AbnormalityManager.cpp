@@ -2,6 +2,7 @@
 #include "UObject/ConstructorHelpers.h"
 
 #include "Subsystems/UISubsystem.h"
+#include "General/BakeryGameMode.h"
 #include "General/BakeryGameState.h"
 #include "Abnormality/AbnormalityEvents/AbnormalityEvent.h"
 #include "Abnormality/AbnormalityEvents/Cause.h"
@@ -15,7 +16,13 @@ UAbnormalityManager::UAbnormalityManager()
 	if (AbnormalityDataTableFinder.Succeeded())
 	{
 		UDataTable* AbnormalityDataTable = AbnormalityDataTableFinder.Object;
-		AbnormalityDataTable->GetAllRows(FString("Abnormalities"), AbnormalityEventDatas);
+		TArray<const FAbnormalityEventData*> Datas;
+		AbnormalityDataTable->GetAllRows(FString("Abnormalities"), Datas);
+
+		for (auto Data : Datas)
+		{
+			AbnormalityEventDatas.Emplace(*Data);
+		}
 	}
 }
 
@@ -29,8 +36,9 @@ UAbnormalityManager* UAbnormalityManager::GetInstance(UWorld* InWorld)
 {
 	if (!Instance)
 	{
-		Instance = NewObject<UAbnormalityManager>(InWorld);
+		Instance = NewObject<UAbnormalityManager>(InWorld, FName("AbnormalityManager")/*, EObjectFlags::RF_MarkAsRootSet*/);
 		Instance->SetWorld(InWorld);
+		Instance->AddToRoot();
 	}
 
 	return Instance;
@@ -40,21 +48,28 @@ UAbnormalityManager* UAbnormalityManager::GetInstance(UWorld* InWorld)
 
 void UAbnormalityManager::HandleRegisteredAbnormality(float ElapsedTime)
 {
-	TSet<const FAbnormalityEventData*> Keys;
+	ABakeryGameMode* BakeryGameMode = Cast<ABakeryGameMode>(GetWorld()->GetAuthGameMode());
+	if (!BakeryGameMode->IsOpened())
+	{
+		return;
+	}
+
+	TSet<FName> Keys;
 	OccurrenceTimeMap.GetKeys(Keys);
 
-	for (const FAbnormalityEventData* AbnormalityEventData : Keys)
+	for (const FName& AbnormalityName : Keys)
 	{
-		if (OccurrenceTimeMap[AbnormalityEventData] <= ElapsedTime)
+		if (OccurrenceTimeMap[AbnormalityName] <= ElapsedTime)
 		{
-			ICause* AbnormalityEvent = Cast<ICause>(AbnormalityEventMap[AbnormalityEventData->Name]);
+			ICause* AbnormalityEvent = Cast<ICause>(AbnormalityEventMap[AbnormalityName]);
 			AbnormalityEvent->Cause();
 
 			UUISubsystem* UISubsystem = World->GetGameInstance()->GetSubsystem<UUISubsystem>();
 			UBakeryHUDWidget* HUDWidget = Cast<UBakeryHUDWidget>(UISubsystem->GetUIObject(FName("BakeryHUD")));
-			HUDWidget->RemoveAbnormalityMarker(AbnormalityEventData);
+			HUDWidget->RemoveAbnormalityMarker(AbnormalityName);
 
-			OccurrenceTimeMap.Remove(AbnormalityEventData);
+			OccurrenceTimeMap.Remove(AbnormalityName);
+			PendingFinishAbnormalities.Emplace(AbnormalityName);
 		}
 	}
 }
@@ -64,8 +79,8 @@ void UAbnormalityManager::RegisterAbnormality(FName Name, int OccurrenceTime)
 	// TODO: AbnormalityEventDatas를 맵으로 관리
 	for (int32 i = 0; i < AbnormalityEventDatas.Num(); i++)
 	{
-		const FAbnormalityEventData* AbnormalityEventData = AbnormalityEventDatas[i];
-		if (AbnormalityEventData->Name.Compare(Name) == 0)
+		const FAbnormalityEventData& AbnormalityEventData = AbnormalityEventDatas[i];
+		if (AbnormalityEventData.Name.Compare(Name) == 0)
 		{
 			// HUD 시간 바에 이상 현상 마커 등록
 			UUISubsystem* UISubsystem = World->GetGameInstance()->GetSubsystem<UUISubsystem>();
@@ -74,9 +89,9 @@ void UAbnormalityManager::RegisterAbnormality(FName Name, int OccurrenceTime)
 
 			// 이상 현상 액터가 아직 생성되지 않았다면 생성
 			AActor* AbnormalityEventActor = nullptr;
-			if (!AbnormalityEventMap.Contains(AbnormalityEventData->Name))
+			if (!AbnormalityEventMap.Contains(AbnormalityEventData.Name))
 			{
-				AbnormalityEventActor = World->SpawnActor(AbnormalityEventData->AbnormalityEventActorClass);
+				AbnormalityEventActor = World->SpawnActor(AbnormalityEventData.AbnormalityEventActorClass);
 				ICause* Cause = Cast<ICause>(AbnormalityEventActor);
 				if (!Cause)
 				{
@@ -84,10 +99,10 @@ void UAbnormalityManager::RegisterAbnormality(FName Name, int OccurrenceTime)
 					return;
 				}
 
-				AbnormalityEventMap.Emplace(AbnormalityEventData->Name, AbnormalityEventActor);
+				AbnormalityEventMap.Emplace(AbnormalityEventData.Name, AbnormalityEventActor);
 			}
 
-			OccurrenceTimeMap.Emplace(AbnormalityEventData, OccurrenceTime);
+			OccurrenceTimeMap.Emplace(AbnormalityEventData.Name, OccurrenceTime);
 
 			break;
 		}
@@ -96,6 +111,8 @@ void UAbnormalityManager::RegisterAbnormality(FName Name, int OccurrenceTime)
 
 void UAbnormalityManager::RegisterFixedAbnormality()
 {
+	ClearRegisteredAbnormality();
+
 	RegisterAbnormality(FName("DishThief"), 600);
 	RegisterAbnormality(FName("Ink"), 680);
 	RegisterAbnormality(FName("SpeedDown"), 690);
@@ -135,14 +152,11 @@ void UAbnormalityManager::RegisterRandomAbnormality()
 
 void UAbnormalityManager::ClearRegisteredAbnormality()
 {
-	TSet<const FAbnormalityEventData*> Keys;
-	OccurrenceTimeMap.GetKeys(Keys);
-
-	for (const FAbnormalityEventData* AbnormalityEventData : Keys)
+	for (const FName& AbnormalityName : PendingFinishAbnormalities)
 	{
-		ICause* AbnormalityEvent = Cast<ICause>(AbnormalityEventMap[AbnormalityEventData->Name]);
+		ICause* AbnormalityEvent = Cast<ICause>(AbnormalityEventMap[AbnormalityName]);
 		AbnormalityEvent->Finish();
 	}
 
-	OccurrenceTimeMap.Empty();
+	PendingFinishAbnormalities.Empty();
 }

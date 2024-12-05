@@ -13,6 +13,11 @@ ADishContainer::ADishContainer()
 
 }
 
+void ADishContainer::End()
+{
+	DishPool.End();
+}
+
 void ADishContainer::BeginPlay()
 {
 	Super::BeginPlay();

@@ -11,9 +11,13 @@ void UInkAbnormalityWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	FWidgetAnimationDynamicEvent FadeInFinished;
+	FadeInFinished.BindDynamic(this, &UInkAbnormalityWidget::OnFadeInFinished);
+
 	FWidgetAnimationDynamicEvent FadeOutFinished;
 	FadeOutFinished.BindDynamic(this, &UInkAbnormalityWidget::OnFadeOutFinished);
 	
+	BindToAnimationFinished(InkFadeOutAnim, FadeOutFinished);
 	BindToAnimationFinished(InkFadeOutAnim, FadeOutFinished);
 }
 
@@ -21,6 +25,9 @@ void UInkAbnormalityWidget::Initailize(UTexture2D* InkImage, int InkNum, float I
 {
 	if (InkImages.Num() == InkNum)
 	{
+		Shake();
+		FadeIn();
+
 		return;
 	}
 
@@ -87,12 +94,25 @@ void UInkAbnormalityWidget::FadeIn()
 
 void UInkAbnormalityWidget::FadeOut()
 {
-	bIsVisible = false;
 	QueuePlayAnimation(InkFadeOutAnim);
+}
+
+void UInkAbnormalityWidget::Stop()
+{
+	bIsVisible = false;
+	PlayAnimation(InkFadeOutAnim);
+}
+
+void UInkAbnormalityWidget::OnFadeInFinished()
+{
+	FadeOut();
 }
 
 void UInkAbnormalityWidget::OnFadeOutFinished()
 {
-	Shake();
-	QueuePlayAnimation(InkFadeInAnim);
+	if (bIsVisible)
+	{
+		Shake();
+		FadeIn();
+	}
 }

@@ -11,6 +11,14 @@ TPool::~TPool()
 {
 }
 
+void TPool::End()
+{
+	for (UObject* Object : ObjectPool)
+	{
+		Object->RemoveFromRoot();
+	}
+}
+
 void TPool::Initialize(UWorld* InWorld, TSubclassOf<UObject> InObjectClass, AActor* InParentActor, int32 InPoolSize, int32 InPoolScaleStep)
 {
 	World = InWorld;
@@ -118,6 +126,7 @@ UObject* TPool::Spawn()
 	else if (bIsComponentClass)
 	{
 		Object = NewObject<UActorComponent>(World, ObjectClass);
+		Object->AddToRoot();
 		UActorComponent* Component = Cast<UActorComponent>(Object);
 		Component->RegisterComponentWithWorld(World);
 	}

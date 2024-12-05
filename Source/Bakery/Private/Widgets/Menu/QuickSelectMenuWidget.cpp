@@ -23,7 +23,7 @@ void UQuickSelectMenuWidget::NativeConstruct()
 
 			for (auto MenuData : MenuDatas)
 			{
-				MenuDataMap.Emplace(MenuData->Menu, MenuData);
+				MenuDataMap.Emplace(MenuData->Menu, *MenuData);
 			}
 		}
 	}
@@ -66,14 +66,14 @@ void UQuickSelectMenuWidget::SetMenu(EQuickSelectMenu QuickSelectMenu)
 
 	CurrentQuickSelectMenuType = QuickSelectMenu;
 
-	const FQuickSelectMenuData* const* QuickSelecetMenuData = MenuDataMap.Find(QuickSelectMenu);
+	const FQuickSelectMenuData* QuickSelecetMenuData = MenuDataMap.Find(QuickSelectMenu);
 	if (!QuickSelecetMenuData)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("퀵 메뉴 구성 정보를 찾을 수 없습니다."));
 		return;
 	}
 
-	CurrentQuickMenuData = *QuickSelecetMenuData;
+	CurrentQuickMenuData = QuickSelecetMenuData;
 	for (int i = 0; i < MenuItemWidgets.Num(); i++)
 	{
 		auto MenuItemWidget = MenuItemWidgets[i];

@@ -40,12 +40,17 @@ public:
 	~USoundManager();
 	static USoundManager* GetInstance(UWorld* World);
 
+	void End();
+
 	void InitializeAudio(UObject* AudioObject);
+	UFUNCTION()
 	void ResetAudio(UAudioComponent* Audio);
 
 	void PlayBackgroundMusic();
 	void StopBackgroundMusic();
 	void SetBackgroundMusicPitch(float PitchMultiplier);
+
+	UFUNCTION()
 	void OnBackgroundMusicEnded(UAudioComponent* Audio);
 
 	UAudioComponent* PlaySoundAtLocationByTag(const FName& SoundTag, const FVector& Location, float Volume = 1.f, float Pitch = 1.f);
@@ -54,7 +59,9 @@ private:
 
 	static USoundManager* Instance;
 
+	UPROPERTY()
 	UDataTable* SoundDataTable = nullptr;
+
 	TPool AudioPool;
 	
 	UAudioComponent* BackgroundMusicAudio = nullptr;

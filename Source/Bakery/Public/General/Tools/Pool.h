@@ -15,6 +15,8 @@ public:
 	TPool();
 	~TPool();
 
+	void End();
+
 	void Initialize(UWorld* InWorld, TSubclassOf<UObject> InObjectClass, AActor* InParentActor = nullptr, int32 InPoolSize = 10, int32 InPoolScaleStep = 10);
 	void Expand(int Size = -1);
 
@@ -33,12 +35,17 @@ private:
 	bool bIsActorClass = false;
 	bool bIsComponentClass = false;
 
+	UPROPERTY()
 	TArray<UObject*> ObjectPool;
+
+	UPROPERTY()
 	TMap<UObject*, bool> ObjectAvailableMap;
 	int CurrentIndex;
 
 	UWorld* World;
 	TSubclassOf<UObject> ObjectClass;
+
+	UPROPERTY()
 	AActor* ParentActor;
 	int PoolSize = 0;
 	int PoolScaleStep = 0;

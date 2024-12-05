@@ -17,6 +17,8 @@ class BAKERY_API ADishContainer : public AGrabInteractableActor
 public:	
 	ADishContainer();
 
+	void End();
+
 	virtual void OnEnterInteract(const FInteractionInfo& InteractionInfo) override {}
 	virtual void OnInteract(float DeltaTime) override {}
 	virtual void OnExitInteract() override {}

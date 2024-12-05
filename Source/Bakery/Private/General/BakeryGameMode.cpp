@@ -14,6 +14,8 @@
 #include "General/Tools/CustomerSpawner.h"
 #include "Abnormality/AbnormalityManager.h"
 #include "Subsystems/SoundManager.h"
+#include "Kitchen/IngredientContainer.h"
+#include "Kitchen/DishContainer.h"
 
 ABakeryGameMode::ABakeryGameMode()
 {
@@ -25,11 +27,8 @@ void ABakeryGameMode::BeginPlay()
 	Super::BeginPlay();
 
 	BakeryGameState = Cast<ABakeryGameState>(GameState);
-	UUISubsystem* UISubsystem = GetGameInstance()->GetSubsystem<UUISubsystem>();
-	UISubsystem->LoadAllUI();
-
-	UUserWidget* HUDWidget = UISubsystem->SetUIVisibility(FName("BakeryHUD"), ESlateVisibility::SelfHitTestInvisible);
-	BakeryHUDWidget = Cast<UBakeryHUDWidget>(HUDWidget);
+	//FTimerHandle UILoadHandle;
+	//GetWorld()->GetTimerManager().SetTimer(UILoadHandle, this, &ABakeryGameMode::LoadUI, 1.f, false);
 
 	PlayerController = Cast<ABakeryPlayerController>(GetWorld()->GetFirstPlayerController());
 
@@ -43,14 +42,26 @@ void ABakeryGameMode::BeginPlay()
 	BakeryGameState->SetTime(GameStartTime);
 	GetWorldTimerManager().SetTimer(GameTimeHandle, BakeryGameState, &ABakeryGameState::AddTime, TimeTickRate, true, TimeTickRate);
 
-	// TODO: 현재 시연용으로, 이상현상 종류와 발생 시간이 고정됨
-	// 이상 현상 등록
-	UAbnormalityManager* AbnormalityManager = UAbnormalityManager::GetInstance(GetWorld());
-	FTimerHandle FixedHandle;
-	GetWorld()->GetTimerManager().SetTimer(FixedHandle, AbnormalityManager, &UAbnormalityManager::RegisterFixedAbnormality, 0.01f, false);
-	OnBakeryClosed.AddUObject(AbnormalityManager, &UAbnormalityManager::RegisterFixedAbnormality);
-
 	USoundManager::GetInstance(GetWorld())->PlayBackgroundMusic();
+}
+
+void ABakeryGameMode::EndPlay(EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	// TODO: 데이터 로딩 / 해제 모두 한 곳에서 관리하기
+	UAbnormalityManager::GetInstance(GetWorld())->RemoveFromRoot();
+	USoundManager::GetInstance(GetWorld())->End();
+
+	for (TActorIterator<AIngredientContainer>It(GetWorld()); It; ++It)
+	{
+		(*It)->End();
+	}
+
+	for (TActorIterator<ADishContainer>It(GetWorld()); It; ++It)
+	{
+		(*It)->End();
+	}
 }
 
 void ABakeryGameMode::Tick(float DeltaSeconds)
@@ -73,8 +84,28 @@ void ABakeryGameMode::Tick(float DeltaSeconds)
 	}
 }
 
+void ABakeryGameMode::LoadUI()
+{
+	UUISubsystem* UISubsystem = GetGameInstance()->GetSubsystem<UUISubsystem>();
+	UISubsystem->LoadAllUI();
+
+	UUserWidget* HUDWidget = UISubsystem->SetUIVisibility(FName("BakeryHUD"), ESlateVisibility::SelfHitTestInvisible);
+	BakeryHUDWidget = Cast<UBakeryHUDWidget>(HUDWidget);
+
+	// TODO: 현재 시연용으로, 이상현상 종류와 발생 시간이 고정됨
+	// 이상 현상 등록
+	UAbnormalityManager* AbnormalityManager = UAbnormalityManager::GetInstance(GetWorld());
+	FTimerHandle FixedHandle;
+	GetWorld()->GetTimerManager().SetTimer(FixedHandle, AbnormalityManager, &UAbnormalityManager::RegisterFixedAbnormality, 0.01f, false);
+}
+
 void ABakeryGameMode::OpenBakery()
 {
+	if (!BakeryHUDWidget)
+	{
+		return;
+	}
+
 	BakeryHUDWidget->SetHUDState(true);
 
 	BakeryGameState->SetTime(BakeryOpenTime);
@@ -94,11 +125,13 @@ void ABakeryGameMode::CloseBakery()
 		(*It)->Leave();
 	}
 
+	UAbnormalityManager::GetInstance(GetWorld())->RegisterFixedAbnormality();
+
 	OnBakeryPreClosed.Broadcast();
 	OnBakeryClosed.Broadcast();
 }
 
 bool ABakeryGameMode::IsOpened()
 {
-	return BakeryHUDWidget->GetHUDState();
+	return BakeryHUDWidget && BakeryHUDWidget->GetHUDState();
 }

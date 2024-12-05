@@ -40,5 +40,5 @@ private:
 	int InkMinDistance = 300.f;
 
 	UInkAbnormalityWidget* InkAbnormalityDrawing;
-	FTimerHandle InkShakeTimer;
+	//FTimerHandle InkShakeTimer;
 };

@@ -34,8 +34,7 @@ public:
 	ACountertop();
 	void Tick(float DeltaTime) override;
 
-	void Reset();
-	void ResetCooking();
+	void ResetCooking(bool bFullyReset = false);
 
 	void HandleCook();
 	void HandleQuickMenu();
@@ -168,6 +167,7 @@ private:
 	 */
 	AActor* CurrentKeptObject;
 	AIngredient* CurrentKeptIngredient;
+
 	UAudioComponent* CurrentAudio;
 
 	ECookingTool CurrentCookingTool;

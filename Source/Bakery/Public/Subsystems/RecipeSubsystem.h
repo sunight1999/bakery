@@ -24,6 +24,7 @@ public:
 	const URecipeData* GetRecipe(FName Name) const;
 
 private:
+	UPROPERTY()
 	TMap<FName, const URecipeData*> RecipeMap;
 	const URecipeData* RecipeRoot;
 };

@@ -29,23 +29,17 @@ void URecipeSubsystem::Load(const FPrimaryAssetType& AssetType)
 	}
 
 	// 검색된 ID로 해당 에셋 데이터를 실제로 로딩
-	// TODO: 비동기 로딩으로 변경
 	for (const FPrimaryAssetId& Id : RecipeAssetIds)
 	{
-		FSoftObjectPtr RecipeObjectPtr(AssetManager.GetPrimaryAssetPath(Id));
-		
-		if (RecipeObjectPtr.IsPending())
-		{
-			RecipeObjectPtr.LoadSynchronous();
-		}
-
-		URecipeData* RecipeData = CastChecked<URecipeData>(RecipeObjectPtr.Get());
-		RecipeMap.Add(Id.PrimaryAssetName, RecipeData);
-
-		if (!RecipeData)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Recipe DataAsset '%s' is null"), *Id.PrimaryAssetName.ToString());
-		}
+		FSoftObjectPath RecipeObjectPath = AssetManager.GetPrimaryAssetPath(Id);
+		AssetManager.GetStreamableManager().RequestAsyncLoad(RecipeObjectPath,
+			[this, RecipeObjectPath]() {
+				URecipeData* RecipeAsset = Cast<URecipeData>(RecipeObjectPath.TryLoad());
+				if (RecipeAsset)
+				{
+					RecipeMap.Add(RecipeAsset->GetName(), RecipeAsset);
+				}
+			});
 	}
 }
 

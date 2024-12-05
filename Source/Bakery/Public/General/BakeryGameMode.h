@@ -24,6 +24,8 @@ public:
 	ABakeryGameMode();
 	virtual void Tick(float DeltaSeconds) override;
 
+	void LoadUI();
+
 	virtual void OpenBakery();
 	virtual void CloseBakery();
 
@@ -40,6 +42,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
 private:
 	// 게임 시간 배속

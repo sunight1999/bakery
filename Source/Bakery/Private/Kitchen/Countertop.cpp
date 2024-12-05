@@ -98,15 +98,7 @@ void ACountertop::Tick(float DeltaTime)
 	}
 }
 
-void ACountertop::Reset()
-{
-	CurrentKeptObject = nullptr;
-	CurrentKeptIngredient = nullptr;
-
-	ResetCooking();
-}
-
-void ACountertop::ResetCooking()
+void ACountertop::ResetCooking(bool bFullyReset)
 {
 	bIsCooking = false;
 	CurrentAutoCookingTime = 0.f;
@@ -122,10 +114,16 @@ void ACountertop::ResetCooking()
 
 	StopCookingAnimation();
 
-	if (CurrentAudio)
+	if (IsValid(CurrentAudio))
 	{
 		CurrentAudio->Stop();
 		CurrentAudio = nullptr;
+	}
+
+	if (bFullyReset)
+	{
+		CurrentKeptObject = nullptr;
+		CurrentKeptIngredient = nullptr;
 	}
 }
 
@@ -501,7 +499,7 @@ void ACountertop::OnEnterGrab(const FInteractionInfo& InteractionInfo)
 			}
 			else
 			{
-				Reset();
+				ResetCooking(true);
 			}
 
 			CookingStateIndicator->Hide();
@@ -515,6 +513,6 @@ void ACountertop::OnEnterGrab(const FInteractionInfo& InteractionInfo)
 		Grabber->Grab(Primitive, GrabPoint);
 
 		CookingStateIndicator->Hide();
-		Reset();
+		ResetCooking(true);
 	}
 }

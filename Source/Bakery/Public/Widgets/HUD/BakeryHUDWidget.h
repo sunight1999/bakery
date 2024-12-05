@@ -44,8 +44,8 @@ public:
 	void SetOperatingTimeMarker(float OpenTime, float CloseTime);
 	void SetTimeMarker(float CurrentTime);
 	void SetMarkerPosition(UWidget* Widget, float X);
-	void AddAbnormalityMarker(const FAbnormalityEventData* AbnormalityEventData, int OccurrenceTime);
-	void RemoveAbnormalityMarker(const FAbnormalityEventData* AbnormalityEventData);
+	void AddAbnormalityMarker(const FAbnormalityEventData& AbnormalityEventData, int OccurrenceTime);
+	void RemoveAbnormalityMarker(const FName& AbnormalityName);
 
 	/*
 	 * 오른쪽 HUD 값 Setter
@@ -96,7 +96,8 @@ private:
 	UCanvasPanel* PrepareDisplay;
 
 	FVector2D DayClockSize;
-	TMap<const FAbnormalityEventData*, UImage*> AbnormalityMarkerMap;
+	UPROPERTY()
+	TMap<FName, UImage*> AbnormalityMarkerMap;
 
 	/*
 	 * 오른쪽 HUD 변수

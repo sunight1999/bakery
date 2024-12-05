@@ -34,6 +34,11 @@ USoundManager* USoundManager::GetInstance(UWorld* World)
 	return Instance;
 }
 
+void USoundManager::End()
+{
+	AudioPool.End();
+}
+
 void USoundManager::InitializeAudio(UObject* AudioObject)
 {
 	UAudioComponent* Audio = Cast<UAudioComponent>(AudioObject);

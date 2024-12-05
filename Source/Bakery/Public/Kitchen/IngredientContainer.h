@@ -21,6 +21,8 @@ public:
 	AIngredientContainer();
 	void Tick(float DeltaTime) override;
 
+	void End();
+
 	void OnEnterInteract(const FInteractionInfo& InteractionInfo) override {}
 	void OnInteract(float DeltaTime) override {}
 	void OnExitInteract() override {}

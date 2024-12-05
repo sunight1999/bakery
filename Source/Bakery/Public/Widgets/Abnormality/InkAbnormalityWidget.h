@@ -24,6 +24,10 @@ public:
 
 	void FadeIn();
 	void FadeOut();
+	void Stop();
+
+	UFUNCTION()
+	void OnFadeInFinished();
 
 	UFUNCTION()
 	void OnFadeOutFinished();

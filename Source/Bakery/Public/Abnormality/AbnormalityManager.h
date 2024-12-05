@@ -32,11 +32,18 @@ private:
 	UWorld* World;
 
 	// 전체 이상 현상 데이터
-	TArray<const FAbnormalityEventData*> AbnormalityEventDatas;
+	UPROPERTY()
+	TArray<FAbnormalityEventData> AbnormalityEventDatas;
 
 	// 액터로 생성된 이상 현상 데이터
+	UPROPERTY()
 	TMap<FName, AActor*> AbnormalityEventMap;
 
 	// 현재 발생 예정인 이상 현상
-	TMap<const FAbnormalityEventData*, float> OccurrenceTimeMap;
+	UPROPERTY()
+	TMap<FName, float> OccurrenceTimeMap;
+
+
+	UPROPERTY()
+	TArray<FName> PendingFinishAbnormalities;
 };

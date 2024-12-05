@@ -45,7 +45,7 @@ void UUISubsystem::LoadAllUI()
 			continue;
 		}
 
-		UUserWidget* Widget = CreateWidget<UUserWidget>(World, UIInformation->UIClass);
+		UUserWidget* Widget = CreateWidget<UUserWidget>(GameInstance, UIInformation->UIClass);
 
 		Widget->AddToViewport(UIInformation->GetZOrder());
 		Widget->SetVisibility(UIInformation->DefaultVisibility);

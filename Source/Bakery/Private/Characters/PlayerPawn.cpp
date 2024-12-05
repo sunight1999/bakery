@@ -47,6 +47,10 @@ void APlayerPawn::BeginPlay()
 
 	QuickMenu = Cast<UQuickSelectMenuWidget>(QuickMenuWidget->GetWidget());
 	verify(QuickMenu);
+
+	ABakeryGameMode* BakeryGameMode = Cast<ABakeryGameMode>(GetWorld()->GetAuthGameMode());
+	FTimerHandle UILoadHandle;
+	GetWorld()->GetTimerManager().SetTimer(UILoadHandle, BakeryGameMode, &ABakeryGameMode::LoadUI, 0.1f, false);
 }
 
 void APlayerPawn::Tick(float DeltaTime)

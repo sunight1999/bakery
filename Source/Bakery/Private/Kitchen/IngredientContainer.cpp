@@ -18,6 +18,11 @@ void AIngredientContainer::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void AIngredientContainer::End()
+{
+	IngredientPool.End();
+}
+
 void AIngredientContainer::BeginPlay()
 {
 	Super::BeginPlay();
