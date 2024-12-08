@@ -114,6 +114,7 @@ void UAbnormalityManager::RegisterFixedAbnormality()
 	ClearRegisteredAbnormality();
 
 	RegisterAbnormality(FName("DishThief"), 600);
+	RegisterAbnormality(FName("Sprinkler"), 630);
 	RegisterAbnormality(FName("Ink"), 680);
 	RegisterAbnormality(FName("SpeedDown"), 690);
 }
