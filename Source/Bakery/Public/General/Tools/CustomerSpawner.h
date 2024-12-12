@@ -43,6 +43,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "CustomerSpawner")
 	TArray<TSubclassOf<UAnimInstance>> CustomerAnimClasses;
 
+	UPROPERTY(EditAnywhere, Category = "CustomerSpawner")
+	TArray<UAnimMontage*> CustomerAnimMontages;
+
 	AHallManager* HallManager;
 	URecipeSubsystem* RecipeSubsystem;
 };

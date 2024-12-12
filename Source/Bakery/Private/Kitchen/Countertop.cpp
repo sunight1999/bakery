@@ -14,6 +14,7 @@
 #include "Interactions/GrabberComponent.h"
 #include "Interactions/Interactables/InteractableComponent.h"
 #include "Widgets/Progress/ProgressWidget.h"
+#include "Widgets/Menu/QuickSelectMenuWidget.h"
 
 #include "Kitchen/KitchenDefines.h"
 #include "Kitchen/Ingredient.h"
@@ -79,8 +80,16 @@ void ACountertop::BeginPlay()
 
 	if (bHasQuickMenu)
 	{
-		verify(QuickMenuValues.Num() > 0);
-		CurrentCookingTool = QuickMenuValues[0];
+		if (QuickSelectMenuType == EQuickSelectMenu::CookingTools)
+		{
+			verify(ToolsQuickMenuValues.Num() > 0);
+			CurrentCookingTool = ToolsQuickMenuValues[0];
+		}
+		else
+		{
+			verify(ExtrasQuickMenuValues.Num() > 0);
+			CurrentExtraIngredient = ExtrasQuickMenuValues[0];
+		}
 	}
 }
 
@@ -251,6 +260,19 @@ void ACountertop::HandleCook()
 			GrabbedIngredient = Cast<AIngredient>(Grabbed->GetOwner());
 		}
 
+		// 엑스트라 재료 Countertop인 경우
+		if (bHasQuickMenu && GrabbedIngredient && CurrentExtraIngredient)
+		{
+			const UIngredientData* MergedIngredientData = GrabbedIngredient->TryMergeIngredient(CurrentExtraIngredient);
+			if (MergedIngredientData)
+			{
+				GrabbedIngredient->ChangeIngredient(MergedIngredientData);
+			}
+
+			return;
+		}
+
+
 		// 플레이어가 잡고 있는 액터가 재료일 경우 재료 합치기 시도
 		if (GrabbedIngredient && CurrentKeptIngredient)
 		{
@@ -322,13 +344,28 @@ void ACountertop::HandleQuickMenuClose()
 {
 	APlayerPawn* PlayerPawn = Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 	int SelectedItemIndex = PlayerPawn->HideQuickMenu();
-	if (SelectedItemIndex >= QuickMenuValues.Num())
-	{
-		SelectedItemIndex = 0;
-	}
 
-	CurrentQuickMenuIndex = SelectedItemIndex;
-	CurrentCookingTool = QuickMenuValues[CurrentQuickMenuIndex];
+	if (QuickSelectMenuType == EQuickSelectMenu::CookingTools)
+	{
+		if (SelectedItemIndex >= ToolsQuickMenuValues.Num())
+		{
+			SelectedItemIndex = 0;
+		}
+
+		CurrentQuickMenuIndex = SelectedItemIndex;
+		CurrentCookingTool = ToolsQuickMenuValues[CurrentQuickMenuIndex];
+	}
+	else
+	{
+		if (SelectedItemIndex >= ExtrasQuickMenuValues.Num())
+		{
+			SelectedItemIndex = 0;
+		}
+
+		CurrentQuickMenuIndex = SelectedItemIndex;
+		CurrentExtraIngredient = ExtrasQuickMenuValues[CurrentQuickMenuIndex];
+	}
+	
 	bIsQuickMenuOpened = false;
 
 	ResetCooking();

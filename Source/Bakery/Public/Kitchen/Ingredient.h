@@ -29,6 +29,7 @@ public:
 
 	void ChangeIngredient(const UIngredientData* NewIngredientData, bool bIsRaw = false);
 	const UIngredientData* TryMergeIngredient(const AIngredient* OtherIngredient);
+	const UIngredientData* TryMergeIngredient(const UIngredientData* OtherIngredient);
 
 	const UIngredientData* GetIngredientData() const { return IngredientData; };
 	const URecipeData* GetSourceRecipe() const { return SourceRecipe; }

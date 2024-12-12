@@ -43,6 +43,7 @@ public:
 	float GetWaitingTime() const { return TimerManager->GetTimerRate(WaitingTimer); }
 
 	void SetDespawnPosition(const FVector& Position) { DespawnPosition = Position; }
+	void SetAnimMontage(UAnimMontage* AnimMontage) { CustomerMontage = AnimMontage; }
 
 	/*
 	 * 상태별 처리 함수 (외부 액터에 의해 호출 또는 상태 변경)
@@ -154,8 +155,7 @@ private:
 	/*
 	 * 이상현상 관련
 	 */
-	UPROPERTY(EditAnywhere, Category = "Customer")
-	UAnimMontage* CustomerMontage;
+	UAnimMontage* CustomerMontage = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Customer")
 	float MaxFearedTime = 15.f;

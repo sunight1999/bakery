@@ -28,6 +28,8 @@ UAbnormalityManager::UAbnormalityManager()
 
 UAbnormalityManager::~UAbnormalityManager()
 {
+	RemoveFromRoot();
+
 	Instance = nullptr;
 	World = nullptr;
 }

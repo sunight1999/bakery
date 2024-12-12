@@ -56,12 +56,17 @@ void ACustomerSpawner::PostSpawn(AActor* Actor)
 		SkeletalMesh->SetSkeletalMesh(CustomerMeshes[Index]);
 		SkeletalMesh->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 		SkeletalMesh->SetAnimClass(CustomerAnimClasses[Index]);
+
+		Customer->SetAnimMontage(CustomerAnimMontages[Index]);
 	}
 
 	Customer->SetDespawnPosition(DespawnBox->GetComponentLocation());
 
 	// TODO: 랜덤으로 레시피 중 하나 지정
-	TArray<FName> RecipeNames{ FName("Bread"), FName("Injeolmi"), FName("InjeolmiToast"), FName("Baekseolgi"), FName("Jeolpyeon")};
+	TArray<FName> RecipeNames{
+		FName("Bread"), FName("Injeolmi"), FName("InjeolmiToast"), FName("Baekseolgi"), FName("Jeolpyeon"),
+		FName("Americano"), FName("GreenTea")
+	};
 	int RandomIndex = FMath::RandRange(0, RecipeNames.Num() - 1);
 	FName ChosenRecipe = RecipeNames[RandomIndex];
 	const URecipeData* RecipeData = RecipeSubsystem->GetRecipe(ChosenRecipe);

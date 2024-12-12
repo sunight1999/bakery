@@ -146,8 +146,12 @@ void AIngredient::ChangeIngredient(const UIngredientData* NewIngredientData, boo
 /// <returns>두 재료를 사용하는 레시피의 결과물</returns>
 const UIngredientData* AIngredient::TryMergeIngredient(const AIngredient* OtherIngredient)
 {
-	// 두 재료 중 유효한 Recipe를 할당. 만약 둘 다 nullptr라면 Root 레시피를 가져와 사용
-	return IngredientData->CheckMergeable(OtherIngredient->GetIngredientData());
+	return TryMergeIngredient(OtherIngredient->GetIngredientData());
+}
+
+const UIngredientData* AIngredient::TryMergeIngredient(const UIngredientData* OtherIngredient)
+{
+	return IngredientData->CheckMergeable(OtherIngredient);
 }
 
 void AIngredient::CompletePendingCooking(ECookingTool CookingTool)
@@ -182,7 +186,9 @@ void AIngredient::CheckFirstCook()
 				break;
 			}
 		}
-		DessertSceneCapturer->SetDessertMesh(IngredientData->GetIngredientMeshData()->GetBodyStaticMesh());
+
+		const UIngredientMeshData* IngredientMeshData = IngredientData->GetIngredientMeshData();
+		DessertSceneCapturer->SetDessertMesh(IngredientMeshData->GetBottomStaticMesh(), IngredientMeshData->GetBodyStaticMesh(), IngredientMeshData->GetLidStaticMesh());
 
 		// 디저트 설명 UI 가시화
 		UUISubsystem* UISubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UUISubsystem>();

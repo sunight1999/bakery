@@ -26,21 +26,12 @@ void ABakeryGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
-	BakeryGameState = Cast<ABakeryGameState>(GameState);
-	//FTimerHandle UILoadHandle;
-	//GetWorld()->GetTimerManager().SetTimer(UILoadHandle, this, &ABakeryGameMode::LoadUI, 1.f, false);
-
 	PlayerController = Cast<ABakeryPlayerController>(GetWorld()->GetFirstPlayerController());
 
 	for (TActorIterator<ACustomerSpawner> It(GetWorld()); It; ++It)
 	{
 		CustomerSpawners.Add(*It);
 	}
-
-	// 게임 시간 설정
-	float TimeTickRate = 1.f / GameTimeMultiplier;
-	BakeryGameState->SetTime(GameStartTime);
-	GetWorldTimerManager().SetTimer(GameTimeHandle, BakeryGameState, &ABakeryGameState::AddTime, TimeTickRate, true, TimeTickRate);
 
 	USoundManager::GetInstance(GetWorld())->PlayBackgroundMusic();
 }
@@ -68,6 +59,11 @@ void ABakeryGameMode::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	if (!BakeryGameState)
+	{
+		return;
+	}
+
 	if (BakeryGameState->GetElapsedTime() >= BakeryCloseTime)
 	{
 		if (BakeryGameState->GetBakeryState() == EBakeryState::Opened)
@@ -86,11 +82,21 @@ void ABakeryGameMode::Tick(float DeltaSeconds)
 
 void ABakeryGameMode::LoadUI()
 {
+	// UI 로딩 수행
 	UUISubsystem* UISubsystem = GetGameInstance()->GetSubsystem<UUISubsystem>();
 	UISubsystem->LoadAllUI();
 
 	UUserWidget* HUDWidget = UISubsystem->SetUIVisibility(FName("BakeryHUD"), ESlateVisibility::SelfHitTestInvisible);
 	BakeryHUDWidget = Cast<UBakeryHUDWidget>(HUDWidget);
+
+	// 세이브 데이터 로딩
+	BakeryGameState = GetGameState<ABakeryGameState>();
+	BakeryGameState->LoadGame();
+
+	// 게임 시간 설정
+	float TimeTickRate = 1.f / GameTimeMultiplier;
+	BakeryGameState->SetTime(GameStartTime);
+	GetWorldTimerManager().SetTimer(GameTimeHandle, BakeryGameState, &ABakeryGameState::AddTime, TimeTickRate, true, TimeTickRate);
 
 	// TODO: 현재 시연용으로, 이상현상 종류와 발생 시간이 고정됨
 	// 이상 현상 등록

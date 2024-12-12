@@ -61,6 +61,8 @@ private:
 	UPROPERTY(EditAnywhere, Category="AbnormalityEvent")
 	bool bIsFearingAllEvent = true;
 
+	bool bIsCaused = false;
+
 	const FAbnormalityEventData* AbnormalityEventData;
 };
  

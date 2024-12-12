@@ -94,7 +94,10 @@ private:
 	float QuickMenuShowDelay = .5f;
 
 	UPROPERTY(EditAnywhere, Category = "Countertop")
-	TArray<ECookingTool> QuickMenuValues;
+	TArray<ECookingTool> ToolsQuickMenuValues;
+
+	UPROPERTY(EditAnywhere, Category = "Countertop")
+	TArray<UIngredientData*> ExtrasQuickMenuValues;
 
 	float InteractPressedTime = 0.f;
 	UGrabberComponent* PendingGrabber = nullptr;
@@ -171,6 +174,7 @@ private:
 	UAudioComponent* CurrentAudio;
 
 	ECookingTool CurrentCookingTool;
+	const UIngredientData* CurrentExtraIngredient;
 	float CurrentAutoCookingTime = 0.f;
 	int CurrentHandCookingTime = 0;
 

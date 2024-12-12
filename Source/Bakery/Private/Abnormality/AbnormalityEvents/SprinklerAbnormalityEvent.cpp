@@ -8,6 +8,8 @@
 
 void ASprinklerAbnormalityEvent::BeginPlay()
 {
+	Super::BeginPlay();
+
 	for (int i = 0; i < SpawnRowNum; i++)
 	{
 		FVector RowOffset = FVector::BackwardVector * (i * SpawnRowDistance);
@@ -27,7 +29,7 @@ void ASprinklerAbnormalityEvent::BeginPlay()
 
 void ASprinklerAbnormalityEvent::Tick(float DeltaTime)
 {
-
+	Super::Tick(DeltaTime);
 }
 
 void ASprinklerAbnormalityEvent::Cause()

@@ -1,7 +1,9 @@
 #include "Abnormality/InteractableObject/FirePlug.h"
 #include "Components/WidgetComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "EngineUtils.h"
 
+#include "Characters/PlayerPawn.h"
 #include "Widgets/Progress/ProgressWidget.h"
 #include "Indicators/CookingStateIndicator.h"
 #include "Abnormality/AbnormalityEvents/SprinklerAbnormalityEvent.h"
@@ -35,7 +37,9 @@ void AFirePlug::BeginPlay()
 
 void AFirePlug::OnEnterInteract(const FInteractionInfo& InteractionInfo)
 {
-	
+	APlayerPawn* Player = Cast<APlayerPawn>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+
+	GetWorld()->GetTimerManager().SetTimer(AnimTimer, Player, &APlayerPawn::HandsCook, .7f, true, 0.f);
 }
 
 void AFirePlug::OnInteract(float deltatime)
@@ -64,6 +68,11 @@ void AFirePlug::OnExitInteract()
 		CurrentGauge = 0;
 		ActivationProgress->SetPercentage(0);
 	}
+
+	APlayerPawn* Player = Cast<APlayerPawn>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	Player->HandsDown();
+
+	GetWorld()->GetTimerManager().ClearTimer(AnimTimer);
 }
 
 void AFirePlug::SetEventFlag(bool Flag)

@@ -19,6 +19,8 @@ USoundManager::USoundManager()
 
 USoundManager::~USoundManager()
 {
+	End();
+
 	Instance = nullptr;
 }
 

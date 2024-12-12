@@ -52,5 +52,6 @@ private:
 
 	ACookingStateIndicator* StateIndicator;
 
+	FTimerHandle AnimTimer;
 	bool EventFlag = false;
 };

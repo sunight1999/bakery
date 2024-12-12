@@ -10,8 +10,6 @@
 
 void ABakeryGameState::BeginPlay()
 {
-	LoadGame();
-
 	ABakeryGameMode* BakeryGameMode = Cast<ABakeryGameMode>(GetWorld()->GetAuthGameMode());
 	BakeryGameMode->OnBakeryOpened.AddUObject(this, &ABakeryGameState::SetBakeryStateOpened);
 	BakeryGameMode->OnBakeryOpened.AddUObject(this, &ABakeryGameState::AddDay);
@@ -34,6 +32,8 @@ void ABakeryGameState::LoadGame()
 	AddMoney(BakerySaveGame->Money);
 	AddDay(BakerySaveGame->Day);
 	AddRating(BakerySaveGame->Rating);
+	UE_LOG(LogTemp, Display, TEXT("%f"), BakerySaveGame->Rating);
+
 	CookedRecipes = BakerySaveGame->CookedReipces;
 }
 
