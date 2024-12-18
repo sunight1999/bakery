@@ -125,12 +125,8 @@ UUserWidget* UUISubsystem::SetUIVisibility(FName UIName, ESlateVisibility Visibi
 	return Widget;
 }
 
-// add stack에서 하나씩 pop하며 invisible 처리
-	// CurrentLayer 먼저 처리
-	// CurrentLayer가 유효하지 않으면 가장 높은 Layer를 CurrentLayer로 처리
-
 /// <summary>
-/// 가장 최근에 띄운 UI부터 차례대로 비가시화. 최근에 띄운 UI의 Layer, 높은 Layer 순으로 처리됨
+/// 가장 최근에 띄운 UI부터 차례대로 비가시화. 최근에 띄운 UI의 Layer -> 높은 Layer 순으로 처리됨
 /// </summary>
 void UUISubsystem::RevertUILayer()
 {

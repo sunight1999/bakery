@@ -12,7 +12,6 @@
 #include "Interactions/InteractionDefines.h"
 #include "Interactions/InteractorComponent.h"
 #include "Interactions/GrabberComponent.h"
-#include "Interactions/Interactables/InteractableComponent.h"
 #include "Widgets/Progress/ProgressWidget.h"
 #include "Widgets/Menu/QuickSelectMenuWidget.h"
 
@@ -78,17 +77,12 @@ void ACountertop::BeginPlay()
 	CookingStateIndicator->Initailize(Location, Scale);
 	CookingStateIndicator->SetActorRotation(CookingStateFixedRotation);
 
-	if (bHasQuickMenu)
+	if (QuickSelectMenuType != EQuickSelectMenu::None)
 	{
 		if (QuickSelectMenuType == EQuickSelectMenu::CookingTools)
 		{
 			verify(ToolsQuickMenuValues.Num() > 0);
 			CurrentCookingTool = ToolsQuickMenuValues[0];
-		}
-		else
-		{
-			verify(ExtrasQuickMenuValues.Num() > 0);
-			CurrentExtraIngredient = ExtrasQuickMenuValues[0];
 		}
 	}
 }
@@ -113,7 +107,7 @@ void ACountertop::ResetCooking(bool bFullyReset)
 	CurrentAutoCookingTime = 0.f;
 	CurrentHandCookingTime = 0;
 
-	if (!bHasQuickMenu)
+	if (QuickSelectMenuType == EQuickSelectMenu::None)
 	{
 		CurrentCookingTool = ECookingTool::None;
 	}
@@ -260,19 +254,6 @@ void ACountertop::HandleCook()
 			GrabbedIngredient = Cast<AIngredient>(Grabbed->GetOwner());
 		}
 
-		// 엑스트라 재료 Countertop인 경우
-		if (bHasQuickMenu && GrabbedIngredient && CurrentExtraIngredient)
-		{
-			const UIngredientData* MergedIngredientData = GrabbedIngredient->TryMergeIngredient(CurrentExtraIngredient);
-			if (MergedIngredientData)
-			{
-				GrabbedIngredient->ChangeIngredient(MergedIngredientData);
-			}
-
-			return;
-		}
-
-
 		// 플레이어가 잡고 있는 액터가 재료일 경우 재료 합치기 시도
 		if (GrabbedIngredient && CurrentKeptIngredient)
 		{
@@ -312,7 +293,7 @@ void ACountertop::HandleCook()
 
 	// 현재 Countertop에서 사용 가능한 요리 도구 중 CurrentKeptIngredient와 맞는 게 있으면 요리 시작
 	const UIngredientData* IngredientData = CurrentKeptIngredient->GetIngredientData();
-	if (bHasQuickMenu)
+	if (QuickSelectMenuType != EQuickSelectMenu::None)
 	{
 		if (const UIngredientData* CookingTarget = IngredientData->CheckCookable(CurrentCookingTool))
 		{
@@ -333,40 +314,17 @@ void ACountertop::HandleCook()
 	}
 }
 
-void ACountertop::HandleQuickMenu()
+void ACountertop::HandleQuickMenuClosed()
 {
-	APlayerPawn* PlayerPawn = Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
-	PlayerPawn->SetQuickMenu(QuickSelectMenuType);
-	PlayerPawn->ShowQuickMenu(CurrentQuickMenuIndex);
-}
-
-void ACountertop::HandleQuickMenuClose()
-{
-	APlayerPawn* PlayerPawn = Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
-	int SelectedItemIndex = PlayerPawn->HideQuickMenu();
-
 	if (QuickSelectMenuType == EQuickSelectMenu::CookingTools)
 	{
-		if (SelectedItemIndex >= ToolsQuickMenuValues.Num())
+		if (CurrentQuickSelectIndex >= ToolsQuickMenuValues.Num())
 		{
-			SelectedItemIndex = 0;
+			CurrentQuickSelectIndex = 0;
 		}
 
-		CurrentQuickMenuIndex = SelectedItemIndex;
-		CurrentCookingTool = ToolsQuickMenuValues[CurrentQuickMenuIndex];
+		CurrentCookingTool = ToolsQuickMenuValues[CurrentQuickSelectIndex];
 	}
-	else
-	{
-		if (SelectedItemIndex >= ExtrasQuickMenuValues.Num())
-		{
-			SelectedItemIndex = 0;
-		}
-
-		CurrentQuickMenuIndex = SelectedItemIndex;
-		CurrentExtraIngredient = ExtrasQuickMenuValues[CurrentQuickMenuIndex];
-	}
-	
-	bIsQuickMenuOpened = false;
 
 	ResetCooking();
 }
@@ -376,34 +334,23 @@ void ACountertop::HandleQuickMenuClose()
  */
 void ACountertop::OnEnterInteract(const FInteractionInfo& InteractionInfo)
 {
-	// FInteractionInfo::NoneInteraction를 사용하는 경우가 있어 Interactor 유효성 검사 필요
-	if (InteractionInfo.Interactor)
-	{
-		PendingGrabber = InteractionInfo.Interactor->GetGrabber();
-	}
+	Super::OnEnterInteract(InteractionInfo);
 
-	InteractPressedTime = 0.f;
+	PendingGrabber = InteractionInfo.Interactor->GetGrabber();
 }
 
 void ACountertop::OnInteract(float DeltaTime)
 {
-	if (bHasQuickMenu && !bIsQuickMenuOpened)
-	{
-		InteractPressedTime += DeltaTime;
-
-		if (bHasQuickMenu && InteractPressedTime >= QuickMenuShowDelay)
-		{
-			HandleQuickMenu();
-			bIsQuickMenuOpened = true;
-		}
-	}
+	Super::OnInteract(DeltaTime);
 }
 
 void ACountertop::OnExitInteract()
 {
-	if (bIsQuickMenuOpened)
+	Super::OnExitInteract();
+
+	if (bQuickSelectMenuOpened)
 	{
-		HandleQuickMenuClose();
+		HandleQuickMenuClosed();
 	}
 	else
 	{

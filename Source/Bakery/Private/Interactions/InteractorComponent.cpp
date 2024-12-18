@@ -5,7 +5,8 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "Interactions/GrabberComponent.h"
-#include "Interactions/Interactables/InteractableComponent.h"
+#include "Interactions/Interactables/Interact.h"
+#include "Interactions/Interactables/Grab.h"
 #include "Interactions/InteractionDefines.h"
 #include "Interactions/Interactables/Highlight.h"
 #include "Characters/PlayerPawn.h"
@@ -28,15 +29,6 @@ void UInteractorComponent::BeginPlay()
 void UInteractorComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	if (bIsInteracting)
-	{
-		CurrentInteractable->OnInteractDelegate.Broadcast(DeltaTime);
-	}
-	else if (bIsGrabbing)
-	{
-		CurrentInteractable->OnGrabDelegate.Broadcast(DeltaTime);
-	}
 
 	// 상호작용 가능한 액터 하이라이팅 처리
 	FHitResult HitResult;
@@ -70,10 +62,21 @@ void UInteractorComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 
 		PrevDetectedActor = nullptr;
 	}
+
+	// 상호작용 중인 액터 처리
+	if (CurrentInteracting)
+	{
+		CurrentInteracting->OnInteract(DeltaTime);
+	}
+	else if (CurrentGrabbing)
+	{
+		CurrentGrabbing->OnGrab(DeltaTime);
+	}
 }
 
 void UInteractorComponent::BeginInteraction()
 {
+	// UI가 열려 있을 경우 처리
 	APlayerPawn* PlayerPawn = Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 	if (PlayerPawn && PlayerPawn->IsUIOpened())
 	{
@@ -84,7 +87,7 @@ void UInteractorComponent::BeginInteraction()
 		return;
 	}
 
-	if (bIsGrabbing)
+	if (CurrentGrabbing)
 	{
 		return;
 	}
@@ -92,37 +95,33 @@ void UInteractorComponent::BeginInteraction()
 	FHitResult HitResult;
 	if (DetectInteractable(InteractTraceChannel, HitResult))
 	{
-		auto Interactable = HitResult.GetActor()->GetComponentByClass<UInteractableComponent>();
-		if (!Interactable)
+		CurrentInteracting = Cast<IInteract>(HitResult.GetActor());
+		if (!CurrentInteracting)
 		{
 			return;
 		}
 
-		CurrentInteractable = Interactable;
-		CurrentInteractable->OnEnterInteractDelegate.Broadcast(FInteractionInfo(this, HitResult));
-		bIsInteracting = true;
+		CurrentInteracting->OnEnterInteract(FInteractionInfo(this, HitResult));
 	}
 }
 
 void UInteractorComponent::EndInteraction()
 {
-	if (bIsGrabbing)
+	if (CurrentGrabbing)
 	{
 		return;
 	}
 
-	if (CurrentInteractable)
+	if (CurrentInteracting)
 	{
-		CurrentInteractable->OnExitInteractDelegate.Broadcast();
-		CurrentInteractable = nullptr;
+		CurrentInteracting->OnExitInteract();
+		CurrentInteracting = nullptr;
 	}
-
-	bIsInteracting = false;
 }
 
 void UInteractorComponent::BeginGrab()
 {
-	if (bIsInteracting)
+	if (CurrentInteracting)
 	{
 		return;
 	}
@@ -130,34 +129,28 @@ void UInteractorComponent::BeginGrab()
 	FHitResult HitResult;
 	if (DetectInteractable(GrabTraceChannel, HitResult))
 	{
-		UE_LOG(LogTemp, Display, TEXT("%s"), *HitResult.GetActor()->GetActorNameOrLabel());
-
-		auto Interactable = HitResult.GetActor()->GetComponentByClass<UInteractableComponent>();
-		if (!Interactable)
+		CurrentGrabbing = Cast<IGrab>(HitResult.GetActor());
+		if (!CurrentGrabbing)
 		{
 			return;
 		}
 
-		CurrentInteractable = Interactable;
-		CurrentInteractable->OnEnterGrabDelegate.Broadcast(FInteractionInfo(this, HitResult));
-		bIsGrabbing = true;
+		CurrentGrabbing->OnEnterGrab(FInteractionInfo(this, HitResult));
 	}
 }
 
 void UInteractorComponent::EndGrab()
 {
-	if (bIsInteracting)
+	if (CurrentInteracting)
 	{
 		return;
 	}
 
-	if (CurrentInteractable)
+	if (CurrentGrabbing)
 	{
-		CurrentInteractable->OnExitGrabDelegate.Broadcast();
-		CurrentInteractable = nullptr;
+		CurrentGrabbing->OnExitGrab();
+		CurrentGrabbing = nullptr;
 	}
-
-	bIsGrabbing = false;
 }
 
 bool UInteractorComponent::DetectInteractable(const TEnumAsByte<ECollisionChannel>& TraceChannel, FHitResult& OutHitResult)

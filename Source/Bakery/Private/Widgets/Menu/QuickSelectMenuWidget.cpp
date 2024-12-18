@@ -3,8 +3,10 @@
 
 #include "Widgets/Menu/QuickSelectMenuWidget.h"
 #include "UObject/ConstructorHelpers.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "Widgets/Menu/QuickSelectMenuItemWidget.h"
+#include "Characters/PlayerPawn.h"
 
 void UQuickSelectMenuWidget::NativeConstruct()
 {
@@ -43,6 +45,9 @@ void UQuickSelectMenuWidget::Show(int InitalizeIndex)
 {
 	bIsShowing = true;
 
+	APlayerPawn* PlayerPawn = Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	PlayerPawn->SetUIOpened(true);
+
 	QueuePlayAnimation(QuickSelectMenuAppearAnim);
 	CurrentFocusingItem = -1;
 	SetFocus(InitalizeIndex);
@@ -51,6 +56,9 @@ void UQuickSelectMenuWidget::Show(int InitalizeIndex)
 int UQuickSelectMenuWidget::Hide()
 {
 	bIsShowing = false;
+
+	APlayerPawn* PlayerPawn = Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	PlayerPawn->SetUIOpened(false);
 
 	QueuePlayAnimationReverse(QuickSelectMenuAppearAnim);
 	MenuItemWidgets[CurrentFocusingItem]->SetFocus(false);

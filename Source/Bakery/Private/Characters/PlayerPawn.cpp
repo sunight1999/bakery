@@ -25,9 +25,6 @@ APlayerPawn::APlayerPawn()
 	StateWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("StateWidget"));
 	StateWidget->SetupAttachment(RootComponent);
 	StateWidget->SetVisibility(false);
-
-	QuickMenuWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("QuickMenuWidget"));
-	QuickMenuWidget->SetupAttachment(RootComponent);
 }
 
 void APlayerPawn::BeginPlay()
@@ -44,9 +41,6 @@ void APlayerPawn::BeginPlay()
 
 	Interactor->GetGrabber()->OnGrab.AddUObject(this, &APlayerPawn::HandsUp);
 	Interactor->GetGrabber()->OnRelease.AddUObject(this, &APlayerPawn::HandsDown);
-
-	QuickMenu = Cast<UQuickSelectMenuWidget>(QuickMenuWidget->GetWidget());
-	verify(QuickMenu);
 
 	ABakeryGameMode* BakeryGameMode = Cast<ABakeryGameMode>(GetWorld()->GetAuthGameMode());
 	FTimerHandle UILoadHandle;
@@ -83,8 +77,6 @@ void APlayerPawn::SetPlayerState(EPlayerState InState)
 {
 	StateWidget->SetVisibility(true);
 
-	// TODO: state 비트 플래그로 변경
-	// 하나의 Widget에서 onoff로 state 표현할 수 있게 변경
 	switch (InState)
 	{
 	case EPlayerState::Normal:
@@ -103,25 +95,14 @@ void APlayerPawn::SetPlayerState(EPlayerState InState)
 void APlayerPawn::SetUIOpened(bool bIsOpened)
 {
 	bIsUIOpened = bIsOpened;
-}
 
-UQuickSelectMenuWidget* APlayerPawn::SetQuickMenu(EQuickSelectMenu Menu)
-{
-	QuickMenu->SetMenu(Menu);
-
-	return QuickMenu;
-}
-
-void APlayerPawn::ShowQuickMenu(int InitalizeIndex)
-{
-	SetUIOpened(true);
-	QuickMenu->Show(InitalizeIndex);
-}
-
-int APlayerPawn::HideQuickMenu()
-{
-	SetUIOpened(false);
-	return QuickMenu->Hide();
+	// TODO: 추후 동적 오브젝트 생성(초기화)/파괴 한 곳으로 정리 후, 생성 완료 Delegate에 QuickMenu 초기화 등록
+	if (!QuickMenu)
+	{
+		UUISubsystem* UISubsystem = GetGameInstance()->GetSubsystem<UUISubsystem>();
+		UUserWidget* UserWidget = UISubsystem->GetUIObject(FName("QuickSelectMenu"));
+		QuickMenu = Cast<UQuickSelectMenuWidget>(UserWidget);
+	}
 }
 
 bool APlayerPawn::IsGrabbing()
@@ -165,47 +146,29 @@ void APlayerPawn::Move(const FInputActionValue& Value)
 {
 	const FVector2D MovementValue = Value.Get<FVector2D>();
 
-	// TODO: 코드 리팩토링 필요
-	if (bIsUIOpened)
+	// 퀵 메뉴가 열렸을 경우 처리
+	if (bIsUIOpened && QuickMenu->IsShowing())
 	{
-		if (QuickMenu->IsShowing())
+		int Direction = 0;
+
+		bool bIsXZero = FMath::IsNearlyEqual(MovementValue.X, 0);
+		bool bIsYZero = FMath::IsNearlyEqual(MovementValue.Y, 0);
+
+		if (bIsXZero == bIsYZero)
 		{
-			int Direction = 0;
-
-			if (FMath::IsNearlyEqual(MovementValue.X, 0))
-			{
-				if (FMath::IsNearlyEqual(MovementValue.Y, 1))
-				{
-					Direction = 0;
-				}
-				else if (FMath::IsNearlyEqual(MovementValue.Y, -1))
-				{
-					Direction = 2;
-				}
-				else
-				{
-					return;
-				}
-			}
-			else if (FMath::IsNearlyEqual(MovementValue.Y, 0))
-			{
-				if (FMath::IsNearlyEqual(MovementValue.X, 1))
-				{
-					Direction = 1;
-				}
-				else if (FMath::IsNearlyEqual(MovementValue.X, -1))
-				{
-					Direction = 3;
-				}
-				else
-				{
-					return;
-				}
-			}
-
-			QuickMenu->SetFocus(Direction);
+			return;
 		}
-		
+
+		if (bIsXZero)
+		{
+			Direction = FMath::IsNearlyEqual(MovementValue.Y, 1) ? 0 : 2;
+		}
+		else
+		{
+			Direction = FMath::IsNearlyEqual(MovementValue.X, 1) ? 1 : 3;
+		}
+
+		QuickMenu->SetFocus(Direction);
 		return;
 	}
 
@@ -215,11 +178,20 @@ void APlayerPawn::Move(const FInputActionValue& Value)
 	EnsureHandsDownTimerDone();
 }
 
+/*
+ * UI 관련 함수
+ */
+void APlayerPawn::OpenMenu(FName Menu)
+{
+	UUISubsystem* UISubsystem = GetGameInstance()->GetSubsystem<UUISubsystem>();
+	UISubsystem->SetUIVisibility(Menu, ESlateVisibility::SelfHitTestInvisible);
+
+	SetUIOpened(true);
+}
+
 void APlayerPawn::OpenAbnormalForecastMenu()
 {
-	SetUIOpened(true);
-	UUISubsystem* UISubsystem = GetGameInstance()->GetSubsystem<UUISubsystem>();
-	UISubsystem->SetUIVisibility(FName("AbnormalForecast"), ESlateVisibility::SelfHitTestInvisible);
+	OpenMenu(FName("AbnormalForecast"));
 }
 
 void APlayerPawn::StartBakery()

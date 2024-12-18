@@ -37,8 +37,7 @@ public:
 	void ResetCooking(bool bFullyReset = false);
 
 	void HandleCook();
-	void HandleQuickMenu();
-	void HandleQuickMenuClose();
+	void HandleQuickMenuClosed();
 
 	virtual void OnEnterInteract(const FInteractionInfo& InteractionInfo) override;
 	virtual void OnInteract(float DeltaTime) override;
@@ -85,25 +84,9 @@ private:
 	 * 퀵 메뉴 관련
 	 */
 	UPROPERTY(EditAnywhere, Category = "Countertop")
-	bool bHasQuickMenu = false;
-
-	UPROPERTY(EditAnywhere, Category = "Countertop")
-	EQuickSelectMenu QuickSelectMenuType;
-
-	UPROPERTY(EditAnywhere, Category = "Countertop")
-	float QuickMenuShowDelay = .5f;
-
-	UPROPERTY(EditAnywhere, Category = "Countertop")
 	TArray<ECookingTool> ToolsQuickMenuValues;
 
-	UPROPERTY(EditAnywhere, Category = "Countertop")
-	TArray<UIngredientData*> ExtrasQuickMenuValues;
-
-	float InteractPressedTime = 0.f;
 	UGrabberComponent* PendingGrabber = nullptr;
-
-	bool bIsQuickMenuOpened = false;
-	int CurrentQuickMenuIndex = 0;
 
 	/*
 	 * 메쉬 관련
@@ -174,7 +157,6 @@ private:
 	UAudioComponent* CurrentAudio;
 
 	ECookingTool CurrentCookingTool;
-	const UIngredientData* CurrentExtraIngredient;
 	float CurrentAutoCookingTime = 0.f;
 	int CurrentHandCookingTime = 0;
 

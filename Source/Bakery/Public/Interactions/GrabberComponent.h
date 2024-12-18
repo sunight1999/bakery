@@ -20,7 +20,6 @@ public:
 	UGrabberComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void Grab(FHitResult HitResult);
 	void Grab(UPrimitiveComponent* Primitive, const FVector& ImpactPoint);
 	void ReleaseBegin();
 	void Release();

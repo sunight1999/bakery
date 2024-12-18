@@ -36,24 +36,21 @@ public:
 
 	bool IsUIOpened() const { return bIsUIOpened; }
 	void SetUIOpened(bool bIsOpened);
-
-	UQuickSelectMenuWidget* SetQuickMenu(EQuickSelectMenu Menu);
-	void ShowQuickMenu(int InitalizeIndex);
-	int HideQuickMenu();
 	
 	bool IsGrabbing();
-	void EnsureHandsDownTimerDone();
 
+	void EnsureHandsDownTimerDone();
 	void HandsUp();
 	void HandsCook();
 	void HandsDown() { if (PlayerMontage) StopAnimMontage(PlayerMontage); }
+
+	void OpenMenu(FName Menu);
+	void OpenAbnormalForecastMenu();
 
 protected:
 	virtual void BeginPlay() override;
 
 	void Move(const FInputActionValue& Value);
-
-	void OpenAbnormalForecastMenu();
 	void StartBakery();
 
 private:
@@ -107,11 +104,6 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Player|Animation")
 	TSubclassOf<UUserWidget> SpeedDownStateWidgetClass;
 
-	/*
-	 * 퀵 메뉴 UI 관련
-	 */
-	UPROPERTY(VisibleAnywhere, Category = "Player|Animation")
-	UWidgetComponent* QuickMenuWidget;
 	UQuickSelectMenuWidget* QuickMenu;
 
 	bool bIsUIOpened = false;

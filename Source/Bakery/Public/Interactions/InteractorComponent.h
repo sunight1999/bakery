@@ -6,8 +6,9 @@
 #include "Components/SceneComponent.h"
 #include "InteractorComponent.generated.h"
 
+class IInteract;
+class IGrab;
 class UGrabberComponent;
-class UInteractableComponent;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class BAKERY_API UInteractorComponent : public USceneComponent
@@ -51,13 +52,12 @@ private:
 	UPROPERTY(EditAnywhere, Category="Interaction")
 	float DetectDistance = 65.f;
 
-	// 현재 상호작용 중(키를 누르고 있는 중) 여부
-	bool bIsInteracting = false;
-	// 현재 잡기 중 여부
-	bool bIsGrabbing = false;
-
-	// 상호작용 가능 액터 존재 여부 확인 결과
+	// 상호작용 가능 액터 존재 여부 확인 결과 (하이라이팅 처리용)
 	AActor* PrevDetectedActor;
-	// 현재 상호작용 중인 액터의 InteractableComponent
-	UInteractableComponent* CurrentInteractable;
+
+	// 현재 상호작용 중인 액터
+	IInteract* CurrentInteracting;
+
+	// 현재 잡기 중인 액터
+	IGrab* CurrentGrabbing;
 };

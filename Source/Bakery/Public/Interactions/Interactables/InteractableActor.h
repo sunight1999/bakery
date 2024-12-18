@@ -8,8 +8,9 @@
 #include "Highlight.h"
 #include "InteractableActor.generated.h"
 
-class UInteractableComponent;
+enum class EQuickSelectMenu : uint8;
 class UBoxComponent;
+class UQuickSelectMenuWidget;
 
 UCLASS()
 class BAKERY_API AInteractableActor : public AActor, public IInteract, public IHighlight
@@ -20,13 +21,13 @@ public:
 	AInteractableActor();
 
 	UFUNCTION(BlueprintCallable)
-	virtual void OnEnterInteract(const FInteractionInfo& InteractionInfo) override { unimplemented(); }
+	virtual void OnEnterInteract(const FInteractionInfo& InteractionInfo) override;
 
 	UFUNCTION(BlueprintCallable)
-	virtual void OnInteract(float DeltaTime) override { unimplemented(); }
+	virtual void OnInteract(float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable)
-	virtual void OnExitInteract() override { unimplemented(); }
+	virtual void OnExitInteract() override;
 
 
 	UFUNCTION(BlueprintCallable)
@@ -38,9 +39,23 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(VisibleAnywhere, Category = "Interaction")
-	UInteractableComponent* Interactable;
+	/*
+	 * 퀵 메뉴 관련
+	 */
+	UPROPERTY(EditAnywhere, Category = "Interaction")
+	EQuickSelectMenu QuickSelectMenuType;
 
+	UPROPERTY(EditAnywhere, Category = "Interaction")
+	float QuickSelectMenuShowDelay = .3f;
+
+	bool bQuickSelectMenuOpened = false;
+	UQuickSelectMenuWidget* QuickSelectMenu = nullptr;
+	int CurrentQuickSelectIndex = 0;
+	float CurrentInteractPressedTime = 0.f;
+
+	/*
+	 * 그 외
+	 */
 	UPROPERTY(VisibleAnywhere, Category = "Interaction")
 	UBoxComponent* InteractionBox;
 
